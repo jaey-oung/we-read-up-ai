@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 주문정보</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/myPage/order-list.css">
+    <script src="/js/order-list.js"></script>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+
+
+<div class="container">
+    <div class="content">
+        <div class="content-head">
+            <div class="first-category">
+                <span>홈 / 마이쇼핑 / 주문조회</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- 사이드바 -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <h3>주문조회</h3>
+
+        <!-- 주문내역 조회 탭 -->
+        <div class="tab-menu">
+            <a href="/myPage/orderList" class="tab active">주문내역조회 <span th:text="|(${ph.totalCnt})|">(0)</span></a>
+            <a href="/myPage/exchangeRefundList" class="tab">교환/환불 내역</a>
+        </div>
+
+        <!-- 검색 필터 -->
+        <form action="/myPage/orderList" method="get" class="search-bar">
+            <select name="statusId">
+                <option value="A" th:selected="${osc.statusId == 'A'}">전체 주문처리상태</option>
+                <option value="DS1" th:selected="${osc.statusId == 'DS1'}">배송 준비 중</option>
+                <option value="DS2" th:selected="${osc.statusId == 'DS2'}">배송 중</option>
+                <option value="DS3" th:selected="${osc.statusId == 'DS3'}">배송 완료</option>
+            </select>
+            <button onclick="setDateRange(event, 0)">오늘</button>
+            <button onclick="setDateRange(event, 7)">1주일</button>
+            <button onclick="setDateRange(event, 30)">1개월</button>
+            <button onclick="setDateRange(event, 180)">6개월</button>
+            <input type="date" id="startDate" name="startDate" th:value="${osc.startDate}">
+            <span>~</span>
+            <input type="date" id="endDate" name="endDate" th:value="${osc.endDate}">
+            <button type="submit" class="btn-search">조회</button>
+        </form>
+
+        <!-- 안내 문구 -->
+        <div class="order-info">
+            <p>- 주문 처리 상태를 선택하고 날짜 범위를 지정할 수 있는 검색 필터입니다.</p>
+            <p>- 오늘, 1주일, 1개월, 6개월 버튼으로 빠르게 날짜를 설정할 수 있습니다.</p>
+            <p>- 시작일과 종료일을 수동으로도 선택 가능합니다.</p>
+        </div>
+
+        <table class="board-table">
+            <thead>
+            <tr>
+                <th>주문일</th>
+                <th>주문번호</th>
+                <th>주문자</th>
+                <th>주문상품</th>
+                <th>조회</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order : ${orderList}">
+                <td th:text="${#dates.format(order.regDate, 'yyyy-MM-dd')}">2025-01-01</td>
+                <td th:text="${order.orderId}">123</td>
+                <td th:text="${order.userName}">홍길동</td>
+                <td>
+                    <div>
+                        [[${order.bookName}]] [[${order.bookTypeCount >= 2 ? '외' : ''}]]<br> 총 [[${order.bookTypeCount}]]종 [[${order.totalBookCount}]]권, [[${#numbers.formatDecimal(order.totalPrice, 1, 'COMMA', 0, 'POINT')}]]원
+                    </div>
+                </td>
+                <td><a th:href="@{/myPage/orderDetail/{orderId}(orderId=${order.orderId})}">상세조회</a></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div>
+            <form class="howtopag" action="/myPage/orderList" method="get">
+                <button type="submit" name="page" th:value="${ph.page - 10}" th:class="|howtopag_item${ph.page >= 1 and ph.page <= 10 ? '_pagdisabled' : ''}|">❮❮</button>
+                <button type="submit" name="page" th:value="${ph.page - 1}" th:class="|howtopag_item${ph.showPrev ? '' : '_pagdisabled'}|">❮</button>
+                <th:block th:unless="${ph.endPage == 0}">
+                    <th:block th:each="num : ${#numbers.sequence(ph.beginPage, ph.endPage)}">
+                        <button type="submit" name="page" th:value="${num}" th:text="${num}" th:class="|howtopag_item${ph.page == num ? '_pagactive' : ''}|">num</button>
+                    </th:block>
+                </th:block>
+                <button type="submit" name="page" th:value="${ph.page + 1}" th:class="|howtopag_item${ph.showNext ? '' : '_pagdisabled'}|">❯</button>
+                <button type="submit" name="page" th:value="${ph.page + 10}" th:class="|howtopag_item${ph.page > ph.totalPage - 10 ? '_pagdisabled' : ''}|">❯❯</button>
+
+                <input type="hidden" name="statusId" th:value="${osc.statusId}">
+                <input type="hidden" name="startDate" th:value="${osc.startDate}">
+                <input type="hidden" name="endDate" th:value="${osc.endDate}">
+            </form>
+        </div>
+    </main>
+</div>
+
+
+
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wru.wrubookstore.mapper.LikeMapper">
+    <!-- 해당 책의 좋아요 수 조회 -->
+    <select id="likeCount" parameterType="int" resultType="int">
+        SELECT count(*)
+        FROM `like`
+        WHERE book_id=#{bookId}
+        ORDER BY book_id desc;
+    </select>
+    <!-- 현재 유저가 해당 책을 좋아요 눌렀는지 확인 -->
+    <select id="selectLikeMember" parameterType="LikeDto" resultType="int">
+        SELECT count(*)
+        FROM `like`
+        WHERE book_id=#{bookId} and member_id=#{memberId}
+        ORDER BY book_id desc, member_id desc;
+    </select>
+    <!-- 회원의 좋아요 수 조회 -->
+    <select id="selectCntByMember" parameterType="Integer" resultType="int">
+        SELECT COUNT(*)
+        FROM `like`
+        WHERE member_id = #{memberId}
+    </select>
+    <!-- 회원의 좋아요 목록 페이징에 맞게 출력 -->
+    <select id="selectListByPh" parameterType="Map" resultType="BookDto">
+        SELECT b.*
+        FROM `like` l, book b
+        WHERE l.book_id = b.book_id AND l.member_id = #{memberId}
+        LIMIT #{ph.offset}, #{ph.pageSize}
+    </select>
+    <!-- 좋아요 추가 -->
+    <insert id="insertLike" parameterType="LikeDto">
+        INSERT INTO `like`(member_id, book_id)
+        VALUES (#{memberId}, #{bookId})
+    </insert>
+    <!-- 좋아요 삭제 -->
+    <delete id="deleteLike" parameterType="LikeDto">
+        DELETE FROM `like` WHERE book_id=#{bookId} AND member_id=#{memberId}
+        ORDER BY book_id desc, member_id desc
+    </delete>
+    <!-- 해당 회원의 좋아요 모두 삭제 -->
+    <delete id="deleteAll" parameterType="Integer">
+        DELETE FROM `like`
+        WHERE member_id = #{memberId}
+    </delete>
+    <!-- 마이페이지에서 선택한 좋아요 삭제 -->
+    <delete id="deleteSelected" parameterType="Map">
+        DELETE FROM `like`
+        WHERE member_id = #{memberId}
+        AND book_id IN
+        <foreach item="bookId" collection="bookIdList" open="(" separator="," close=")">
+            #{bookId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE READ UP - FAQ</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/board/faq-list.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="container">
+  <div class="content">
+  <div class="content-head">
+    <div class="first-category">
+      <div class="board-category">
+        <a th:href="@{/board/notice-list}">공지사항</a>
+        <a th:href="@{/board/faq-list}" class="selected">FAQ</a>
+        <a th:href="@{/inquiryboard/list}">나의 문의</a>
+      </div>
+      <span>홈 / 게시판 / 공지사항</span>
+    </div>
+
+    <div class="titleArea">
+      <h1>FAQ</h1>
+    </div>
+
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      let msg = [[${msg}]];
+      if (msg === "LIST_ERR") alert("게시물 목록을 가져오는데 실패했습니다. 다시 시도해 주세요.");
+      if (msg === "READ_ERR") alert("삭제되었거나 없는 게시물입니다.");
+      if (msg === "DEL_ERR")  alert("삭제되었거나 없는 게시물입니다.");
+      if (msg === "WRT_ERR")  alert("게시물 등록에 실패하였습니다. 다시 시도해 주세요.");
+
+      if (msg === "DEL_OK")   alert("성공적으로 삭제되었습니다.");
+      if (msg === "WRT_OK")   alert("성공적으로 등록되었습니다.");
+      if (msg === "MOD_OK")   alert("성공적으로 수정되었습니다.");
+      if (msg === "MOD_ERR")  alert("게시물 수정에 실패하였습니다. 다시 시도해 주세요.");
+      /*]]>*/
+    </script>
+
+    <div class="board-container">
+      <table class="board-table">
+        <thead>
+        <tr>
+          <th class="noticeId">번호</th>
+          <th class="title">제목</th>
+          <th class="name">담당자</th>
+          <th class="regDate">등록일</th>
+          <th class="viewCnt">수정일</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="faqDto : ${faqs}">
+          <td class="faqId" th:text="${faqDto.faqId}"></td>
+          <td class="title">
+            <button type="button" class="collapsible" th:text="${faqDto.title}"></button>
+            <div class="faq-content">
+              <p th:text="${faqDto.content}"></p>
+            </div>
+          </td>
+          <td class="name" th:text="${faqDto.name}"></td>
+          <td class="regDate">
+            <span th:if="${faqDto.regDate != null and faqDto.regDate.time >= startOfToday}"
+                  th:text="${#dates.format(faqDto.regDate, 'yyyy-MM-dd HH:mm')}"></span>
+            <span th:unless="${faqDto.regDate != null and faqDto.regDate.time >= startOfToday}"
+                  th:text="${#dates.format(faqDto.regDate, 'yyyy-MM-dd')}"></span>
+          </td>
+          <td class="modDate">
+            <span th:if="${faqDto.modDate != null and faqDto.modDate.time >= startOfToday}"
+                  th:text="${#dates.format(faqDto.modDate, 'yyyy-MM-dd HH:mm')}"></span>
+            <span th:unless="${faqDto.modDate != null and faqDto.modDate.time >= startOfToday}"
+                  th:text="${#dates.format(faqDto.modDate, 'yyyy-MM-dd')}"></span>
+          </td>
+        </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+  </div>
+</div>
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script>
+  // FAQ 아코디언 기능 구현
+  document.addEventListener('DOMContentLoaded', function () {
+    const collapsibles = document.querySelectorAll('.collapsible');
+
+    collapsibles.forEach(button => {
+      button.addEventListener('click', function () {
+        // 현재 버튼의 faq-content만 토글
+        const content = this.nextElementSibling;
+        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        this.classList.toggle('active');
+      });
+    });
+  });
+
+</script>
+</body>
+</html>

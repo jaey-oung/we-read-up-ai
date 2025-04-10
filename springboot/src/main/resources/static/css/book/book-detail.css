@@ -1,0 +1,618 @@
+body {
+    margin: 0;
+}
+
+.container {
+    padding: 0;
+    width: 100%;
+    zoom: 1;
+    position: relative;
+    margin: 0 auto;
+}
+.mag{
+    margin-right:15px
+}
+
+.container .content {
+    margin: 0 60px;
+}
+
+.content-head {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+}
+
+.first-category {
+    padding-top: 20px;
+    align-self: flex-end;
+}
+
+.first-category span {
+    font-size: 13px;
+    color: gray;
+}
+
+.second-category {
+    display: flex;
+    max-width: 1200px;
+    width: 100%;
+    background-color: #fff;
+    padding: 30px;
+}
+
+/* 상품 이미지 영역 */
+.product-image {
+    flex: 1;
+    text-align: center;
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+
+.product-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* 상품 정보 영역 */
+.product-info {
+    flex: 1;
+    padding-left: 100px;
+}
+
+.product-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.product-detail {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.price {
+    font-size: 22px;
+    font-weight: bold;
+    color: #000;
+    margin: 10px 0 40px;
+}
+
+.addtional-info {
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.shipping-info {
+    font-size: 14px;
+    color: #777;
+    margin: 20px 0;
+}
+
+.product-detail {
+    margin: 20px 0;
+}
+
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.quantity-selector input {
+    width: 50px;
+    height: 40px;
+    text-align: center;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.quantity-selector button {
+    width: 40px;
+    height: 44px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    margin: 40px 0;
+}
+
+.total-price {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* 버튼 영역 */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button-group button {
+    padding: 20px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.buy-now {
+    font-size: 15px;
+    flex: 3;
+    background-color: #000;
+    color: #fff;
+    max-height:65px;
+}
+
+.cart {
+    font-size: 15px;
+    flex: 2;
+    background-color: #fff;
+    color: #000;
+    max-height:65px;
+}
+
+.wishlist {
+    font-size:30px;
+    background-color: #fff;
+    color: #000;
+    max-height:65px;
+    display: flex;               /* Flexbox 사용 */
+    align-items: center;         /* 수직 중앙 정렬 */
+    justify-content: center;     /* 수평 중앙 정렬 */
+}
+
+.button-group button:hover {
+    border: 1px solid black;
+}
+
+
+
+
+
+.third-category {
+    padding: 30px;
+}
+
+
+.info-container {
+    display: flex;
+    align-items: flex-start; /* 제목과 내용이 위쪽 정렬 */
+    justify-content: flex-start; /* 텍스트가 왼쪽에 정렬되도록 */
+    padding-top:0;
+    padding-bottom:20px;
+
+    width: 100%;
+}
+.review-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 내용 세로 정렬 */
+    width: 100%;  /* 필요에 따라 적절한 너비를 설정할 수 있습니다 */
+    /*max-width: 900px; !* 최대 너비 설정 (필요시 조정) *!*/
+    padding-left:50px;
+}
+
+/* 왼쪽 기본 정보 타이틀 */
+.info-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    width: 150px; /* 제목의 너비 설정 */
+    text-align: left; /* 제목은 왼쪽 정렬 */
+    margin-right: 20px; /* 제목과 내용 사이의 간격을 일정하게 유지 */
+}
+/*.info-title2 {*/
+/*    font-size: 20px;*/
+/*    font-weight: bold;*/
+/*    color: #007BFF;*/
+/*    width: 151%;  !* 제목이 왼쪽으로 정렬될 수 있도록 너비 설정 *!*/
+/*    margin-right: -50px; !* 제목과 내용 사이의 간격 *!*/
+/*    margin-left: 85px;*/
+/*}*/
+
+/* 오른쪽 상세 정보 */
+.info-details {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 책 기본 정보 스타일 */
+/*.book-info {*/
+/*    font-size: 14px;*/
+/*    color: #555;*/
+/*    line-height: 1.6;*/
+/*    padding-left: 10px; !* 내용과 제목 사이의 여백 *!*/
+/*    word-wrap: break-word; !* 긴 단어는 자동으로 줄바꿈 *!*/
+/*    white-space: normal; !* 공백을 포함하여 내용이 자동으로 줄바꿈되게 함 *!*/
+/*    word-break: break-all; !* 단어가 너무 길 경우에도 줄바꿈을 강제로 함 *!*/
+/*    width: 100%; !* 텍스트 박스의 너비를 설정 *!*/
+/*    max-width: 600px; !* 리뷰창 크기에 맞는 최대 너비 설정 (600px로 가정) *!*/
+/*    min-height: 50px; !* 최소 높이 설정 *!*/
+/*    !*overflow: hidden; !* 내용이 넘칠 경우 숨기기 *!*!*/
+/*    resize: vertical; !* 세로 방향으로 크기 조정 가능 *!*/
+/*}*/
+
+.book-info2 {
+    flex-grow: 1; /* 내용이 나머지 공간을 차지하도록 설정 */
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+    word-wrap: break-word;
+    white-space: normal;
+    word-break: break-all;
+    padding-left: 10px; /* 내용과 제목 사이의 여백 */
+}
+
+.book-info span {
+    margin-right: 15px;
+}
+
+/* 주제 분류 스타일 */
+.category {
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: left; /* 카테고리 왼쪽 정렬 */
+}
+/* '더보기' 기능을 추가하는 스타일 */
+.more-content {
+    display: block;
+    overflow: hidden;
+    max-height: 120px; /* 텍스트의 최대 높이 설정 */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.more-content.open {
+    max-height: none;
+    white-space: normal;
+}
+
+/* 더보기 버튼 스타일 */
+.show-more-btn {
+    font-size: 14px;
+    color: #007BFF;
+    cursor: pointer;
+    text-decoration: underline;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.highlight {
+    font-weight: bold;
+    color: #000;
+}
+
+
+
+
+
+.qna-container {
+    padding: 50px 0;
+    width: 100%;
+}
+
+/* 탭 스타일 */
+.tab-menu {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab {
+    flex: 1;
+    padding: 15px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+
+.tab.active {
+    background-color: #000;
+    color: #fff;
+}
+
+/* 버튼 그룹 */
+.qna-container .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: 40px 0;
+}
+
+.qna-container .button-group a {
+    padding: 15px 20px;
+    font-size: 11px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    color: black;
+    background-color: #fff;
+}
+
+.qna-container .button-group a:hover {
+    border: 1px solid black;
+}
+
+/* Q&A 리스트 */
+.qna-list {
+    width: 100%;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+.qna-list .qna-item {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.qna-item div {
+    padding: 5px;
+}
+
+.qna-item .qna-index {
+    width: 50px;
+    text-align: center;
+}
+
+.qna-item .qna-user {
+    width: 120px;
+    text-align: center;
+    color: #555;
+}
+
+.qna-item .qna-date {
+    width: 150px;
+    text-align: center;
+    color: #777;
+}
+
+.qna-item .qna-views {
+    width: 50px;
+    text-align: center;
+    color: #777;
+}
+
+
+
+
+
+
+.review-container {
+    display: flex;
+    flex-direction: column; /* 리뷰 항목들을 세로로 배치 */
+    gap: 15px; /* 리뷰 간의 간격 */
+    align-items: stretch; /* 리뷰 박스들이 전체 너비를 차지하도록 */
+    margin-top: 20px;
+}
+
+.review {
+    display: flex;
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    width: 100%; /* 리뷰 박스가 전체 너비를 차지하도록 설정 */
+    max-width: 830px; /* 리뷰 박스 최대 너비 설정 */
+    box-sizing: border-box; /* 패딩을 포함한 크기 계산 */
+}
+
+
+.custom-review-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 20px;
+    width:120px;
+    flex-shrink: 0;  /* .custom-review-left의 크기가 줄어들지 않도록 설정 */
+}
+.custom-wow {
+    width:845px;
+    border-bottom: 1px solid #999;
+    padding-bottom:20px;
+}
+
+.custom-review-right {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;  /* .custom-review-right의 크기가 줄어들지 않도록 설정 */
+}
+
+.review-right {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.review-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 20px;
+    width: 120px; /* 왼쪽 영역의 너비 설정 */
+}
+
+.rating {
+    color: gold;
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;  /* 별점이 가로로 정렬되도록 */
+}
+
+.star {
+    margin-right: 3px;
+    display: inline-block;
+}
+
+.review-content {
+    font-size: 16px;
+    margin-bottom: 10px;
+    /*height: 50px; !* 고정된 높이로 설정 *!*/
+    max-height: 300px;
+    overflow: hidden; /* 내용이 넘칠 경우 숨기기 */
+    text-overflow: ellipsis; /* 내용이 길어지면 말줄임표로 표시 */
+}
+.review-info {
+    text-align: left;
+    font-size: 14px;
+    color: #888;
+}
+
+.review-author {
+    font-weight: bold;
+}
+
+.review-date {
+    margin-top: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+.custom-review {
+    display: flex;
+    justify-content: space-between; /* 각 영역을 양쪽 끝에 배치 */
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: #fff;
+    width: 830px;
+    box-sizing: border-box;
+}
+
+.custom-rating {
+    color: #d3d3d3; /* 기본 회색 별 */
+    font-size: 20px;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+}
+.custom-rating2 {
+    color: #888888; /* 기본 회색 별 */
+    font-size: 20px;
+    flex-direction: row;
+    cursor: pointer;
+    display: inline-block;
+}
+.custom-star2{
+    margin-right:-5px;
+    display: inline-block;
+}
+
+.custom-star {
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.custom-star:hover {
+    color: #ff1493; /* 마우스를 올리면 별 색상이 핑크로 변함 */
+}
+
+
+
+.custom-review-content {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #555;
+    width: 95%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    resize: none;
+}
+
+.custom-review-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.custom-submit-btn {
+    padding: 10px 20px;
+    background-color: #00bfff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.custom-submit-btn:hover {
+    background-color: #009fdd;
+}
+
+.star-rating-empty{
+    color: #888888; /* 기본 회색 별 */
+    font-size: 20px;
+    flex-direction: row;
+    cursor: pointer;
+    display: inline-block;
+    margin-left:-5px;
+}
+
+.star-rating-full{
+    color: #ff1493;
+    font-size: 20px;
+    flex-direction: row;
+    cursor: pointer;
+    display: inline-block;
+    margin-left:-5px;
+}
+
+.tableOfCon{
+    max-height:300px;
+    overflow:hidden;
+    transition: max-height 0.5s ease;
+    cursor: pointer;
+    color:#000000;
+    display:inline-block
+}
+
+.read-more {
+    background-color: transparent;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 13px;
+    display: none;
+}
+
+
+
+.like-btn {width: 50px; height: 50px;background: url(https://umings.github.io/images/i_like_off.png) no-repeat center / 50px; cursor: pointer; border:0; font-size:0; margin:50px auto; display:block;}
+.like-btn.on {background: url(https://umings.github.io/images/i_like_on.png) no-repeat center / 50px; animation: beating .5s 1 alternate;}
+@keyframes beating {
+    0% {transform: scale(1);}
+    40% {transform: scale(1.25);}
+    70% {transform: scale(0.9);}
+    100% {transform: scale(1);}
+}
+
+@keyframes glow {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.5); }
+    100% { filter: brightness(1); }
+}

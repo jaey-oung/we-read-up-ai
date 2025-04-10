@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 홈페이지</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+<body th:attr="data-msg=${msg}">
+<div th:replace="~{fragments/header :: header}"></div>
+<section class="new-books">
+    <div id="h-slider-1" class="h-slider">
+        <div class="h-slide-container">
+            <div class="h-slider-body">
+            </div>
+            <div id="slide-control">
+                <button type="button" class="slide-control-button" id="pause-button">❚❚</button>
+                <button type="button" class="slide-control-button" id="play-button" style="display:none">▶</button>
+                <div id="slider-bottom-text">
+                    <a href="#" id="h-slide-prev">❮</a>
+                    <span id="h-slide-number"></span>
+                    <a href="#" id="h-slide-next">❯</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="book-ranking">
+    <div class="ranking-header">
+        <div>
+            <span class="ranking-title">주간 랭킹</span>
+            <span class="ranking-subtitle">최근 1주일 동안 집계</span>
+        </div>
+    </div>
+    <div class="product-grid">
+        <div class="ranking_books" th:each="book : ${rankedBooks}" >
+            <a th:href="@{'/bookDetail?bookId='+${book.bookAndCategory.bookId}}">
+                <img th:src="${book.bookAndCategory.image}" th:alt="${book.bookAndCategory.name}">
+            </a>
+            <div id="book-text">
+                <p class="ranking-book-category" th:text="${book.bookAndCategory.categoryMediumName} + '/' + ${book.bookAndCategory.categorySmallName}">카테고리</p>
+                <a id="ranking-book-name" th:href="@{'/bookDetail?bookId='+${book.bookAndCategory.bookId}}">
+                    <p class="ranking-book-name" th:text="${book.bookAndCategory.name}">도서명</p>
+                </a>
+                <p class="ranking-book-writers" id="ranking-book-writers">
+                    <th:block th:each="writer, iterStat : ${book.writers}">
+                        <span th:text="${writer}">저자명</span>
+                        <span th:if="!${iterStat.last}">,</span>
+                    </th:block>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="/js/home-slider.js"></script>
+<script src="/js/display-msg.js"></script>
+</body>
+</html>

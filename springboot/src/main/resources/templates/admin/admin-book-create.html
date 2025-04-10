@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE READ UP - 관리자 페이지</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.tiny.cloud/1/ex2qpuz4iqh2lxsbtrucpsaqsh8mba8ru0ql75kltz7qc4su/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <title>상품 등록</title>
+    <link rel="stylesheet" href="/css/admin/admin-book-create.css">
+</head>
+<body>
+<!-- 사이드바 -->
+<div id="sidebar">
+    <div id="logo">
+        <a th:href="@{'/admin/bookList'}"><h2>We Read Up</h2></a>
+    </div>
+    <ul id="menu">
+        <li><a href="/admin/bookList">상품 대시보드</a></li>
+        <li><a href="/admin/bookCreate">상품 등록</a></li>
+        <li><a href="#">주문 관리</a></li>
+        <li><a href="#">재고 관리</a></li>
+    </ul>
+</div>
+
+<form class="product-form">
+    <!-- 상품 기본 정보 섹션 -->
+    <div class="section">
+        <h3>상품 기본 정보</h3>
+        <table class="form-table">
+            <span id="book-list">
+            <tr>
+                <th>상품명</th>
+                <td><input type="text" id="product-name" class="long" /></td>
+            </tr>
+            <tr>
+                <th>카테고리</th>
+                <td>
+                    <div class="category-container">
+                        <div class="category-item" id="categoryLarge">
+                            <div class="category-title">대분류</div>
+                            <ul class="category-list" th:each="i : ${cl}">
+                                <li th:text="${i.categoryLargeName}" class="category-large"></li>
+                                <input type="hidden" class="category-large-id" th:value="${i.categoryLargeId}"/>
+                            </ul>
+                        </div>
+
+                        <div class="category-item" id="categoryMedium">
+                            <div class="category-title">중분류</div>
+                        </div>
+
+                        <div class="category-item" id="categorySmall">
+                            <div class="category-title">소분류</div>
+                        </div>
+                    </div>
+                    <div id="category-name" ></div>
+                </td>
+            </tr>
+            <tr>
+                <th>ISBN</th>
+                <td><input type="text" id="isbn" class="medium" maxlength="13"/></td>
+            </tr>
+            <tr>
+                <th>역자</th>
+                <td><input type="text" id="translator" class="medium" /></td>
+            </tr>
+            <tr>
+                <th>가격 정보</th>
+                <td class="multi-field">
+                    <div class="inline-field" style="width:200px">정가(원) <input type="text" id="price-original" class="short" style="margin-left:28px"/> </div>
+                    <div class="inline-field" style="width:200px">할인율(%) <input type="text" id="discount-rate" class="short" maxlength="4"  /> </div>
+                    <div class="inline-field" style="width:200px">할인가격(원) <input type="text" id="price-discounted" class="short" style="margin-left:2.5px" readonly/> </div>
+                    <div class="inline-field" style="width:200px">판매가(원) <input type="text" id="price-sale" class="short" readonly/> </div>
+                </td>
+            </tr>
+            <tr>
+                <th>등록일</th>
+                <td><input type="date" id="reg-date" class="medium" /></td>
+            </tr>
+            <tr>
+                <th>상품 이미지</th>
+                <td>
+                    <div class="img-preview"><img src="" id="img-preview" style="max-width: 100%; max-height: 300px;"/></div>
+                    <input type="file" id="product-image" accept="image/*" style="width: 500px" /><br />
+                </td>
+            </tr>
+            <tr>
+                <th>상품 소개</th>
+                <td>
+                    <textarea id="product-description" cols="15" rows="50" class="long"></textarea><br />
+<!--                    <input type="file" id="description-image" accept="image/*" multiple style="width: 500px">-->
+                </td>
+            </tr>
+            <tr>
+                <th>상품 목차</th>
+                <td><textarea id="product-contents" cols="5" rows="5" class="long"></textarea></td>
+            </tr>
+            <tr>
+                <th>기타 정보</th>
+                <td class="multi-field">
+                    <div style="width:200px" class="inline-field">재고(개)
+                        <input style="width:200px" type="text" id="stock" class="short" maxlength="6"/>
+                    </div>
+
+                    <!-- 사이즈(mm) -->
+                    <div class="inline-field" style="width:80px">사이즈(mm)
+                        <input style="width:80px" type="text" id="size1" class="short" />
+                    </div>
+
+                    <!-- X를 가운데에 배치 -->
+                    <span style="line-height: 35px; margin-right:7px;">X</span>
+
+                    <div class="inline-field" style="width:80px">
+                        <input style="width:80px" type="text" id="size2" class="short" />
+                    </div>
+
+                    <!-- 무게(g) -->
+                    <div style="width:200px" class="inline-field">무게(g)
+                        <input style="width:200px" type="text" id="weight" class="short" maxlength="6"/>
+                    </div>
+
+                    <!-- 페이지 수 -->
+                    <div style="width:200px" class="inline-field">페이지 수
+                        <input style="width:200px" type="text" id="pages" class="short" maxlength="5"/>
+                    </div>
+                </td>
+            </tr>
+                 </span>
+        </table>
+    </div>
+
+    <!-- 저자 정보 섹션 -->
+<div class="section" id="writer-section">
+    <span class="writer-list">
+        <h3>저자 정보</h3>
+        <table class="form-table">
+            <tr>
+                <th>지은이 선택</th>
+                <td class="author-list">
+                    <select id="author-id" class="writer-medium-id" style="width:200px">
+                        <option>직접 입력</option>
+                        <option th:each="i : ${authors}" th:value="${i.writerId}" th:text="${i.nickname==null ? i.name : i.name+' >> [필명:'+i.nickname+']'}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>지은이</th>
+                <td class="author-list">
+                    <input type="text" id="author-name" class="writer-medium-name" style="width: 200px"/>
+                    <button id="author-button">추가</button>
+                </td>
+            </tr>
+            <tr>
+                <th>작가 성별</th>
+                <td>
+                    <select id="author-gender" class="writer-medium-gender" style="width: 200px">
+                        <option value="N">선택</option>
+                        <option value="M">남성</option>
+                        <option value="F">여성</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>작가 소개</th>
+                <td><textarea id="author-bio" rows="4" class="writer-long"></textarea></td>
+            </tr>
+            <tr>
+                <th>작가 국적</th>
+                <td>
+                    <select id="author-nationality" class="writer-medium">
+                        <option>국적</option>
+                        <option value="가나">가나</option>
+                        <option value="네팔">네팔</option>
+                        <option value="한국">한국</option>
+                        <option value="독일">독일</option>
+                        <option value="덴마크">덴마크</option>
+                        <option value="라오스">라오스</option>
+                        <option value="러시아">러시아</option>
+                        <option value="레바논">레바논</option>
+                        <option value="로마니아">로마니아</option>
+                        <option value="리비아">리비아</option>
+                        <option value="말레이시아">말레이시아</option>
+                        <option value="멕시코">멕시코</option>
+                        <option value="모로코">모로코</option>
+                        <option value="몽골">몽골</option>
+                        <option value="미국">미국</option>
+                        <option value="미얀마">미얀마</option>
+                        <option value="바레인">바레인</option>
+                        <option value="방글라데시">방글라데시</option>
+                        <option value="베트남">베트남</option>
+                        <option value="벨기에">벨기에</option>
+                        <option value="볼리비아">볼리비아</option>
+                        <option value="브라질">브라질</option>
+                        <option value="사우디아라비아">사우디아라비아</option>
+                        <option value="사모아">사모아</option>
+                        <option value="세르비아">세르비아</option>
+                        <option value="세이셸">세이셸</option>
+                        <option value="수단">수단</option>
+                        <option value="스웨덴">스웨덴</option>
+                        <option value="스위스">스위스</option>
+                        <option value="스페인">스페인</option>
+                        <option value="슬로베니아">슬로베니아</option>
+                        <option value="슬로바키아">슬로바키아</option>
+                        <option value="싱가포르">싱가포르</option>
+                        <option value="시리아">시리아</option>
+                        <option value="아르헨티나">아르헨티나</option>
+                        <option value="아이슬란드">아이슬란드</option>
+                        <option value="아프가니스탄">아프가니스탄</option>
+                        <option value="알제리">알제리</option>
+                        <option value="아르메니아">아르메니아</option>
+                        <option value="안도라">안도라</option>
+                        <option value="앵귈라">앵귈라</option>
+                        <option value="에스토니아">에스토니아</option>
+                        <option value="엘살바도르">엘살바도르</option>
+                        <option value="오만">오만</option>
+                        <option value="오스트리아">오스트리아</option>
+                        <option value="온두라스">온두라스</option>
+                        <option value="영국">영국</option>
+                        <option value="예멘">예멘</option>
+                        <option value="오스트레일리아">오스트레일리아</option>
+                        <option value="이란">이란</option>
+                        <option value="이라크">이라크</option>
+                        <option value="이스라엘">이스라엘</option>
+                        <option value="이탈리아">이탈리아</option>
+                        <option value="인도">인도</option>
+                        <option value="인도네시아">인도네시아</option>
+                        <option value="일본">일본</option>
+                        <option value="자메이카">자메이카</option>
+                        <option value="잠비아">잠비아</option>
+                        <option value="자메이카">자메이카</option>
+                        <option value="중국">중국</option>
+                        <option value="체코">체코</option>
+                        <option value="칠레">칠레</option>
+                        <option value="카자흐스탄">카자흐스탄</option>
+                        <option value="카메룬">카메룬</option>
+                        <option value="캐나다">캐나다</option>
+                        <option value="케냐">케냐</option>
+                        <option value="콜롬비아">콜롬비아</option>
+                        <option value="크로아티아">크로아티아</option>
+                        <option value="키르기스스탄">키르기스스탄</option>
+                        <option value="카타르">카타르</option>
+                        <option value="콩고">콩고</option>
+                        <option value="쿠웨이트">쿠웨이트</option>
+                        <option value="쿠바">쿠바</option>
+                        <option value="키프로스">키프로스</option>
+                        <option value="탄자니아">탄자니아</option>
+                        <option value="터키">터키</option>
+                        <option value="태국">태국</option>
+                        <option value="튀니지">튀니지</option>
+                        <option value="투르크메니스탄">투르크메니스탄</option>
+                        <option value="트리니다드토바고">트리니다드토바고</option>
+                        <option value="파키스탄">파키스탄</option>
+                        <option value="파라과이">파라과이</option>
+                        <option value="페루">페루</option>
+                        <option value="포르투갈">포르투갈</option>
+                        <option value="폴란드">폴란드</option>
+                        <option value="프랑스">프랑스</option>
+                        <option value="필리핀">필리핀</option>
+                        <option value="핀란드">핀란드</option>
+                        <option value="헝가리">헝가리</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>작가 필명</th>
+                <td><input type="text" id="author-nickname" rows="4" class="writer-medium-nickname" style="width:200px"></input></td>
+            </tr>
+        </table>
+    </span>
+</div>
+    <!-- 출판사 정보 섹션 -->
+    <div class="section">
+        <span class="publisher-list">
+        <h3>출판사 정보</h3>
+        <table class="form-table">
+            <tr>
+                <th>출판사 선택</th>
+                <td>
+                    <select id="publisher-id" class="publisher-id" style="width:200px">
+                        <option>직접 입력</option>
+                        <option th:each="i : ${publishers}" th:value="${i.publisherId}" th:text="${i.name+'('+i.bizRegNo+')'}"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>출판사명</th>
+                <td><input type="text" id="publisher-name" class="medium" /></td>
+            </tr>
+            <tr>
+                <th>대표명</th>
+                <td><input type="text" id="publisher-ceo" class="medium" /></td>
+            </tr>
+            <tr>
+                <th>사업자번호</th>
+                <td>
+                    <input type="text" id="business-number1" class="medium-phone" maxlength="3"/>-
+                    <input type="text" id="business-number2" class="medium-phone" maxlength="2"/>-
+                    <input type="text" id="business-number3" class="medium-phone" maxlength="5"/>
+                </td>
+            </tr>
+            <tr>
+                <th>기본 주소</th>
+                <td><input type="text" id="address1" class="long" /></td>
+            </tr>
+            <tr>
+                <th>상세 주소</th>
+                <td><input type="text" id="address2" class="long" /></td>
+            </tr>
+            <tr>
+                <th>우편번호</th>
+                <td><input type="text" id="zipcode" class="medium" maxlength="10"/></td>
+            </tr>
+            <tr>
+                <th>전화번호</th>
+                <td>
+                    <input type="text" id="phone1" class="medium-phone" maxlength="3"/>-
+                    <input type="text" id="phone2" class="medium-phone" maxlength="4"/>-
+                    <input type="text" id="phone3" class="medium-phone" maxlength="4"/>
+                </td>
+            </tr>
+            <tr>
+                <th>국적</th>
+                <td>
+                    <select id="publisher-nationality" class="medium">
+                        <option>국적</option>
+                        <option value="가나">가나</option>
+                        <option value="네팔">네팔</option>
+                        <option value="한국">한국</option>
+                        <option value="독일">독일</option>
+                        <option value="덴마크">덴마크</option>
+                        <option value="라오스">라오스</option>
+                        <option value="러시아">러시아</option>
+                        <option value="레바논">레바논</option>
+                        <option value="로마니아">로마니아</option>
+                        <option value="리비아">리비아</option>
+                        <option value="말레이시아">말레이시아</option>
+                        <option value="멕시코">멕시코</option>
+                        <option value="모로코">모로코</option>
+                        <option value="몽골">몽골</option>
+                        <option value="미국">미국</option>
+                        <option value="미얀마">미얀마</option>
+                        <option value="바레인">바레인</option>
+                        <option value="방글라데시">방글라데시</option>
+                        <option value="베트남">베트남</option>
+                        <option value="벨기에">벨기에</option>
+                        <option value="볼리비아">볼리비아</option>
+                        <option value="브라질">브라질</option>
+                        <option value="사우디아라비아">사우디아라비아</option>
+                        <option value="사모아">사모아</option>
+                        <option value="세르비아">세르비아</option>
+                        <option value="세이셸">세이셸</option>
+                        <option value="수단">수단</option>
+                        <option value="스웨덴">스웨덴</option>
+                        <option value="스위스">스위스</option>
+                        <option value="스페인">스페인</option>
+                        <option value="슬로베니아">슬로베니아</option>
+                        <option value="슬로바키아">슬로바키아</option>
+                        <option value="싱가포르">싱가포르</option>
+                        <option value="시리아">시리아</option>
+                        <option value="아르헨티나">아르헨티나</option>
+                        <option value="아이슬란드">아이슬란드</option>
+                        <option value="아프가니스탄">아프가니스탄</option>
+                        <option value="알제리">알제리</option>
+                        <option value="아르메니아">아르메니아</option>
+                        <option value="안도라">안도라</option>
+                        <option value="앵귈라">앵귈라</option>
+                        <option value="에스토니아">에스토니아</option>
+                        <option value="엘살바도르">엘살바도르</option>
+                        <option value="오만">오만</option>
+                        <option value="오스트리아">오스트리아</option>
+                        <option value="온두라스">온두라스</option>
+                        <option value="영국">영국</option>
+                        <option value="예멘">예멘</option>
+                        <option value="오스트레일리아">오스트레일리아</option>
+                        <option value="이란">이란</option>
+                        <option value="이라크">이라크</option>
+                        <option value="이스라엘">이스라엘</option>
+                        <option value="이탈리아">이탈리아</option>
+                        <option value="인도">인도</option>
+                        <option value="인도네시아">인도네시아</option>
+                        <option value="일본">일본</option>
+                        <option value="자메이카">자메이카</option>
+                        <option value="잠비아">잠비아</option>
+                        <option value="자메이카">자메이카</option>
+                        <option value="중국">중국</option>
+                        <option value="체코">체코</option>
+                        <option value="칠레">칠레</option>
+                        <option value="카자흐스탄">카자흐스탄</option>
+                        <option value="카메룬">카메룬</option>
+                        <option value="캐나다">캐나다</option>
+                        <option value="케냐">케냐</option>
+                        <option value="콜롬비아">콜롬비아</option>
+                        <option value="크로아티아">크로아티아</option>
+                        <option value="키르기스스탄">키르기스스탄</option>
+                        <option value="카타르">카타르</option>
+                        <option value="콩고">콩고</option>
+                        <option value="쿠웨이트">쿠웨이트</option>
+                        <option value="쿠바">쿠바</option>
+                        <option value="키프로스">키프로스</option>
+                        <option value="탄자니아">탄자니아</option>
+                        <option value="터키">터키</option>
+                        <option value="태국">태국</option>
+                        <option value="튀니지">튀니지</option>
+                        <option value="투르크메니스탄">투르크메니스탄</option>
+                        <option value="트리니다드토바고">트리니다드토바고</option>
+                        <option value="파키스탄">파키스탄</option>
+                        <option value="파라과이">파라과이</option>
+                        <option value="페루">페루</option>
+                        <option value="포르투갈">포르투갈</option>
+                        <option value="폴란드">폴란드</option>
+                        <option value="프랑스">프랑스</option>
+                        <option value="필리핀">필리핀</option>
+                        <option value="핀란드">핀란드</option>
+                        <option value="헝가리">헝가리</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button style="margin-top:30px;margin-left:88%" id="create-button">등록하기</button>
+        </span>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // 서버에서 받은 authors 리스트를 JavaScript의 authors 배열로 변환
+        const authors = /*[[${authors}]]*/ [];  // 서버에서 전달된 authors 데이터를 배열로 변환
+
+        // 서버에서 받은 publishers 리스트를 JavaScript의 publishers 배열로 변환
+        const publishers = /*[[${publishers}]]*/ [];  // 서버에서 전달된 publishers 데이터를 배열로 변환
+        /*]]>*/
+    </script>
+
+<script>
+    $(document).ready(function(){
+        let categorySmallId;
+        let image;
+        let writers = [];
+        let publisher = [];
+        let books = [];
+
+        $('#create-button').click(function(event){
+            event.preventDefault();
+            // 상품명
+            let name = $('#product-name').val();
+            // isbn
+            let isbn = parseInt($('#isbn').val().replace(/[^0-9]/g,''));
+            // translator
+            let translator = $('#translator').val();
+            // 카테고리
+            // let categorySmallId = categorySmallId;
+            // 정가
+            let originalPrice = parseInt($('#price-original').val().replace(/[^0-9]/g,''));
+            // 할인율
+            let discountPercent = parseInt($('#discount-rate').val().replace(/[^0-9]/g,''));
+            // 할인가격
+            let discountPrice = parseInt($('#price-discounted').val().replace(/[^0-9]/g,''));
+            // 판매가
+            let salePrice = parseInt($('#price-sale').val().replace(/[^0-9]/g,''));
+            // 등록일
+            let releaseDate = $('#reg-date').val();
+            // 이미지
+            // let image = image;
+            // 목차
+            let tableOfContent = $('#product-contents').val().replace(/\n/g, '<br>');
+            // 내용
+            let description = tinymce.activeEditor.getContent().replace();
+            // 재고수량
+            let stockQuantity = $('#stock').val();
+            // 사이즈
+            let size = $('#size1').val()+'*'+$('#size2').val();
+            // 무게
+            let weight = $('#weight').val();
+            // 페이지 수
+            let page = $('#pages').val();
+
+            // 배열 초기화
+            books = [];
+            if(name && isbn && translator && categorySmallId && originalPrice && discountPercent && discountPrice && salePrice
+                && releaseDate && image && tableOfContent && description && stockQuantity && size && weight && page){
+                books.push({
+                    name: name,
+                    isbn: isbn,
+                    translator: translator,
+                    categorySmallId: categorySmallId,
+                    originalPrice: originalPrice,
+                    discountPercent: discountPercent,
+                    discountPrice: discountPrice,
+                    salePrice: salePrice,
+                    releaseDate: releaseDate,
+                    image: image,
+                    tableOfContent: tableOfContent,
+                    description: description,
+                    stockQuantity: stockQuantity,
+                    size: size,
+                    weight: weight,
+                    page: page,
+                })
+            } else{
+                alert('상품 정보를 모두 채워주세요!');
+                $('#product-name').focus();
+                return;
+            }
+
+
+
+            // 출판사 이름
+            let publisherName = $('#publisher-name').val();
+            // 출판사 대표
+            let president = $('#publisher-ceo').val();
+            // 사업자번호
+            let bizRegNo = $('#business-number1').val() + $('#business-number2').val() + $('#business-number3').val();
+            // 기본 주소
+            let mainAddress = $('#address1').val();
+            // 상세 주소
+            let detailAddress = $('#address2').val();
+            // 우편번호
+            let zipCode = $('#zipcode').val();
+            // 폰번호
+            let phoneNum = $('#phone1').val() + $('#phone2').val() + $('#phone3').val();
+            console.log('사업자번호:'+bizRegNo);
+            console.log('폰넘버:'+phoneNum);
+            // 출판사 국적
+            let bizArea = $('#publisher-nationality').val();
+
+            // 배열 초기화
+            publisher = [];
+            if(publisherName && president && bizRegNo && mainAddress && detailAddress && zipCode && phoneNum && bizArea){
+                // 출판사 배열
+                publisher.push({
+                    name: publisherName,
+                    president: president,
+                    bizRegNo: bizRegNo,
+                    mainAddress: mainAddress,
+                    detailAddress: detailAddress,
+                    zipCode: zipCode,
+                    phoneNum: phoneNum,
+                    bizArea: bizArea
+                })
+            } else{
+                alert('출판사 정보를 모두 채워주세요!');
+                $('#publisher-id').focus();
+                return;
+            }
+
+            // 배열 초기화
+            writers = [];
+            // 지은이 배열
+            $('.writer-list').each(function(){
+                // 지은이 이름
+                let writerName = $(this).closest($('.writer-list')).find($('.writer-medium-name')).val();
+                // 지은이 성별
+                let gender = $(this).closest($('.writer-list')).find($('.writer-medium-gender')).val();
+                // 지은이 설명
+                let writerDescription = $(this).closest($('.writer-list')).find($('.writer-long')).val();
+                // 지은이 국적
+                let nationality = $(this).closest($('.writer-list')).find($('.writer-medium')).val();
+                // 지은이 별명
+                let nickname = $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).val();
+
+                if(nickname===''){
+                    nickname = null;
+                }
+
+                if(writerDescription===''){
+                    writerDescription = null;
+                }
+
+                if(writerName && gender !== 'N' && nationality !== '국적'){
+                    writers.push({
+                            name: writerName,
+                            gender: gender,
+                            description: writerDescription,
+                            nationality: nationality,
+                            nickname: nickname,
+                    })
+                } else {
+                    alert('작가 정보를 모두 채워주세요!');
+                    $('#publisher-id').focus();
+                    return false;
+                }
+                console.log('writers'+writers);
+            })
+
+
+
+            axios.post('/admin/bookCreate',{
+                bookDto:books,
+
+                publisherDto:publisher,
+
+                writerDto:writers
+            },
+            {
+                headers:{'content-type':'application/json'}
+            }).then(function(response){
+                switch(response.data){
+                    case 'isbn is already exist':
+                        alert('이미 등록된 상품입니다! 다시 확인해 주세요.');
+                        $('#isbn').focus();
+                        break;
+                    case 'success':
+                        alert('상품 등록에 성공했습니다!');
+                        window.location.href = '/admin/bookList'
+                        break;
+                    case 'create fail':
+                        alert('상품 등록에 실패했습니다!');
+                        break;
+                }
+            })
+        });
+
+        $('#size1').on('input', function (){
+           let size = $('#size1').val().replace(/[^0-9]/g,'');
+           $('#size1').val(size);
+        });
+        $('#size2').on('input', function (){
+           let size = $('#size2').val().replace(/[^0-9]/g,'');
+           $('#size2').val(size);
+        });
+        $('#business-number1').on('input', function(){
+            let biz = $('#business-number1').val().replace(/[^0-9]/g,'');
+            $('#business-number1').val(biz);
+        });
+        $('#business-number2').on('input', function(){
+            let biz = $('#business-number2').val().replace(/[^0-9]/g,'');
+            $('#business-number2').val(biz);
+        });
+        $('#business-number3').on('input', function(){
+            let biz = $('#business-number3').val().replace(/[^0-9]/g,'');
+            $('#business-number3').val(biz);
+        });
+        $('#phone1').on('input', function(){
+            let phone = $('#phone1').val().replace(/[^0-9]/g,'');
+            $('#phone1').val(phone);
+        });
+        $('#phone2').on('input', function(){
+            let phone = $('#phone2').val().replace(/[^0-9]/g,'');
+            $('#phone2').val(phone);
+        });
+        $('#phone3').on('input', function(){
+            let phone = $('#phone3').val().replace(/[^0-9]/g,'');
+            $('#phone3').val(phone);
+        });
+        $('#zipcode').on('input', function(){
+            let zipcode = $('#zipcode').val().replace(/[^0-9-]/g,'');
+            $('#zipcode').val(zipcode);
+        });
+        $('#pages').on('input', function(){
+           let pages = $('#pages').val().replace(/[^0-9]/g,'');
+           $('#pages').val(pages);
+        });
+        $('#weight').on('input', function(){
+            let weight = $('#weight').val().replace(/[^0-9]/g,'');
+            $('#weight').val(weight);
+        });
+        $('#stock').on('input', function(){
+            let stock = $('#stock').val().replace(/[^0-9]/g,'');
+            $('#stock').val(stock);
+        });
+        $('#isbn').on('input', function(){
+            let isbn = $('#isbn').val().replace(/[^0-9]/g,'');
+            $('#isbn').val(isbn);
+        });
+
+
+
+        $('#author-button').on('click', function(event){
+            event.preventDefault();
+
+            let nameBox = $('<span class="writer-list">\n' +
+                '        <h3 style="margin-top:30px">저자 정보</h3>\n' +
+                '        <table class="form-table">\n' +
+                '            <tr>\n' +
+                '                <th>지은이 선택</th>\n' +
+                '                <td class="author-list">\n' +
+                '                    <select id="author-id" class="writer-medium-id" style="width:200px">\n' +
+                '                        <option>직접 입력</option>\n' +
+                '                    </select>\n' +
+                '                </td>\n' +
+                '            </tr>\n' +
+                '            <tr>\n' +
+                '                <th>지은이</th>\n' +
+                '                <td class="author-list">\n' +
+                '                    <input type="text" id="author-name" class="writer-medium-name" style="width: 200px"/>\n' +
+                '                    <button class="author-del">제거</button>\n' +
+                '                </td>\n' +
+                '            </tr>\n' +
+                '            <tr>\n' +
+                '                <th>작가 성별</th>\n' +
+                '                <td>\n' +
+                '                    <select id="author-gender" class="writer-medium-gender" style="width: 200px">\n' +
+                '                        <option value="N">선택</option>\n' +
+                '                        <option value="M">남성</option>\n' +
+                '                        <option value="F">여성</option>\n' +
+                '                    </select>\n' +
+                '                </td>\n' +
+                '            </tr>\n' +
+                '            <tr>\n' +
+                '                <th>작가 소개</th>\n' +
+                '                <td><textarea id="author-bio" rows="4" class="writer-long"></textarea></td>\n' +
+                '            </tr>\n' +
+                '            <tr>\n' +
+                '                <th>작가 국적</th>\n' +
+                '                <td>\n' +
+                '                    <select id="author-nationality" class="writer-medium">\n' +
+                '                        <option>국적</option>\n' +
+                '                        <option value="가나">가나</option>\n' +
+                '                        <option value="네팔">네팔</option>\n' +
+                '                        <option value="한국">한국</option>\n' +
+                '                        <option value="독일">독일</option>\n' +
+                '                        <option value="덴마크">덴마크</option>\n' +
+                '                        <option value="라오스">라오스</option>\n' +
+                '                        <option value="러시아">러시아</option>\n' +
+                '                        <option value="레바논">레바논</option>\n' +
+                '                        <option value="로마니아">로마니아</option>\n' +
+                '                        <option value="리비아">리비아</option>\n' +
+                '                        <option value="말레이시아">말레이시아</option>\n' +
+                '                        <option value="멕시코">멕시코</option>\n' +
+                '                        <option value="모로코">모로코</option>\n' +
+                '                        <option value="몽골">몽골</option>\n' +
+                '                        <option value="미국">미국</option>\n' +
+                '                        <option value="미얀마">미얀마</option>\n' +
+                '                        <option value="바레인">바레인</option>\n' +
+                '                        <option value="방글라데시">방글라데시</option>\n' +
+                '                        <option value="베트남">베트남</option>\n' +
+                '                        <option value="벨기에">벨기에</option>\n' +
+                '                        <option value="볼리비아">볼리비아</option>\n' +
+                '                        <option value="브라질">브라질</option>\n' +
+                '                        <option value="사우디아라비아">사우디아라비아</option>\n' +
+                '                        <option value="사모아">사모아</option>\n' +
+                '                        <option value="세르비아">세르비아</option>\n' +
+                '                        <option value="세이셸">세이셸</option>\n' +
+                '                        <option value="수단">수단</option>\n' +
+                '                        <option value="스웨덴">스웨덴</option>\n' +
+                '                        <option value="스위스">스위스</option>\n' +
+                '                        <option value="스페인">스페인</option>\n' +
+                '                        <option value="슬로베니아">슬로베니아</option>\n' +
+                '                        <option value="슬로바키아">슬로바키아</option>\n' +
+                '                        <option value="싱가포르">싱가포르</option>\n' +
+                '                        <option value="시리아">시리아</option>\n' +
+                '                        <option value="아르헨티나">아르헨티나</option>\n' +
+                '                        <option value="아이슬란드">아이슬란드</option>\n' +
+                '                        <option value="아프가니스탄">아프가니스탄</option>\n' +
+                '                        <option value="알제리">알제리</option>\n' +
+                '                        <option value="아르메니아">아르메니아</option>\n' +
+                '                        <option value="안도라">안도라</option>\n' +
+                '                        <option value="앵귈라">앵귈라</option>\n' +
+                '                        <option value="에스토니아">에스토니아</option>\n' +
+                '                        <option value="엘살바도르">엘살바도르</option>\n' +
+                '                        <option value="오만">오만</option>\n' +
+                '                        <option value="오스트리아">오스트리아</option>\n' +
+                '                        <option value="온두라스">온두라스</option>\n' +
+                '                        <option value="영국">영국</option>\n' +
+                '                        <option value="예멘">예멘</option>\n' +
+                '                        <option value="오스트레일리아">오스트레일리아</option>\n' +
+                '                        <option value="이란">이란</option>\n' +
+                '                        <option value="이라크">이라크</option>\n' +
+                '                        <option value="이스라엘">이스라엘</option>\n' +
+                '                        <option value="이탈리아">이탈리아</option>\n' +
+                '                        <option value="인도">인도</option>\n' +
+                '                        <option value="인도네시아">인도네시아</option>\n' +
+                '                        <option value="일본">일본</option>\n' +
+                '                        <option value="자메이카">자메이카</option>\n' +
+                '                        <option value="잠비아">잠비아</option>\n' +
+                '                        <option value="자메이카">자메이카</option>\n' +
+                '                        <option value="중국">중국</option>\n' +
+                '                        <option value="체코">체코</option>\n' +
+                '                        <option value="칠레">칠레</option>\n' +
+                '                        <option value="카자흐스탄">카자흐스탄</option>\n' +
+                '                        <option value="카메룬">카메룬</option>\n' +
+                '                        <option value="캐나다">캐나다</option>\n' +
+                '                        <option value="케냐">케냐</option>\n' +
+                '                        <option value="콜롬비아">콜롬비아</option>\n' +
+                '                        <option value="크로아티아">크로아티아</option>\n' +
+                '                        <option value="키르기스스탄">키르기스스탄</option>\n' +
+                '                        <option value="카타르">카타르</option>\n' +
+                '                        <option value="콩고">콩고</option>\n' +
+                '                        <option value="쿠웨이트">쿠웨이트</option>\n' +
+                '                        <option value="쿠바">쿠바</option>\n' +
+                '                        <option value="키프로스">키프로스</option>\n' +
+                '                        <option value="탄자니아">탄자니아</option>\n' +
+                '                        <option value="터키">터키</option>\n' +
+                '                        <option value="태국">태국</option>\n' +
+                '                        <option value="튀니지">튀니지</option>\n' +
+                '                        <option value="투르크메니스탄">투르크메니스탄</option>\n' +
+                '                        <option value="트리니다드토바고">트리니다드토바고</option>\n' +
+                '                        <option value="파키스탄">파키스탄</option>\n' +
+                '                        <option value="파라과이">파라과이</option>\n' +
+                '                        <option value="페루">페루</option>\n' +
+                '                        <option value="포르투갈">포르투갈</option>\n' +
+                '                        <option value="폴란드">폴란드</option>\n' +
+                '                        <option value="프랑스">프랑스</option>\n' +
+                '                        <option value="필리핀">필리핀</option>\n' +
+                '                        <option value="핀란드">핀란드</option>\n' +
+                '                        <option value="헝가리">헝가리</option>\n' +
+                '                    </select>\n' +
+                '                </td>\n' +
+                '            </tr>\n' +
+                '         <tr>\n' +
+                '                <th>작가 필명</th>\n' +
+                '                <td><input type="text" id="author-nickname" rows="4" class="writer-medium-nickname" style="width:200px"></input></td>\n' +
+                '            </tr>' +
+                '        </table>\n' +
+                '    </span>')
+            $('#writer-section').append(nameBox);
+
+            authors.forEach(function(author) {
+                var optionText = author.nickname ? author.name + ' >> [필명: ' + author.nickname + ']' : author.name;
+                $(nameBox).find($('.writer-medium-id')).append('<option value="' + author.writerId + '">' + optionText + '</option>');
+            });
+
+            $('.author-del').on('click', function(event){
+                event.preventDefault();
+                $(this).closest('.writer-list').remove();
+            });
+
+            $('.writer-medium-id').on('change', function(){
+                var id = $(this).val();
+                var selectedAuthor = authors.find(function(author) {
+                    return author.writerId === id;
+                });
+                if(selectedAuthor){
+                    console.log('2번 자동입력');
+                    $(this).closest($('.writer-list')).find($('.writer-medium-name')).val(selectedAuthor.name).prop('readonly', true);
+                    $(this).closest($('.writer-list')).find($('.writer-long')).val(selectedAuthor.description).prop('readonly', true);
+                    $(this).closest($('.writer-list')).find($('.writer-medium-gender')).val(selectedAuthor.gender).css('pointer-events', 'none');
+                    $(this).closest($('.writer-list')).find($('.writer-medium')).val(selectedAuthor.nationality).css('pointer-events', 'none');
+                    $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).val(selectedAuthor.nickname).prop('readonly', true);
+                }
+
+                if($(this).val() === '직접 입력'){
+                    console.log('2번 직접입력');
+                    $(this).closest($('.writer-list')).find($('.writer-medium-name')).prop('readonly', false);
+                    $(this).closest($('.writer-list')).find($('.writer-long')).prop('readonly', false);
+                    $(this).closest($('.writer-list')).find($('.writer-medium-gender')).css('pointer-events', 'auto');
+                    $(this).closest($('.writer-list')).find($('.writer-medium')).css('pointer-events', 'auto');
+                    $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).prop('readonly', false);
+                }
+            });
+        });
+
+        $('#author-id').on('change', function(){
+            var id = $(this).val();
+            var selectedAuthor = authors.find(function(author) {
+                return author.writerId === id;
+            });
+            if(selectedAuthor){
+                console.log('1번 자동입력');
+                $(this).closest($('.writer-list')).find($('.writer-medium-name')).val(selectedAuthor.name).prop('readonly', true);
+                $(this).closest($('.writer-list')).find($('.writer-long')).val(selectedAuthor.description).prop('readonly', true);
+                $(this).closest($('.writer-list')).find($('.writer-medium-gender')).val(selectedAuthor.gender).css('pointer-events', 'none');
+                $(this).closest($('.writer-list')).find($('.writer-medium')).val(selectedAuthor.nationality).css('pointer-events', 'none');
+                $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).val(selectedAuthor.nickname).prop('readonly', true);
+            }
+
+            if($('.writer-medium-id').val() === '직접 입력'){
+                console.log('1번 직접입력');
+                $(this).closest($('.writer-list')).find($('.writer-medium-name')).prop('readonly', false);
+                $(this).closest($('.writer-list')).find($('.writer-long')).prop('readonly', false);
+                $(this).closest($('.writer-list')).find($('.writer-medium-gender')).css('pointer-events', 'auto');
+                $(this).closest($('.writer-list')).find($('.writer-medium')).css('pointer-events', 'auto');
+                $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).prop('readonly', false);
+            }
+        });
+
+        $('#publisher-id').on('change', function(){
+            var id = $(this).val();
+            var publisherId = publishers.find(function(publisher) {
+                return publisher.publisherId === id;
+            })
+
+            if(publisherId){
+                $('#publisher-name').val(publisherId.name).prop('readonly', true);
+                $('#publisher-ceo').val(publisherId.president).prop('readonly', true);
+                $('#business-number1').val(publisherId.bizRegNo.substring(0,3)).prop('readonly', true);
+                $('#business-number2').val(publisherId.bizRegNo.substring(4,6)).prop('readonly', true);
+                $('#business-number3').val(publisherId.bizRegNo.substring(7)).prop('readonly', true);
+                $('#address1').val(publisherId.mainAddress).prop('readonly', true);
+                $('#address2').val(publisherId.detailAddress).prop('readonly', true);
+                $('#zipcode').val(publisherId.zipCode).prop('readonly', true);
+                $('#phone1').val(publisherId.phoneNum.substring(0,3)).prop('readonly', true);
+                $('#phone2').val(publisherId.phoneNum.substring(4,8)).prop('readonly', true);
+                $('#phone3').val(publisherId.phoneNum.substring(9)).prop('readonly', true);
+                $('#publisher-nationality').val(publisherId.bizArea).css('pointer-events', 'none');
+            }
+
+            if($('#publisher-id').val() === '직접 입력'){
+                $('#publisher-name').prop('readonly', false);
+                $('#publisher-ceo').prop('readonly', false);
+                $('#business-number').prop('readonly', false);
+                $('#address1').prop('readonly', false);
+                $('#address2').prop('readonly', false);
+                $('#zipcode').prop('readonly', false);
+                $('#phone').prop('readonly', false);
+                $('#publisher-nationality').css('pointer-events', 'auto');
+            }
+        })
+
+
+        tinymce.init({
+            selector: '#product-description',
+            plugins: 'image media link',  // 이미지, 미디어, 링크 삽입 플러그인
+            toolbar: 'undo redo | styleselect | bold italic ',  // 툴바 설정
+            images_upload_url: '/upload-image',  // 이미지 업로드 URL
+            automatic_uploads: true,  // 자동 업로드
+            file_picker_types: 'image',  // 파일 선택기 타입 설정
+            image_uploadtab: true
+        });
+
+
+        $('#product-image').on('change', function(e){
+            var file = e.target.files[0];
+
+            var maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            if (file.size > maxSize) {
+                alert("파일 크기가 5MB를 초과합니다. 다시 선택해주세요.");
+                $(this).val('');  // 파일 선택 초기화
+                $('#img-preview').attr('src', '');  // 미리보기 이미지 초기화
+                return;  // 크기가 초과하면 함수 종료
+            }
+
+
+            var formData = new FormData();
+            formData.append('image', file);
+
+            console.log(formData.get('image'));
+
+            axios.post('/admin/upload', formData,{
+                headers:{'content-type':'multipart/form-data'}
+            }).then(function(response){
+                image = response.data;
+                console.log(response.data);
+                console.log('image:'+image);
+
+                var reader = new FileReader();
+                reader.onload=function(event){
+                    $('#img-preview').attr('src', event.target.result);
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            })
+        });
+
+        $('#price-original').on('input', function() {
+            if(/[^0-9,]/g.test($(this).val())){
+                alert('숫자만 넣어주세요.');
+                $(this).val('');
+            }
+            let value = $(this).val().replace(/,/g,'');
+            value = parseInt(value);
+
+            let discount = parseInt($('#discount-rate').val().replace(/[^0-9]/g,''));
+            console.log(value);
+
+            if (discount >= 100) {
+                $('#discount-rate').val(100);  // 할인율이 100 이상이면 100으로 설정
+                discount = parseInt($('#discount-rate').val());
+            }
+
+            if (value > 0) {
+                $(this).val(value.toLocaleString());  // 가격 표시
+                $('#price-sale').val((Math.round(value-(discount/100*value))).toLocaleString());  // 가격 표시
+                $('#price-discounted').val(($('#price-original').val().replace(/,/g,'')-$('#price-sale').val().replace(/,/g,'')).toLocaleString());
+            } else if (value <= 0) {
+                $(this).val(0);  // 값이 0 이하일 경우 0으로 설정
+                $('#price-sale').val(0);  // 판매가 0으로 설정
+                $('#price-discounted').val(0);
+            }
+        });
+
+        $('#discount-rate').on('input', function(){
+            if(/[^0-9,]/g.test($(this).val())){
+                alert('숫자만 넣어주세요.');
+                $(this).val('0');
+            }
+
+            let discount = parseInt($(this).val());
+            let value = parseInt($('#price-original').val().replace(/,/g,''));
+
+            if (discount >= 100) {
+                $('#discount-rate').val(100);  // 할인율이 100 이상이면 100으로 설정
+                discount = parseInt($('#discount-rate').val());
+            }
+
+            if (value > 0) {
+                $('#price-original').val(value.toLocaleString());  // 가격 표시
+                $('#price-sale').val((Math.round(value-(discount/100*value))).toLocaleString());  // 가격 표시
+                $('#price-discounted').val(($('#price-original').val().replace(/,/g,'')-$('#price-sale').val().replace(/,/g,'')).toLocaleString());
+            } else if (value <= 0) {
+                $(this).val(0);  // 값이 0 이하일 경우 0으로 설정
+                $('#price-sale').val(0);  // 판매가 0으로 설정
+                $('#price-discounted').val(0);
+            }
+        });
+
+        $('.category-large').click(function(){
+            let categoryResponse = [];
+            let categoryLargeName = $(this).closest('.category-list').find('.category-large').text();
+
+            $('.category-large').css('color', '#333');
+            $(this).css('color', '#007acc');
+
+            categoryResponse.push({
+                categoryLargeName: categoryLargeName,
+                categoryLargeId: $(this).closest('.category-list').find('.category-large-id').val()
+            })
+            console.log($(this).closest('.category-list').find('.category-large').text())
+            console.log($(this).closest('.category-list').find('.category-large-id').val())
+
+            axios.post('/admin/bookCategory', categoryResponse, {
+                headers: {'content-type':'application/json'}
+            }).then(function(response){
+                $('#category-name').text('(대분류) '+ categoryLargeName+' > ').css('margin-top', '10px');
+
+                let list = [];
+
+                response.data.forEach(function(item){
+                    $('.category-medium').remove();
+                    $('.category-small').remove();
+                    console.log(item);
+                    let categoryItem = $('<ul class="category-list"><li class="category-medium"></li></ul>')
+                        .find('li')
+                        .text(item.categoryMediumName)
+                        .data('id', item.categoryMediumId)
+                        .css('margin-bottom', '12px')
+                        .end();
+                    list.push(categoryItem);
+                })
+                list.forEach(function(item){
+                    $('#categoryMedium').append(item);  // 중분류 리스트에 항목 추가
+                })
+
+                $('.category-medium').click(function(){
+                    let categoryResponse = [];
+                    let categoryMediumName = $(this).closest('.category-list').find('.category-medium').text();
+                    let categoryMediumId = $(this).closest('.category-list').find('.category-medium').data('id');
+
+                    console.log($(this).closest('.category-list').find('.category-medium').text());
+                    console.log($(this).closest('.category-list').find('.category-medium').data('id'));
+
+                    categoryResponse.push({
+                        categoryMediumName: categoryMediumName,
+                        categoryMediumId: categoryMediumId
+                    })
+
+                    $('.category-medium').css('color', '#333');
+                    $(this).css('color', '#007acc');
+
+                    axios.post('/admin/bookCategory', categoryResponse, {
+                        headers: {'content-type' : 'application/json'}
+                    }).then(function(response){
+                        $('#category-name').text('(대분류) '+ categoryLargeName+' > '+'(중분류) '+categoryMediumName+' > ').css('margin-top', '10px');
+
+                        let list = [];
+
+                        response.data.forEach(function(item){
+                            $('.category-small').remove();
+                            console.log(item);
+                            let categoryItem = $('<ul class="category-list"><li class="category-small"></li></ul>')
+                                .find('li')
+                                .text(item.categorySmallName)
+                                .data('id', item.categorySmallId)
+                                .css('margin-bottom', '12px')
+                                .end();
+                            list.push(categoryItem);
+                        })
+
+                        list.forEach(function(item){
+                            $('#categorySmall').append(item);
+                        })
+
+                        $('.category-small').click(function(){
+                            let categorySmallName = $(this).closest('.category-list').find('.category-small').text();
+                            categorySmallId = $(this).closest('.category-list').find('.category-small').data('id');
+                            $('.category-small').css('color', '#333');
+                            $(this).css('color', '#007acc');
+
+                            $('#category-name').text('(대분류) '+ categoryLargeName+' > '+'(중분류) '+categoryMediumName+' > '+'(소분류) '+categorySmallName).css('margin-top', '10px');
+                        })
+                    })
+                })
+            })
+        });
+    });
+</script>
+
+</body>
+</html>

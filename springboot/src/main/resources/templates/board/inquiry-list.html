@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE READ UP - 문의</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/board/inquiry-list.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+    <div class="content">
+    <div class="content-head">
+        <div class="first-category">
+            <div class="board-category">
+                <a th:href="@{/board/notice-list}">공지사항</a>
+                <a th:href="@{/board/faq-list}">FAQ</a>
+                <a th:href="@{/inquiryboard/list}" class="selected">나의 문의</a>
+            </div>
+            <span>홈 / 게시판 / 공지사항</span>
+        </div>
+
+        <div class="titleArea">
+            <h1>나의 문의</h1>
+        </div>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            let msg = [[${msg}]];
+            if (msg === "MEMBER_ONLY") { // 로그인 필요 메시지 처리
+                alert("회원 로그인이 필요합니다.");
+                window.location.href = "/board/notice-list"; // 로그인 페이지로 이동
+            }
+            if (msg === "LIST_ERR") alert("게시물 목록을 가져오는데 실패했습니다. 다시 시도해 주세요.");
+            if (msg === "READ_ERR") alert("삭제되었거나 없는 게시물입니다.");
+            if (msg === "DEL_ERR") alert("삭제되었거나 없는 게시물입니다.");
+            if (msg === "WRT_ERR") alert("게시물 등록에 실패하였습니다. 다시 시도해 주세요.");
+
+            if (msg === "DEL_OK") alert("성공적으로 삭제되었습니다.");
+            if (msg === "WRT_OK") alert("성공적으로 등록되었습니다.");
+            if (msg === "MOD_OK") alert("성공적으로 수정되었습니다.");
+            if (msg === "MOD_ERR") alert("게시물 수정에 실패하였습니다. 다시 시도해 주세요.");
+            /*]]>*/
+        </script>
+
+        <div class="board-container">
+            <table class="board-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th class="inquiry-con">문의내용</th>
+                    <th>문의상태</th>
+                    <th>답변내용</th>
+                    <th>작성자</th>
+                    <th>담당직원</th>
+                    <th>등록일</th>
+                    <th>수정일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="inquiryDto : ${list}" th:data-inquiry-id="${inquiryDto.inquiryId}" th:data-member-id="${inquiryDto.memberId}">
+                    <td class="inquiryId" th:text="${inquiryDto.inquiryId}"></td>
+                    <td class="title" th:text="${inquiryDto.title}"></td>
+                    <td class="content" th:text="${inquiryDto.content}"></td>
+                    <td th:text="${inquiryDto.inquiryStatusName}"></td>
+                    <td th:text="${inquiryDto.replyContent}"></td>
+                    <td th:text="${inquiryDto.memberNickname}"></td>
+                    <td th:text="${inquiryDto.employeeName}"></td>
+                    <td th:text="${#dates.format(inquiryDto.regDate, 'yyyy-MM-dd')}"></td>
+                    <td th:text="${#dates.format(inquiryDto.modDate, 'yyyy-MM-dd')}"></td>
+
+                    <!-- 삭제 버튼: 작성자만 볼 수 있도록 -->
+                    <td th:if="${currentUserId == inquiryDto.memberId}">
+                        console.log("현재 사용자 ID:", currentUserId);
+                        <button class="delete-button" th:data-inquiry-id="${inquiryDto.inquiryId}">삭제</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="inquiry-detail" id="inquiryDetail" style="display:none;">
+            <div class="detail-box">
+                <h3>제목</h3>
+                <p id="detailTitle"></p>
+            </div>
+            <div class="detail-box">
+                <h3>내용</h3>
+                <p id="detailContent"></p>
+            </div>
+            <div class="detail-box">
+                <h3>답변</h3>
+                <p id="detailReplyContent"></p> </div>
+            <div class="reply-box" id="replyBox" style="display:none;">
+                <textarea id="replyContent" rows="4" cols="100"></textarea>
+                <button id="submitReply">답변 등록</button>
+            </div>
+            <div id="deleteButtonContainer" style="display:none;">
+                <button id="deleteButton">게시물삭제</button>
+            </div>
+        </div>
+        <div>
+            <button id="newInquiryButton" class="btn-submit">신규 등록</button>
+            <div id="newInquiryForm" class="inquiry-form" style="display:none;">
+                <h3>신규 문의 등록</h3>
+                <input type="text" id="newTitle" placeholder="제목">
+                <textarea id="newContent" placeholder="내용"></textarea>
+                <div class="form-inputs">
+                    <button id="submitNewInquiry" class="btn-submit">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<!--<p>현재 사용자 ID: <span th:text="${currentUserId}">anonymous</span></p>-->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script th:inline="javascript">
+    const currentUserId = /*[[${currentUserId}]]*/ 'anonymous';
+    console.log("현재 사용자 ID:", currentUserId);
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableRows = document.querySelectorAll('.board-table tbody tr');
+        const inquiryDetail = document.getElementById('inquiryDetail');
+        const detailTitle = document.getElementById('detailTitle');
+        const detailContent = document.getElementById('detailContent');
+        const replyBox = document.getElementById('replyBox');
+        const submitReply = document.getElementById('submitReply');
+        const deleteButtonContainer = document.getElementById('deleteButtonContainer');
+        const deleteButton = document.getElementById('deleteButton');
+        // const newInquiryButton = document.getElementById('newInquiryButton');
+        // const newInquiryForm = document.getElementById('newInquiryForm');
+
+        // const currentUserId = /*[(${currentUserId})]*/ 'anonymous';
+        // console.log("현재 사용자 ID:", currentUserId);
+
+        // const currentUserId = [[${currentUserId}]]; // 컨트롤러에서 전달받은 currentUserId 사용
+        let selectedInquiryId = null;
+        let selectedMemberId = null;
+
+        // 게시물 클릭 시 상세 내용 표시
+        tableRows.forEach(row => {
+            row.addEventListener('click', function () {
+                console.log("클릭됨! currentUserId:", currentUserId);  // 추가
+
+                selectedInquiryId = this.dataset.inquiryId;
+                selectedMemberId = this.dataset.memberId;
+                const title = this.querySelector('.title').textContent;
+                const content = this.querySelector('.content').textContent;
+                // 답변 내용 표시
+                const replyContent = this.querySelector('td:nth-child(5)').textContent; // 답변 내용이 있는 열
+                document.getElementById('detailReplyContent').textContent = replyContent;
+
+                inquiryDetail.style.display = 'block';
+
+                detailTitle.textContent = title;
+                detailContent.textContent = content;
+                inquiryDetail.style.display = 'block';
+
+                // 직원(emp_)이라면 replyBox를 항상 표시
+                if (currentUserId.startsWith('emp_')) {
+                    replyBox.style.display = 'block';
+                } else {
+                    replyBox.style.display = 'none';
+                }
+
+                // // 현재 로그인한 사용자가 employeeId라면 답변 등록 버튼 표시
+                // if (this.querySelector('td:nth-child(6)').textContent === currentUserId) {
+                //     replyBox.style.display = 'block';
+                // } else {
+                //     replyBox.style.display = 'none';
+                // }
+
+                // 현재 로그인한 사용자가 작성자라면 삭제 버튼 표시
+                if (String(selectedMemberId) === String(currentUserId)) {
+                    deleteButtonContainer.style.display = 'block';
+                } else {
+                    deleteButtonContainer.style.display = 'none';
+                }
+            });
+        });
+
+// 신규 게시물 등록 버튼 클릭 시 입력 창 표시
+        newInquiryButton.addEventListener('click', function () {
+            newInquiryForm.style.display = newInquiryForm.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // 신규 문의 등록 처리
+        document.getElementById('submitNewInquiry').addEventListener('click', function () {
+            const newTitle = document.getElementById('newTitle').value;
+            const newContent = document.getElementById('newContent').value;
+
+            fetch('/inquiryboard/write', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: newTitle, content: newContent })
+            }).then(response => {
+                if (response.ok) {
+                    alert('성공적으로 등록되었습니다.');
+                    window.location.reload();
+                } else {
+                    alert('등록에 실패했습니다. 다시 시도해주세요.');
+                }
+            });
+        });
+
+        // // 답변 등록 버튼 클릭 시 처리
+        // document.getElementById('submitReply').addEventListener('click', function () {
+        //     const inquiryId = document.querySelector('.board-table tbody tr.active').dataset.inquiryId;
+        //     const replyContent = document.getElementById('replyContent').value;
+        //
+        //     fetch('/inquiryboard/modify', {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ inquiryId: inquiryId, replyContent: replyContent })
+        //     }).then(response => {
+        //         if (response.ok) {
+        //             alert('답변이 등록되었습니다.');
+        //             window.location.reload();
+        //         } else {
+        //             alert('답변 등록에 실패했습니다.');
+        //         }
+        //     });
+        // });
+        //
+        // // 삭제 버튼 클릭 시 처리
+        // document.querySelectorAll('.delete-button').forEach(button => {
+        //     button.addEventListener('click', function () {
+        //         const inquiryId = this.dataset.inquiryId;
+        //
+        //         if (confirm('정말 삭제하시겠습니까?')) {
+        //             fetch('/inquiryboard/remove', {
+        //                 method: 'POST',
+        //                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        //                 body: new URLSearchParams({ inquiryId })
+        //             }).then(response => {
+        //                 if (response.ok) {
+        //                     alert('삭제되었습니다.');
+        //                     window.location.reload();
+        //                 } else {
+        //                     alert('삭제에 실패했습니다.');
+        //                 }
+        //             });
+        //         }
+        //     });
+        // });
+
+        submitReply.addEventListener('click', function () {
+            const replyContent = document.getElementById('replyContent').value;
+            fetch('/inquiryboard/modify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ inquiryId: selectedInquiryId, replyContent: replyContent })
+            }).then(response => {
+                if (response.ok) {
+                    alert('답변이 등록되었습니다.');
+                    window.location.reload();
+                } else {
+                    alert('답변 등록에 실패했습니다.');
+                }
+            });
+        });
+
+        deleteButton.addEventListener('click', function () {
+            if (confirm('정말 삭제하시겠습니까?')) {
+                fetch('/inquiryboard/remove', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ inquiryId: selectedInquiryId })
+                }).then(response => {
+                    if (response.ok) {
+                        alert('삭제되었습니다.');
+                        window.location.reload();
+                    } else {
+                        alert('삭제에 실패했습니다.');
+                    }
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>
