@@ -2,6 +2,69 @@ body {
     margin: 0;
 }
 
+/* 팝업 배경 */
+#survey-popup {
+    position: fixed;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* 팝업 박스 */
+.survey-popup-box {
+    background: #fffdf6;
+    padding: 4rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    text-align: center;
+}
+
+/* 팝업 닫기 버튼 */
+#survey-popup-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #888;
+    cursor: pointer;
+}
+
+/* 제목 */
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #8b4513;
+}
+
+/* 설명 */
+.popup-description {
+    margin-bottom: 1.5rem;
+    color: #8b4513;
+    font-size: 1rem;
+}
+
+/* 설문 시작 버튼 */
+#survey-popup-start {
+    padding: 0.8rem 1.6rem;
+    background-color: #d97a35;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* 설문 시작 버튼 호버 시 */
+#survey-popup-start:hover {
+    background-color: #7a583e;
+}
+
 /* 슬라이더 css */
 
 .h-slider {

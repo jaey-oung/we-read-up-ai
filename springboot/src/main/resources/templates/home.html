@@ -10,6 +10,19 @@
     <link rel="stylesheet" href="/css/home.css">
 </head>
 <body th:attr="data-msg=${msg}">
+<!-- 도서 성향 설문 팝업 -->
+<div id="survey-popup">
+    <div class="survey-popup-box">
+        <!-- 팝업 닫기 버튼 -->
+        <button id="survey-popup-close">&times;</button>
+        <!-- 제목 -->
+        <h2>📚 당신의 독서 성향은?</h2>
+        <!-- 설명 -->
+        <p class="popup-description">당신에게 꼭 맞는 책을 추천해드릴게요!</p>
+        <!-- 설문 시작 버튼 -->
+        <button type="button" id="survey-popup-start">설문 시작하기</button>
+    </div>
+</div>
 <div th:replace="~{fragments/header :: header}"></div>
 <section class="new-books">
     <div id="h-slider-1" class="h-slider">
@@ -56,6 +69,7 @@
     </div>
 </section>
 <div th:replace="~{fragments/footer :: footer}"></div>
+<script src="/js/home.js"></script>
 <script src="/js/home-slider.js"></script>
 <script src="/js/display-msg.js"></script>
 </body>
