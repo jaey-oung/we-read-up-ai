@@ -2,9 +2,17 @@ body {
     margin: 0;
 }
 
-/* 팝업 배경 */
-#survey-popup {
+/* 기본 스타일 */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* 팝업 컨테이너 */
+#popup-container, #questions-container {
     position: fixed;
+    top: 0; left: 0;
     width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
@@ -13,57 +21,266 @@ body {
     z-index: 1000;
 }
 
-/* 팝업 박스 */
-.survey-popup-box {
+/* 초기 상태에서 질문 컨테이너 숨김 */
+#questions-container {
+    display: none;
+}
+
+/* 팝업 박스 공통 스타일 */
+.popup-box {
     background: #fffdf6;
     padding: 4rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 40px rgba(139, 69, 19, 0.2);
     position: relative;
     text-align: center;
+    width: 95%;
+    max-width: 800px;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-/* 팝업 닫기 버튼 */
-#survey-popup-close {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
+/* 닫기 버튼 */
+#popup-close-btn, #quiz-close-btn {
+    font-size: 2rem;
+    color: #d4a76a;
     background: none;
     border: none;
-    font-size: 2rem;
-    color: #888;
+    position: absolute;
+    top: 1.2rem;
+    right: 1.5rem;
     cursor: pointer;
 }
 
-/* 제목 */
+#popup-close-btn:hover, #quiz-close-btn:hover {
+    color: #8b4513;
+}
+
+/* 시작 화면 스타일 */
 h2 {
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: 2.5rem;
     color: #8b4513;
+    margin-bottom: 2rem;
 }
 
-/* 설명 */
+.popup-intro-text {
+    color: #d97a35;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
 .popup-description {
-    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
     color: #8b4513;
-    font-size: 1rem;
+    margin-bottom: 2.5rem;
 }
 
-/* 설문 시작 버튼 */
-#survey-popup-start {
-    padding: 0.8rem 1.6rem;
+#popup-start-btn {
+    display: inline-block;
+    padding: 0.9rem 2.5rem;
+    background: #d97a35;
+    border: none;
+    border-radius: 9999px;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+    white-space: nowrap;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+#popup-start-btn:hover {
+    background: #7a583e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(139, 69, 19, 0.3);
+}
+
+/* 진행 상태 표시 */
+.progress-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background-color: #f0e6d6;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #d97a35;
+    width: 25%;
+    border-radius: 10px;
+    transition: 0.3s ease;
+}
+
+.progress-text {
+    color: #8b4513;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* 질문 컨테이너 */
+.question-container {
+    display: none;
+}
+
+.question-container.active {
+    display: block;
+}
+
+.question-text {
+    font-size: 1.15rem;
+    color: #8b4513;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
+
+/* 퀴즈 본문 */
+.quiz-body {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    width: 100%;
+}
+
+.choice-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 2rem;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 600px;
+}
+
+.choice-box {
+    flex: 1;
+    min-width: 200px;
+    max-width: 280px;
+    background-color: #fff9e6;
+    border: 2px solid #d4a76a;
+    border-radius: 1.5rem;
+    padding: 3rem 2rem;
+    font-size: 1.3rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.1);
+    text-align: center;
+    color: #8b4513;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+}
+
+.choice-box:hover {
+    border-color: #d97a35;
+    background-color: #fff5d6;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(139, 69, 19, 0.15);
+}
+
+.choice-box.selected {
     background-color: #d97a35;
     color: white;
+    border-color: #7a583e;
+    font-weight: 600;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(139, 69, 19, 0.2);
+}
+
+.vs-text {
+    margin: 0 1rem;
+    font-size: 1.4rem;
+    color: #d4a76a;
+    align-self: center;
+}
+
+/* 네비게이션 버튼 */
+.nav-btn {
+    font-size: 2.2rem;
+    color: #d97a35;
+    background: none;
     border: none;
-    border-radius: 0.5rem;
-    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    color: #7a583e;
+    transform: scale(1.1);
+}
+
+.nav-btn.invisible {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* 제출 버튼 */
+#submit-btn {
+    width: fit-content;
+    margin: 2.5rem auto 0;
+    padding: 0.9rem 2.5rem;
+    background: #d97a35;
+    border: none;
+    border-radius: 9999px;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+    white-space: nowrap;
+}
+
+#submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+#submit-btn.active {
+    background: #d97a35;
     cursor: pointer;
 }
 
-/* 설문 시작 버튼 호버 시 */
-#survey-popup-start:hover {
-    background-color: #7a583e;
+#submit-btn.active:hover {
+    background: #7a583e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(139, 69, 19, 0.3);
 }
+
+/* 각 질문별 프로그레스 바 상태 */
+#q1:not(.active) ~ .progress-fill { width: 25%; }
+#q2:not(.active) ~ .progress-fill { width: 50%; }
+#q3:not(.active) ~ .progress-fill { width: 75%; }
+#q4:not(.active) ~ .progress-fill { width: 100%; }
 
 /* 슬라이더 css */
 
