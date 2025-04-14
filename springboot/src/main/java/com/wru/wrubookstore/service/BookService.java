@@ -98,6 +98,6 @@ public interface BookService {
     // 저자 이름으로 검색
     List<BookDto> searchByWriter3(MainSearchCondition sc) throws Exception;
 
-    // 판매 순위별 상위 5권 조회
+    // 판매량 기준 상위 5권 도서 리스트 반환
     List<RankedBookDto> getWeeklyRanking() throws Exception;
 }

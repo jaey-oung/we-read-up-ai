@@ -213,14 +213,13 @@ public class BookServiceImpl implements BookService {
         return bookRepository.searchByWriter3(sc);
     }
 
-    // 판매 순위별 상위 5권 조회
+    // 판매량 기준 상위 5권 도서 리스트 반환
     @Override
     public List<RankedBookDto> getWeeklyRanking() throws Exception {
         List<RankedBookDto> rankedBooks = new ArrayList<>();
-        // 판매 순위별 상위 5권 bookId 조회
+        // 판매량 기준 상위 5권 bookId 조회
         List<Integer> bookIds = orderRepository.selectBookIdInSalesRank();
         for (int i = 0; i < bookIds.size(); i++) {
-            // bookId 하나씩 가져오기
             int bookId = bookIds.get(i);
             // 책 정보와 카테고리 정보 가져오기
             CategoryDto bookAndCategoryInfo = bookRepository.selectRankedBookInfo(bookId);
@@ -228,7 +227,6 @@ public class BookServiceImpl implements BookService {
             List<String> authors = bookRepository.selectWriter(bookId);
             rankedBooks.add(new RankedBookDto(bookAndCategoryInfo, authors));
         }
-        // 책의 개별 정보 각각 담아 리스트로 반환
         return rankedBooks;
     }
 
