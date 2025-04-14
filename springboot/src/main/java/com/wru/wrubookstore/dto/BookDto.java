@@ -14,16 +14,18 @@ import java.util.Date;
 public class BookDto {
     private Integer bookId;             // 책 코드 PK Auto_Increment
     private String publisherId;         // 출판사 코드
-    private String categorySmallId;     // 소_카테고리 코드
+    private String categoryLargeId;     // 대_카테고리 코드
+    private String categoryMediumId;    // 중_카테고리 코드 (nullable)
+    private String categorySmallId;     // 소_카테고리 코드 (nullable)
     private String name;                // 책 이름
-    private String translator;          // 역자
+    private String translator;          // 역자 (nullable)
     private int originalPrice;          // 정가
     private BigDecimal discountPercent; // 할인율 1 ~ 0.00
     private int discountPrice;          // 할인되는 가격
     private int salePrice;              // 판매가
     private Date releaseDate;           // 등록일
     private Date regDate;               // 판매일
-    private String tableOfContent;      // 도서 목차
+    private String tableOfContent;      // 도서 목차 (nullable)
     private String description;         // 도서 소개
     private long isbn;                  // 책 고유번호
     private int stockQuantity;          // 재고 수량
@@ -34,8 +36,10 @@ public class BookDto {
 
     public BookDto(){}
 
-    public BookDto(String publisherId, String categorySmallId, String name, String translator, int originalPrice, BigDecimal discountPercent, int discountPrice, int salePrice, Date releaseDate, Date regDate, String tableOfContent, String description, long isbn, int stockQuantity, String size, int weight, int page, String image) {
+    public BookDto(String publisherId, String categoryLargeId, String categoryMediumId, String categorySmallId, String name, String translator, int originalPrice, BigDecimal discountPercent, int discountPrice, int salePrice, Date releaseDate, Date regDate, String tableOfContent, String description, long isbn, int stockQuantity, String size, int weight, int page, String image) {
         this.publisherId = publisherId;
+        this.categoryLargeId = categoryLargeId;
+        this.categoryMediumId = categoryMediumId;
         this.categorySmallId = categorySmallId;
         this.name = name;
         this.translator = translator;

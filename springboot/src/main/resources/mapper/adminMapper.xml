@@ -109,10 +109,10 @@
     </select>
     <!-- 책 등록용 -->
     <insert id="insertBook" parameterType="BookDto">
-        INSERT INTO book (publisher_id, category_small_id, name, translator, original_price, discount_percent,
+        INSERT INTO book (publisher_id, category_large_id, category_medium_id, category_small_id, name, translator, original_price, discount_percent,
                           discount_price, sale_price, release_date, table_of_content, description, isbn,
                           stock_quantity, size, weight, page, image)
-        VALUES (#{publisherId},#{categorySmallId},#{name},#{translator},#{originalPrice},#{discountPercent},
+        VALUES (#{publisherId},#{categoryLargeId}, #{categoryMediumId}, #{categorySmallId},#{name},#{translator},#{originalPrice},#{discountPercent},
                 #{discountPrice},#{salePrice},#{releaseDate},#{tableOfContent},#{description},#{isbn},
                 #{stockQuantity},#{size},#{weight},#{page},#{image})
     </insert>
