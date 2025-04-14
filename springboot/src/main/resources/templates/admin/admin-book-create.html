@@ -65,7 +65,12 @@
             </tr>
             <tr>
                 <th>역자</th>
-                <td><input type="text" id="translator" class="medium" /></td>
+                <td>
+                    <input type="text" id="translator" class="medium" />
+                    <label style="margin-left: 12px;">
+                        <input type="checkbox" id="translator-none" style="vertical-align: middle;" /> 해당 없음
+                    </label>
+                </td>
             </tr>
             <tr>
                 <th>가격 정보</th>
@@ -96,7 +101,12 @@
             </tr>
             <tr>
                 <th>상품 목차</th>
-                <td><textarea id="product-contents" cols="5" rows="5" class="long"></textarea></td>
+                <td>
+                    <textarea id="product-contents" cols="5" rows="5" class="long"></textarea>
+                    <label style="margin-left: 12px;">
+                        <input type="checkbox" id="contents-none" style="vertical-align: middle;" /> 해당 없음
+                    </label>
+                </td>
             </tr>
             <tr>
                 <th>기타 정보</th>
@@ -435,22 +445,43 @@
 
 <script>
     $(document).ready(function(){
-        let categorySmallId;
         let image;
         let writers = [];
         let publisher = [];
         let books = [];
+        let selectedCategory = {
+            largeId: null,
+            mediumId: null,
+            smallId: null
+        };
+
+        // 체크박스 상태에 따라 값 초기화 및 비활성화
+        $('#translator-none').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#translator').val('').prop('disabled', true);
+            } else {
+                $('#translator').prop('disabled', false);
+            }
+        });
+
+        $('#contents-none').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#product-contents').val('').prop('disabled', true);
+            } else {
+                $('#product-contents').prop('disabled', false);
+            }
+        });
 
         $('#create-button').click(function(event){
             event.preventDefault();
+            // 전체 유효성 통과 여부
+            let isValidWriterInfo = true;
             // 상품명
             let name = $('#product-name').val();
             // isbn
             let isbn = parseInt($('#isbn').val().replace(/[^0-9]/g,''));
             // translator
-            let translator = $('#translator').val();
-            // 카테고리
-            // let categorySmallId = categorySmallId;
+            let translator = $('#translator-none').is(':checked') ? null : $('#translator').val();
             // 정가
             let originalPrice = parseInt($('#price-original').val().replace(/[^0-9]/g,''));
             // 할인율
@@ -464,7 +495,7 @@
             // 이미지
             // let image = image;
             // 목차
-            let tableOfContent = $('#product-contents').val().replace(/\n/g, '<br>');
+            let tableOfContent = $('#contents-none').is(':checked') ? null : $('#product-contents').val().replace(/\n/g, '<br>');
             // 내용
             let description = tinymce.activeEditor.getContent().replace();
             // 재고수량
@@ -478,13 +509,15 @@
 
             // 배열 초기화
             books = [];
-            if(name && isbn && translator && categorySmallId && originalPrice && discountPercent && discountPrice && salePrice
-                && releaseDate && image && tableOfContent && description && stockQuantity && size && weight && page){
+            if(name && isbn && originalPrice && discountPercent && discountPrice && salePrice && releaseDate
+                && description && stockQuantity && size && weight && page){
                 books.push({
                     name: name,
                     isbn: isbn,
                     translator: translator,
-                    categorySmallId: categorySmallId,
+                    categoryLargeId: selectedCategory.largeId,
+                    categoryMediumId: selectedCategory.mediumId,
+                    categorySmallId: selectedCategory.smallId,
                     originalPrice: originalPrice,
                     discountPercent: discountPercent,
                     discountPrice: discountPrice,
@@ -527,7 +560,7 @@
 
             // 배열 초기화
             publisher = [];
-            if(publisherName && president && bizRegNo && mainAddress && detailAddress && zipCode && phoneNum && bizArea){
+            if(publisherName && president && bizRegNo && mainAddress && detailAddress && zipCode && phoneNum && bizArea !== '' && bizArea !== '국적'){
                 // 출판사 배열
                 publisher.push({
                     name: publisherName,
@@ -568,7 +601,7 @@
                     writerDescription = null;
                 }
 
-                if(writerName && gender !== 'N' && nationality !== '국적'){
+                if(writerName && gender !== 'N' && nationality !== '' && nationality !== '국적'){
                     writers.push({
                             name: writerName,
                             gender: gender,
@@ -579,12 +612,14 @@
                 } else {
                     alert('작가 정보를 모두 채워주세요!');
                     $('#publisher-id').focus();
+                    isValidWriterInfo = false;
                     return false;
                 }
                 console.log('writers'+writers);
             })
 
-
+            // 여기서 전체 클릭 이벤트 함수 종료
+            if(!isValidWriterInfo) return;
 
             axios.post('/admin/bookCreate',{
                 bookDto:books,
@@ -996,30 +1031,39 @@
         });
 
         $('.category-large').click(function(){
-            let categoryResponse = [];
             let categoryLargeName = $(this).closest('.category-list').find('.category-large').text();
+            let categoryLargeId = $(this).closest('.category-list').find('.category-large-id').val();
 
-            $('.category-large').css('color', '#333');
-            $(this).css('color', '#007acc');
+            // 대분류 선택 시 저장
+            selectedCategory.largeId = categoryLargeId;
+            selectedCategory.mediumId = null;
+            selectedCategory.smallId = null;
 
-            categoryResponse.push({
+            axios.post('/admin/bookCategory', [{
                 categoryLargeName: categoryLargeName,
-                categoryLargeId: $(this).closest('.category-list').find('.category-large-id').val()
-            })
-            console.log($(this).closest('.category-list').find('.category-large').text())
-            console.log($(this).closest('.category-list').find('.category-large-id').val())
-
-            axios.post('/admin/bookCategory', categoryResponse, {
+                categoryLargeId: categoryLargeId
+            }], {
                 headers: {'content-type':'application/json'}
             }).then(function(response){
                 $('#category-name').text('(대분류) '+ categoryLargeName+' > ').css('margin-top', '10px');
 
+                $('.category-medium').remove();
+                $('.category-small').remove();
+
                 let list = [];
 
+                // (1) 중분류 "해당 없음"
+                list.push(
+                    $('<ul class="category-list"><li class="category-medium"></li></ul>')
+                        .find('li')
+                        .text('해당 없음')
+                        .data('id', null)
+                        .css({'margin-bottom': '12px', 'font-style': 'italic', 'color': '#999'})
+                        .end()
+                );
+
+                // (2) 중분류 목록
                 response.data.forEach(function(item){
-                    $('.category-medium').remove();
-                    $('.category-small').remove();
-                    console.log(item);
                     let categoryItem = $('<ul class="category-list"><li class="category-medium"></li></ul>')
                         .find('li')
                         .text(item.categoryMediumName)
@@ -1027,37 +1071,49 @@
                         .css('margin-bottom', '12px')
                         .end();
                     list.push(categoryItem);
-                })
+                });
+
                 list.forEach(function(item){
-                    $('#categoryMedium').append(item);  // 중분류 리스트에 항목 추가
-                })
+                    $('#categoryMedium').append(item);
+                });
 
+                // (3) 중분류 클릭 이벤트
                 $('.category-medium').click(function(){
-                    let categoryResponse = [];
-                    let categoryMediumName = $(this).closest('.category-list').find('.category-medium').text();
-                    let categoryMediumId = $(this).closest('.category-list').find('.category-medium').data('id');
+                    let categoryMediumName = $(this).text();
+                    let categoryMediumId = $(this).data('id');
 
-                    console.log($(this).closest('.category-list').find('.category-medium').text());
-                    console.log($(this).closest('.category-list').find('.category-medium').data('id'));
+                    selectedCategory.mediumId = categoryMediumId;
+                    selectedCategory.smallId = null;
 
-                    categoryResponse.push({
+                    if (categoryMediumId === null) {
+                        $('#category-name').text('(대분류) ' + categoryLargeName + ' > (중분류 없음)').css('margin-top', '10px');
+                        $('.category-small').remove();
+                        return;
+                    }
+
+                    axios.post('/admin/bookCategory', [{
                         categoryMediumName: categoryMediumName,
                         categoryMediumId: categoryMediumId
-                    })
-
-                    $('.category-medium').css('color', '#333');
-                    $(this).css('color', '#007acc');
-
-                    axios.post('/admin/bookCategory', categoryResponse, {
+                    }], {
                         headers: {'content-type' : 'application/json'}
                     }).then(function(response){
-                        $('#category-name').text('(대분류) '+ categoryLargeName+' > '+'(중분류) '+categoryMediumName+' > ').css('margin-top', '10px');
+                        $('#category-name').text('(대분류) '+ categoryLargeName+' > (중분류) '+categoryMediumName+' > ').css('margin-top', '10px');
 
+                        $('.category-small').remove();
                         let list = [];
 
+                        // (4) 소분류 "해당 없음"
+                        list.push(
+                            $('<ul class="category-list"><li class="category-small"></li></ul>')
+                                .find('li')
+                                .text('해당 없음')
+                                .data('id', null)
+                                .css({'margin-bottom': '12px', 'font-style': 'italic', 'color': '#999'})
+                                .end()
+                        );
+
+                        // (5) 소분류 목록
                         response.data.forEach(function(item){
-                            $('.category-small').remove();
-                            console.log(item);
                             let categoryItem = $('<ul class="category-list"><li class="category-small"></li></ul>')
                                 .find('li')
                                 .text(item.categorySmallName)
@@ -1065,23 +1121,28 @@
                                 .css('margin-bottom', '12px')
                                 .end();
                             list.push(categoryItem);
-                        })
+                        });
 
                         list.forEach(function(item){
                             $('#categorySmall').append(item);
-                        })
+                        });
 
+                        // (6) 소분류 클릭 이벤트
                         $('.category-small').click(function(){
-                            let categorySmallName = $(this).closest('.category-list').find('.category-small').text();
-                            categorySmallId = $(this).closest('.category-list').find('.category-small').data('id');
-                            $('.category-small').css('color', '#333');
-                            $(this).css('color', '#007acc');
+                            let categorySmallName = $(this).text();
+                            let categorySmallId = $(this).data('id');
 
-                            $('#category-name').text('(대분류) '+ categoryLargeName+' > '+'(중분류) '+categoryMediumName+' > '+'(소분류) '+categorySmallName).css('margin-top', '10px');
-                        })
-                    })
-                })
-            })
+                            selectedCategory.smallId = categorySmallId;
+
+                            if (categorySmallId === null) {
+                                $('#category-name').text('(대분류) ' + categoryLargeName + ' > (중분류) ' + categoryMediumName + ' > (소분류 없음)').css('margin-top', '10px');
+                            } else {
+                                $('#category-name').text('(대분류) ' + categoryLargeName + ' > (중분류) ' + categoryMediumName + ' > (소분류) ' + categorySmallName).css('margin-top', '10px');
+                            }
+                        });
+                    });
+                });
+            });
         });
     });
 </script>
