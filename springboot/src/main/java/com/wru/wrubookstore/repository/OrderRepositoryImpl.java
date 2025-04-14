@@ -52,7 +52,9 @@ public class OrderRepositoryImpl implements OrderRepository {
 
     @Override
     public List<Integer> selectBookIdInSalesRank() throws Exception {
-        return session.selectList(namespace + "selectBookIdInSalesRank");
+        // 조회할 도서 수 (상위 5권까지 조회)
+        int topN = 5;
+        return session.selectList(namespace + "selectBookIdInSalesRank", topN);
     }
 
     @Override

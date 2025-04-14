@@ -59,6 +59,19 @@
         WHERE ob.book_id = b.book_id AND ob.order_id = #{orderId}
     </select>
 
+    <!-- 판매량 기준 상위 5권 bookId 조회 (판매량이 같을 경우 bookId가 큰 순서대로)-->
+    <select id="selectBookIdInSalesRank" parameterType="int" resultType="int">
+        SELECT b.book_id
+        FROM orders a, order_book b
+        WHERE a.order_id = b.order_id
+            AND a.end_date IS NOT NULL
+            AND end_date BETWEEN DATE_SUB((SELECT end_date FROM orders
+                                           ORDER BY end_date DESC LIMIT 1), INTERVAL 6 DAY) AND end_date
+        GROUP BY b.book_id
+        ORDER BY SUM(b.quantity) DESC, b.book_id DESC
+        LIMIT #{topN}
+    </select>
+
     <!-- 주문 생성 -->
     <insert id="insertOrder" parameterType="OrderDto" useGeneratedKeys="true" keyProperty="orderId">
         INSERT INTO orders(user_id)
@@ -75,18 +88,6 @@
         INSERT INTO order_book(order_id, book_id, quantity, price)
         VALUES(#{orderId}, #{bookId}, #{quantity}, #{price})
     </insert>
-
-    <!-- 판매량 기준 상위 5권 bookId 조회 (판매량이 같을 경우 bookId가 큰 순서대로)-->
-    <select id="selectBookIdInSalesRank" resultType="int">
-        SELECT b.book_id
-        FROM orders a, order_book b
-        WHERE a.order_id = b.order_id
-          AND a.end_date IS NOT NULL
-          AND DATEDIFF(curdate(), end_date) &lt; 7
-        GROUP BY b.book_id
-        ORDER BY SUM(b.quantity) DESC, b.book_id DESC
-        LIMIT 5
-    </select>
 
     <!-- 테스트용 주문 데이터 전체 삭제 (orders)-->
     <delete id="deleteAllOrdersTest">
