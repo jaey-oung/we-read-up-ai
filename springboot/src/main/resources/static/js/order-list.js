@@ -1,21 +1,28 @@
-function setDateRange(event, daysAgo) {
-    event.preventDefault(); // 폼 제출 방지
+function setDate(keyword) {
+    const startDate = document.getElementById('startDate');
+    const day = new Date();
 
-    const today = new Date();
-    const startDate = new Date();
+    switch (keyword) {
+        // 1주일 버튼 클릭 시
+        case 'oneWeek':
+            day.setDate(day.getDate() - 7);
+            break;
+        // 1개월 버튼 클릭 시
+        case 'oneMonth':
+            day.setMonth(day.getMonth() - 1, day.getDate() + 1);
+            break;
+        // 6개월 버튼 클릭 시
+        case 'sixMonth':
+            day.setMonth(day.getMonth() - 6, day.getDate() + 1);
+            break;
+        // 오늘 버튼 클릭 시
+        default:
+            break;
+    }
 
-    // 시작 날짜 설정 (오늘 날짜에서 daysAgo 만큼 뺌)
-    startDate.setDate(today.getDate() - daysAgo);
+    const year = day.getFullYear();
+    const month = String(day.getMonth() + 1).padStart(2, '0');
+    const date = String(day.getDate()).padStart(2, '0');
 
-    // 날짜를 YYYY-MM-DD 형식으로 변환하는 함수
-    function formatDate(date) {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0'); // 월 (0부터 시작하므로 +1 필요)
-    const dd = String(date.getDate()).padStart(2, '0'); // 일
-    return `${yyyy}-${mm}-${dd}`;
-}
-
-    // input 요소에 값 설정
-    document.getElementById("startDate").value = formatDate(startDate);
-    document.getElementById("endDate").value = formatDate(today);
+    startDate.value = `${year}-${month}-${date}`;
 }
