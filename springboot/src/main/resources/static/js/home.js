@@ -1,45 +1,87 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // ===== DOM 요소 선택 =====
+    /* ===== DOM 요소 선택 ===== */
+    // 컨테이너 요소
     const popup = document.getElementById("popup-container");
     const questions = document.getElementById("questions-container");
+
+    // 버튼 요소
     const startBtn = document.getElementById("popup-start-btn");
     const popupCloseBtn = document.getElementById("popup-close-btn");
-    const quizCloseBtn = document.getElementById("quiz-close-btn");
+    const quesCloseBtn = document.getElementById("ques-close-btn");
     const nextBtns = document.querySelectorAll(".next-btn");
     const prevBtns = document.querySelectorAll(".prev-btn");
     const submitBtn = document.getElementById("submit-btn");
-    const choiceBoxes = document.querySelectorAll(".choice-box");
+
+    // 선택 및 진행 상태 요소
+    const scaleOptions = document.querySelectorAll(".scale-option");
     const progressFill = document.querySelector(".progress-fill");
     const progressText = document.querySelector(".progress-text");
 
-    // ===== 상태 관리 =====
-    let currentQuestion = 1;
-    const answers = new Array(4).fill(null);
+    /* ===== 상수 정의 ===== */
+    const FIRST_QUESTION = 1;
+    const LAST_QUESTION = 4;
 
-    // ===== 유틸리티 함수 =====
+    /* ===== 상태 관리 ===== */
+    // 현재 질문 번호
+    let currentQuestion = FIRST_QUESTION;
+    // 성향 점수 저장 객체
+    const answers = {
+        S: 0, I: 0,
+        F: 0, D: 0,
+        N: 0, M: 0,
+        Q: 0, A: 0
+    };
+
+    /* ===== 유틸리티 함수 ===== */
     // 진행 상태 업데이트
     function updateProgress() {
-        progressFill.style.width = `${(currentQuestion / 4) * 100}%`;
-        progressText.textContent = `${currentQuestion}/4`;
+        progressFill.style.width = `${(currentQuestion / LAST_QUESTION) * 100}%`;
+        progressText.textContent = `${currentQuestion}/${LAST_QUESTION}`;
     }
 
     // 제출 버튼 상태 업데이트
     function updateSubmitButton() {
-        const allAnswered = answers.every(answer => answer !== null);
+        // 모든 질문에 답변했는지 확인
+        const allAnswered = document.querySelectorAll('.scale-option.selected').length === LAST_QUESTION;
+
         submitBtn.disabled = !allAnswered;
         submitBtn.classList.toggle("active", allAnswered);
     }
 
-    // 질문 표시/숨김
+    // 질문 표시/숨김 처리
     function showQuestion(num) {
         document.getElementById(`q${num}`).classList.add("active");
+        updateNavigationButtons(num);
     }
 
     function hideQuestion(num) {
         document.getElementById(`q${num}`).classList.remove("active");
     }
 
-    // ===== 이벤트 핸들러 =====
+    // 네비게이션 버튼 상태 업데이트
+    function updateNavigationButtons(num) {
+        const prevBtns = document.querySelectorAll('.prev-btn');
+        const nextBtns = document.querySelectorAll('.next-btn');
+
+        prevBtns.forEach(btn => {
+            if (parseInt(btn.closest('.question-text').dataset.question) === FIRST_QUESTION) {
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = 'flex';
+            }
+        });
+
+        nextBtns.forEach(btn => {
+            if (parseInt(btn.closest('.question-text').dataset.question) === LAST_QUESTION) {
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = 'flex';
+            }
+        });
+    }
+
+    /* ===== 이벤트 핸들러 ===== */
+    // 시작 버튼 클릭
     function handleStartClick() {
         popup.style.display = "none";
         questions.style.display = "flex";
@@ -48,17 +90,20 @@ document.addEventListener("DOMContentLoaded", function () {
         updateSubmitButton();
     }
 
+    // 닫기 버튼 클릭
     function handleCloseClick() {
         popup.style.display = "none";
     }
 
-    function handleQuizCloseClick() {
+    function handleQuesCloseClick() {
         questions.style.display = "none";
     }
 
+    // 다음 버튼 클릭
     function handleNextClick(e) {
-        const num = parseInt(e.currentTarget.dataset.question);
-        if (num < 4) {
+        const questionText = e.currentTarget.closest('.question-text');
+        const num = parseInt(questionText.dataset.question);
+        if (num < LAST_QUESTION) {
             hideQuestion(num);
             currentQuestion = num + 1;
             showQuestion(currentQuestion);
@@ -66,9 +111,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // 이전 버튼 클릭
     function handlePrevClick(e) {
-        const num = parseInt(e.currentTarget.dataset.question);
-        if (num > 1) {
+        const questionText = e.currentTarget.closest('.question-text');
+        const num = parseInt(questionText.dataset.question);
+        if (num > FIRST_QUESTION) {
             hideQuestion(num);
             currentQuestion = num - 1;
             showQuestion(currentQuestion);
@@ -76,32 +123,58 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    // 제출 버튼 클릭
     function handleSubmitClick() {
-        if (answers.every(answer => answer !== null)) {
-            alert("당신의 성향은: " + answers.join(""));
-            questions.style.display = "none";
-            // TODO: 결과 화면 띄우기
-        } else {
-            alert("모든 질문에 답변해 주세요!");
+        // 각 질문에 대한 점수 계산
+        for (let i = FIRST_QUESTION; i <= LAST_QUESTION; i++) {
+            const container = document.querySelector(`#q${i} .scale-container`);
+            const selected = container.querySelector('.scale-option.selected');
+
+            if (!selected) {
+                alert("모든 질문에 답변해 주세요!");
+                return;
+            }
+
+            // 1~5
+            const value = parseInt(selected.textContent);
+            const leftCode = container.dataset.leftCode;
+            const rightCode = container.dataset.rightCode;
+
+            // 점수 계산 (1: left 100/right 0, 2: left 75/right 25, ...)
+            const rightRatio = (value - 1) * 25;
+
+            answers[leftCode] = 100 - rightRatio;
+            answers[rightCode] = rightRatio;
         }
+
+        alert("당신의 독서 성향 점수:\n" + JSON.stringify(answers, null, 2));
+        questions.style.display = "none";
+
+        // TODO: 백엔드로 결과 전송
     }
 
-    function handleChoiceClick() {
-        const parent = this.closest(".question-container");
-        const code = this.dataset.code;
-        const questionNumber = parseInt(parent.id.replace("q", ""));
-        parent.querySelectorAll(".choice-box").forEach(cb => cb.classList.remove("selected"));
-        this.classList.add("selected");
-        answers[questionNumber - 1] = code;
+    // 척도 옵션 클릭
+    function handleScaleOptionClick(e) {
+        const option = e.currentTarget;
+        const parent = option.closest(".question-container");
+        const container = parent.querySelector(".scale-container");
+
+        // 이전 선택 제거
+        container.querySelectorAll(".scale-option").forEach(opt => {
+            opt.classList.remove("selected");
+        });
+
+        // 새로운 선택 표시
+        option.classList.add("selected");
         updateSubmitButton();
     }
 
-    // ===== 이벤트 리스너 등록 =====
+    /* ===== 이벤트 리스너 등록 ===== */
     startBtn.addEventListener("click", handleStartClick);
     popupCloseBtn.addEventListener("click", handleCloseClick);
-    quizCloseBtn.addEventListener("click", handleQuizCloseClick);
+    quesCloseBtn.addEventListener("click", handleQuesCloseClick);
     nextBtns.forEach(btn => btn.addEventListener("click", handleNextClick));
     prevBtns.forEach(btn => btn.addEventListener("click", handlePrevClick));
     submitBtn.addEventListener("click", handleSubmitClick);
-    choiceBoxes.forEach(box => box.addEventListener("click", handleChoiceClick));
+    scaleOptions.forEach(option => option.addEventListener("click", handleScaleOptionClick));
 });
