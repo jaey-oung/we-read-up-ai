@@ -138,33 +138,43 @@ n = random.randint(1, 100)
 q = random.randint(1, 100)
 
 user_mbti_score = {
-    # 'S': s, 'I': 100-s,
-    # 'F': f, 'D': 100-f,
-    # 'N': n, 'M': 100-n,
-    # 'Q': q, 'A': 100-q
-    'S': 42, 'I': 58, 'F': 18, 'D': 82, 'N': 63, 'M': 37, 'Q': 78, 'A': 22
+    'S': s, 'I': 100-s,
+    'F': f, 'D': 100-f,
+    'N': n, 'M': 100-n,
+    'Q': q, 'A': 100-q
+    # 'S': 42, 'I': 58, 'F': 18, 'D': 82, 'N': 63, 'M': 37, 'Q': 78, 'A': 22
 }
 
 # ===== 예측 ===== #
-dataset = []
 print(f"[{currentTime()}] 예측 시작...")
+raw_dataset = []  # 임베딩만 저장되는 원본 데이터
+CACHE_KEYS = ['S','I','F','D','N','M','Q','A']
+
 if os.path.exists(CACHE_EMB_PATH):
     print(f"[{currentTime()}] 임베딩 캐시 불러오는 중...")
     with open(CACHE_EMB_PATH, 'r', encoding='utf-8') as f:
-        dataset = json.load(f)
+        raw_dataset = json.load(f)
     print(f"[{currentTime()}] 캐시 불러오기 완료")
 else:
     print(f"[{currentTime()}] 임베딩 시작...")
     mbti_results = predict_mbti_batch(df_para['paragraph'].tolist(), model, tokenizer, device)
     for i, row in df_para.iterrows():
         mbti_tensor = mbti_results[i]
-        mbti_score = {k: v * 100 for k, v in zip(['S','I','F','D','N','M','Q','A'], mbti_tensor)}
-        distance = mbti_distance(user_mbti_score, mbti_score)
-        dataset.append((distance, row['title'], row['paragraph'], mbti_score))
+        mbti_score = {k: float(v * 100) for k, v in zip(CACHE_KEYS, mbti_tensor)}
+        raw_dataset.append({
+            "title": row["title"],
+            "paragraph": row["paragraph"],
+            "mbti_score": mbti_score
+        })
     with open(CACHE_EMB_PATH, 'w', encoding='utf-8') as f:
-        json.dump(dataset, f, ensure_ascii=False, indent=2)
+        json.dump(raw_dataset, f, ensure_ascii=False, indent=2)
     print(f"[{currentTime()}] 임베딩 종료...")
-print(f"[{currentTime()}] 예측 종료...")
+
+# ===== 유저 MBTI 점수 기준 거리 계산 ===== #
+dataset = []
+for item in raw_dataset:
+    dist = mbti_distance(user_mbti_score, item["mbti_score"])
+    dataset.append((dist, item["title"], item["paragraph"], item["mbti_score"]))
 
 # ===== 상위 5개 출력 ===== #
 dataset.sort(key=lambda x: x[0])
