@@ -33,6 +33,7 @@ python/.mypy_cache/
 python/.pytest_cache/
 python/*.pyc
 python/*.pyo
+python/data/
 
 # VSCode
 .vscode/
