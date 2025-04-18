@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // 질문 표시/숨김 처리
     function showQuestion(num) {
         document.getElementById(`q${num}`).classList.add("active");
-        updateNavigationButtons(num);
+        updateNavigationButtons();
     }
 
     function hideQuestion(num) {
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 네비게이션 버튼 상태 업데이트
-    function updateNavigationButtons(num) {
+    function updateNavigationButtons() {
         const prevBtns = document.querySelectorAll('.prev-btn');
         const nextBtns = document.querySelectorAll('.next-btn');
 
@@ -135,16 +135,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // 1~5
-            const value = parseInt(selected.textContent);
+            // 점수 계산 (4척도 기준)
+            // 1: 왼쪽 완전 선호 (100 / 0)
+            // 2: 왼쪽 약간 선호 (66.7 / 33.3)
+            // 3: 오른쪽 약간 선호 (33.3 / 66.7)
+            // 4: 오른쪽 완전 선호 (0 / 100)
+            const value = parseInt(selected.dataset.score);
             const leftCode = container.dataset.leftCode;
             const rightCode = container.dataset.rightCode;
 
-            // 점수 계산 (1: left 100/right 0, 2: left 75/right 25, ...)
-            const rightRatio = (value - 1) * 25;
+            const rightRatio = ((value - 1) / 3) * 100;
 
-            answers[leftCode] = 100 - rightRatio;
-            answers[rightCode] = rightRatio;
+            answers[leftCode] = Math.round(100 - rightRatio);
+            answers[rightCode] = Math.round(rightRatio);
         }
 
         alert("당신의 독서 성향 점수:\n" + JSON.stringify(answers, null, 2));
