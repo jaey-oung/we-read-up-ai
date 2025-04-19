@@ -102,7 +102,7 @@
                     <div class="scale-container" data-left-code="Q" data-right-code="A">
                         <div class="scale-option" data-score="1">목적 중심 책에<br>가장 끌림</div>
                         <div class="scale-option" data-score="2">목적 중심 책에<br>약간 끌림</div>
-                        <div class="scale-option" data-score="3">자유 중심 책에에<br>약간 끌림</div>
+                        <div class="scale-option" data-score="3">자유 중심 책에<br>약간 끌림</div>
                         <div class="scale-option" data-score="4">자유 중심 책에<br>가장 끌림</div>
                     </div>
                 </div>
@@ -111,6 +111,29 @@
         </div>
     </div>
 </div>
+
+<!-- 독서 성향 테스트 결과 팝업 -->
+<div id="result-container" style="display: none">
+    <div class="popup-box">
+
+        <div id="type-info-btn">모든 유형 살펴보기</div>
+        <button id="result-close-btn">&times;</button>
+
+        <div id="type-info-box">
+            <div class="type-grid" id="types-container"></div>
+        </div>
+
+        <h2>📚 당신의 독서 성향은...</h2>
+
+        <div class="result-content">
+            <div class="result-type">
+                <h3 id="result-type-name"></h3>
+                <p id="result-type-description"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{fragments/header :: header}"></div>
 <section class="new-books">
     <div id="h-slider-1" class="h-slider">
@@ -157,6 +180,8 @@
     </div>
 </section>
 <div th:replace="~{fragments/footer :: footer}"></div>
+<!-- Lucide 아이콘 라이브러리 -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="/js/home.js"></script>
 <script src="/js/home-slider.js"></script>
 <script src="/js/display-msg.js"></script>
