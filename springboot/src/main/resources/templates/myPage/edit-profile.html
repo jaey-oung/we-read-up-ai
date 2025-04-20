@@ -95,7 +95,7 @@
       </form>
 
       <div class="third-category">
-        <form action="/myPage/withdraw" method="post" onsubmit="return deleteUser()">
+        <form action="/myPage/withdraw" method="post">
           <input type="submit" value="회원 탈퇴" id="delete-user">
         </form>
         <form th:unless="${user.isMember}" action="/myPage/convertMember" method="get">
@@ -117,16 +117,7 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="/js/birth.js"></script>
-<script>
-  function deleteUser() {
-    return confirm("정말로 회원 탈퇴하시겠습니까?");
-  }
-  $(document).ready(function (){
-    $('#cancel').click(function(){
-      window.location.href = "/myPage";
-    });
-  });
-</script>
+<script src="/js/edit-profile.js"></script>
 
 </body>
 </html>
