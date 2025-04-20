@@ -1,107 +1,273 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // ===== DOM 요소 선택 =====
+/* ===== 상수 정의 ===== */
+// 질문 번호 시작/끝 값
+const FIRST_QUESTION = 1;
+const LAST_QUESTION = 4;
+
+/* ===== 전역 상태 정의 ===== */
+// 각 성향 축(S/I, F/D, N/M, Q/A)에 대한 사용자 응답 점수를 저장하는 객체
+const answers = { S: 0, I: 0, F: 0, D: 0, N: 0, M: 0, Q: 0, A: 0 };
+
+/* ===== 독서 성향 유형 데이터 ===== */
+// 각 MBTI 성향 조합에 따른 결과 정보 정의
+const readerTypes = {
+    SFNQ: { name: "몰입형 이야기꾼", description: "감성적으로 공감하며 이야기 자체에 몰입하는 독서형 감성러입니다.", icon: "book-open" },
+    SFNA: { name: "스토리 헌터", description: "감성과 현실에 기반해 목표한 이야기를 집중적으로 찾아 읽는 탐색자입니다.", icon: "compass" },
+    SFMQ: { name: "따뜻한 의미 수집가", description: "감성으로 의미를 찾아내며 이야기 안팎에서 여운을 곱씹는 독서가입니다.", icon: "heart" },
+    SFMA: { name: "정보형 탐험가", description: "현실적이며 감성적인 성격으로 메시지를 중심으로 자유롭게 독서를 탐험하는 타입입니다.", icon: "map" },
+    SDNQ: { name: "사색적 분석가", description: "이야기에서 논리적 흐름을 읽어내며 분석하는 독서형 지성인입니다.", icon: "brain" },
+    SDNA: { name: "현실주의 전략가", description: "데이터 기반 현실주의자로 목표 독서 리스트를 체계적으로 공략하는 독자입니다.", icon: "target" },
+    SDMQ: { name: "지식 탐험가", description: "데이터 중심 사고로 깊은 의미를 자유롭게 탐험하며 책을 즐기는 탐색가입니다.", icon: "search" },
+    SDMA: { name: "메시지 설계자", description: "정보 중심 메시지를 중시하며 구조적이고 의도된 독서를 추구하는 성격입니다.", icon: "layout" },
+    IFNQ: { name: "이야기 연금술사", description: "풍부한 감성과 상상력으로 이야기를 자신의 세계로 재해석하는 독자입니다.", icon: "wand" },
+    IFNA: { name: "몽상형 독서가", description: "감성과 상상을 바탕으로 목표 독서를 즐기는 꿈꾸는 독서가입니다.", icon: "moon" },
+    IFMQ: { name: "직관형 감정가", description: "상상 속 의미를 자유롭게 해석하며 감정을 중심으로 책을 경험하는 성격입니다.", icon: "feather" },
+    IFMA: { name: "감성 큐레이터", description: "상상력을 자극하는 메시지를 감성적으로 수집하고 정리하는 예술적 독서가입니다.", icon: "palette" },
+    IDNQ: { name: "창조적 탐색가", description: "이야기에서 새로운 패턴과 통찰을 끌어내는 분석형 탐색가입니다.", icon: "puzzle" },
+    IDNA: { name: "분석형 비전가", description: "상상과 데이터를 조합해 목표한 독서 목표를 논리적으로 완수하는 독서가입니다.", icon: "lightbulb" },
+    IDMQ: { name: "지식 개척자", description: "지적 호기심을 기반으로 자유롭게 독서를 넘나드는 창의적 유형입니다.", icon: "rocket" },
+    IDMA: { name: "비전 메이커", description: "메시지를 통해 상상과 사실을 엮으며 깊이 있는 통찰을 추구하는 독자입니다.", icon: "eye" },
+};
+
+/* ===== 유틸리티 함수 ===== */
+// 사용자 응답 점수를 바탕으로 4자리 성향 코드 생성
+function calculateType() {
+    const types = [
+        { left: 'S', right: 'I' },
+        { left: 'F', right: 'D' },
+        { left: 'N', right: 'M' },
+        { left: 'Q', right: 'A' }
+    ];
+
+    return types.map(({ left, right }) =>
+        answers[left] >= answers[right] ? left : right
+    ).join('');
+}
+
+// 결과 DOM을 받아온 성향 유형 정보로 업데이트
+function displayResult(code, info) {
+    const resultTypeName = document.getElementById("result-type-name");
+    const resultTypeDescription = document.getElementById("result-type-description");
+
+    resultTypeName.innerHTML = `
+        <i data-lucide="${info.icon}" class="result-icon"></i>
+        <span class="result-code">${code}</span>
+        <span class="result-name">${info.name}</span>
+    `;
+    resultTypeDescription.textContent = info.description;
+}
+
+// 일치하는 성향 코드가 보여주기
+function showResult(type) {
+    const resultContainer = document.getElementById("result-container");
+    const container = document.getElementById("types-container");
+
+    // 완전 일치 시 우선 처리
+    if (readerTypes[type])
+        displayResult(type, readerTypes[type]);
+
+    // 결과 유형 동적으로 채우기
+    Object.entries(readerTypes).forEach(([code, info]) => {
+        const item = document.createElement("div");
+        item.className = "type-item";
+        if (code === type) item.classList.add("selected");
+        item.setAttribute("data-type", code);
+        item.setAttribute("title", info.description);
+
+        // 내부 요소 구성
+        item.innerHTML = `
+            <i data-lucide="${info.icon}" class="type-icon"></i>
+            <div class="code">${code}</div>
+            <div class="name">${info.name}</div>
+            <div class="description">${info.description}</div>
+        `;
+
+        container.appendChild(item);
+    });
+
+    // lucide 아이콘 다시 렌더링
+    lucide.createIcons();
+
+    resultContainer.style.display = "flex";
+}
+
+/* ===== 초기화 함수 ===== */
+function init() {
+    /* ===== DOM 요소 선택 ===== */
+    // 컨테이너 요소
     const popup = document.getElementById("popup-container");
     const questions = document.getElementById("questions-container");
+    const resultContainer = document.getElementById("result-container");
+    const typeInfoBox = document.getElementById("type-info-box");
+
+    // 버튼 요소
     const startBtn = document.getElementById("popup-start-btn");
     const popupCloseBtn = document.getElementById("popup-close-btn");
-    const quizCloseBtn = document.getElementById("quiz-close-btn");
+    const quesCloseBtn = document.getElementById("ques-close-btn");
     const nextBtns = document.querySelectorAll(".next-btn");
     const prevBtns = document.querySelectorAll(".prev-btn");
     const submitBtn = document.getElementById("submit-btn");
-    const choiceBoxes = document.querySelectorAll(".choice-box");
+    const typeInfoBtn = document.getElementById("type-info-btn");
+
+    // 선택 및 진행 상태 요소
     const progressFill = document.querySelector(".progress-fill");
     const progressText = document.querySelector(".progress-text");
 
-    // ===== 상태 관리 =====
-    let currentQuestion = 1;
-    const answers = new Array(4).fill(null);
+    /* ===== 상태 관리 ===== */
+    let currentQuestion = FIRST_QUESTION;
 
-    // ===== 유틸리티 함수 =====
-    // 진행 상태 업데이트
+    /* ===== 유틸리티 함수 ===== */
+    // 진행 바(%) 및 질문 번호 텍스트 업데이트
     function updateProgress() {
-        progressFill.style.width = `${(currentQuestion / 4) * 100}%`;
-        progressText.textContent = `${currentQuestion}/4`;
+        progressFill.style.width = `${(currentQuestion / LAST_QUESTION) * 100}%`;
+        progressText.textContent = `${currentQuestion}/${LAST_QUESTION}`;
     }
 
-    // 제출 버튼 상태 업데이트
+    // 모든 질문이 응답되었는지 확인 후 제출 버튼 활성화
     function updateSubmitButton() {
-        const allAnswered = answers.every(answer => answer !== null);
+        const allAnswered = document.querySelectorAll(".scale-option.selected").length === LAST_QUESTION;
         submitBtn.disabled = !allAnswered;
         submitBtn.classList.toggle("active", allAnswered);
     }
 
-    // 질문 표시/숨김
+    // 현재 질문 보여주기 및 버튼 상태 업데이트
     function showQuestion(num) {
         document.getElementById(`q${num}`).classList.add("active");
+        updateNavigationButtons();
     }
 
+    // 현재 질문 숨기기
     function hideQuestion(num) {
         document.getElementById(`q${num}`).classList.remove("active");
     }
 
-    // ===== 이벤트 핸들러 =====
-    function handleStartClick() {
+    // 질문 번호에 따라 이전/다음 버튼 표시 여부 결정
+    function updateNavigationButtons() {
+        const prevBtns = document.querySelectorAll(".prev-btn");
+        const nextBtns = document.querySelectorAll(".next-btn");
+
+        prevBtns.forEach((btn) => {
+            btn.style.display = parseInt(btn.closest(".question-text").dataset.question) === FIRST_QUESTION ? "none" : "flex";
+        });
+
+        nextBtns.forEach((btn) => {
+            btn.style.display = parseInt(btn.closest(".question-text").dataset.question) === LAST_QUESTION ? "none" : "flex";
+        });
+    }
+
+    // 점수 계산 후 최종 성향 판단 → 결과 출력 및 팝업 닫기
+    function handleSubmitClick() {
+        for (let i = FIRST_QUESTION; i <= LAST_QUESTION; i++) {
+            const container = document.querySelector(`#q${i} .scale-container`);
+            const selected = container.querySelector(".scale-option.selected");
+            if (!selected) return alert("모든 질문에 답변해 주세요!");
+
+            // 점수 계산 (4척도 기준)
+            // 1: 왼쪽 완전 선호 (100 / 0)
+            // 2: 왼쪽 약간 선호 (66.7 / 33.3)
+            // 3: 오른쪽 약간 선호 (33.3 / 66.7)
+            // 4: 오른쪽 완전 선호 (0 / 100)
+            const value = parseInt(selected.dataset.score);
+            const leftCode = container.dataset.leftCode;
+            const rightCode = container.dataset.rightCode;
+            const rightRatio = Math.round((value - 1) * 33.3);
+
+            answers[leftCode] = 100 - rightRatio;
+            answers[rightCode] = rightRatio;
+        }
+
+        const type = calculateType();
+        showResult(type);
+        alert("당신의 독서 성향 점수:\n" + JSON.stringify(answers, null, 2));
+        questions.style.display = "none";
+
+        // TODO: 백엔드로 결과 전송
+    }
+
+    // 스케일(1~4) 선택 시 선택 상태 갱신 및 제출 버튼 상태 업데이트
+    function handleScaleOptionClick(e) {
+        const option = e.currentTarget;
+        const container = option.closest(".scale-container");
+
+        container.querySelectorAll(".scale-option").forEach((opt) => opt.classList.remove("selected"));
+        option.classList.add("selected");
+        updateSubmitButton();
+    }
+
+    /* ===== 이벤트 리스너 등록 ===== */
+    // 설문 시작 버튼 클릭 시 팝업 닫고 질문 화면으로 전환
+    startBtn.addEventListener("click", () => {
         popup.style.display = "none";
         questions.style.display = "flex";
         showQuestion(currentQuestion);
         updateProgress();
         updateSubmitButton();
-    }
+    });
 
-    function handleCloseClick() {
-        popup.style.display = "none";
-    }
+    // 시작 팝업 닫기 버튼 클릭 시 팝업 닫힘
+    popupCloseBtn.addEventListener("click", () => popup.style.display = "none");
 
-    function handleQuizCloseClick() {
-        questions.style.display = "none";
-    }
+    // 질문 화면 닫기 버튼 클릭 시 질문 창 닫힘
+    quesCloseBtn.addEventListener("click", () => questions.style.display = "none");
 
-    function handleNextClick(e) {
-        const num = parseInt(e.currentTarget.dataset.question);
-        if (num < 4) {
+    // 제출 버튼 클릭 시 점수 계산 및 결과 출력
+    submitBtn.addEventListener("click", handleSubmitClick);
+
+    // 다음 버튼 클릭 시 다음 질문으로 이동
+    nextBtns.forEach((btn) => btn.addEventListener("click", (e) => {
+        const num = parseInt(e.currentTarget.closest(".question-text").dataset.question);
+        if (num < LAST_QUESTION) {
             hideQuestion(num);
             currentQuestion = num + 1;
             showQuestion(currentQuestion);
             updateProgress();
         }
-    }
+    }));
 
-    function handlePrevClick(e) {
-        const num = parseInt(e.currentTarget.dataset.question);
-        if (num > 1) {
+    // 이전 버튼 클릭 시 이전 질문으로 이동
+    prevBtns.forEach((btn) => btn.addEventListener("click", (e) => {
+        const num = parseInt(e.currentTarget.closest(".question-text").dataset.question);
+        if (num > FIRST_QUESTION) {
             hideQuestion(num);
             currentQuestion = num - 1;
             showQuestion(currentQuestion);
             updateProgress();
         }
-    }
+    }));
 
-    function handleSubmitClick() {
-        if (answers.every(answer => answer !== null)) {
-            alert("당신의 성향은: " + answers.join(""));
-            questions.style.display = "none";
-            // TODO: 결과 화면 띄우기
-        } else {
-            alert("모든 질문에 답변해 주세요!");
-        }
-    }
+    // 척도 선택 클릭 시 선택 상태 갱신 및 제출 버튼 활성화 여부 확인
+    document.querySelectorAll(".scale-option").forEach((option) => {
+        option.addEventListener("click", handleScaleOptionClick);
+    });
 
-    function handleChoiceClick() {
-        const parent = this.closest(".question-container");
-        const code = this.dataset.code;
-        const questionNumber = parseInt(parent.id.replace("q", ""));
-        parent.querySelectorAll(".choice-box").forEach(cb => cb.classList.remove("selected"));
-        this.classList.add("selected");
-        answers[questionNumber - 1] = code;
-        updateSubmitButton();
-    }
+    // lucide 아이콘 최초 초기화
+    lucide.createIcons();
 
-    // ===== 이벤트 리스너 등록 =====
-    startBtn.addEventListener("click", handleStartClick);
-    popupCloseBtn.addEventListener("click", handleCloseClick);
-    quizCloseBtn.addEventListener("click", handleQuizCloseClick);
-    nextBtns.forEach(btn => btn.addEventListener("click", handleNextClick));
-    prevBtns.forEach(btn => btn.addEventListener("click", handlePrevClick));
-    submitBtn.addEventListener("click", handleSubmitClick);
-    choiceBoxes.forEach(box => box.addEventListener("click", handleChoiceClick));
+    // 결과창이 열릴 때마다 아이콘을 새로 렌더링 (DOM style 변경 감지)
+    new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === "attributes" && mutation.attributeName === "style") {
+                if (resultContainer.style.display === "flex") {
+                    lucide.createIcons();
+                }
+            }
+        });
+    }).observe(resultContainer, { attributes: true });
+
+    // 마우스 올릴 시 유형 박스 표시
+    typeInfoBtn.addEventListener("mouseenter", () => {
+        typeInfoBox.style.display = "block";
+    });
+
+    // 마우스 떠날 시 유형 박스 숨김
+    typeInfoBox.addEventListener("mouseleave", () => {
+        typeInfoBox.style.display = "none";
+    });
+}
+
+/* ===== 초기 실행 ===== */
+document.addEventListener("DOMContentLoaded", init);
+
+// 결과 팝업 닫힘
+document.getElementById("result-close-btn").addEventListener("click", () => {
+    document.getElementById("result-container").style.display = "none";
 });
