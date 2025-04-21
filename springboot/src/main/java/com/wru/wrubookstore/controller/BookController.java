@@ -4,6 +4,7 @@ import com.wru.wrubookstore.domain.PageHandler;
 import com.wru.wrubookstore.domain.MainSearchCondition;
 import com.wru.wrubookstore.domain.SearchCondition;
 import com.wru.wrubookstore.dto.*;
+import com.wru.wrubookstore.dto.response.book.BookDetailResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
 import com.wru.wrubookstore.dto.response.publisher.PublisherListResponse;
 import com.wru.wrubookstore.dto.response.review.ReviewListResponse;
@@ -14,28 +15,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.Writer;
 import java.util.*;
 
 @Controller
+@RequestMapping("/book")
 public class BookController {
     private final BookService bookService;
-    private final LikeService likeService;
-    private final ReviewService reviewService;
-    private final MemberService memberService;
-    private final UserService userService;
 
-    BookController(BookService bookService, UserService userService,LikeService likeService, ReviewService reviewService, MemberService memberService) {
+    BookController(BookService bookService) {
         this.bookService = bookService;
-        this.likeService = likeService;
-        this.reviewService = reviewService;
-        this.memberService = memberService;
-        this.userService = userService;
-
     }
 
     /* 메인 홈페이지 메뉴의 카테고리 클릭 시 도서 리스트 출력 */
@@ -157,75 +148,13 @@ public class BookController {
     }
 
 
+    // 상품 상세 페이지
     @GetMapping("/bookDetail")
-    public String bookDetail(@SessionAttribute(value = "userId", required = false) Integer userId ,Integer bookId, Integer page, String category, Integer pageSize, Model m) {
-        try{
-            int isLikeUser = 0;
-            int memberId = 0;
-            int isMember = 0;
+    public String bookDetail(@SessionAttribute(value = "userId", required = false) Integer userId, Integer bookId, Model m) throws Exception {
+        // 상품 상세 정보(책, 지은이, 출판사, 리뷰, 좋아요, 카테고리, 별점)
+        BookDetailResponse bookDetailResponse = bookService.select(bookId, userId);
 
-            if(userId != null){
-                System.out.println("userId = " + userId);
-                MemberDto memberDto = memberService.selectMember(userId);
-                System.out.println("bookDetail//memberDto = " + memberDto);
-                UserDto userDto = userService.selectUser(userId);
-                System.out.println("userDto = " + userDto);
-
-                if(userDto.getIsMember()){
-                    isMember = 1;
-                }
-                if (memberDto != null) {
-                    memberId = memberDto.getMemberId();
-                    // 좋아요 누른 회원의 정보 조회
-                    LikeDto likeDto = new LikeDto(bookId, memberId);
-                    // 0이면 좋아요 안누른 유저, 1이면 좋아요 누른 유저
-                    isLikeUser = likeService.selectLikeMember(likeDto);
-                }
-            }
-
-            // 책 정보 조회
-            BookDto bookDto = bookService.select(bookId);
-            // 지은이들 조회
-            List<String> writer = bookService.selectWriter(bookId);
-            // 출판사 조회
-            String publisher = bookService.selectPublisher(bookId);
-            // 리뷰들 조회
-            List<ReviewListResponse> review = reviewService.selectReview(bookId);
-            // 리뷰가 있는지 없는지 확인
-            int reviewCnt = reviewService.countReview(bookId);
-            CategoryResponse categoryResponse = bookService.selectCategorySM(bookId);
-            categoryResponse.setCategoryLargeName(bookService.selectCategoryL(categoryResponse).getCategoryLargeName());
-            // 리뷰 점수 조회
-            double rating;
-            if(reviewCnt == 0){
-                rating = 0;
-            } else{
-                rating = reviewService.ratingReview(bookId);
-            }
-
-            System.out.println("rating = " + rating);
-
-            System.out.println("여기야!!//categoryResponse = " + categoryResponse);
-
-            m.addAttribute("review", review);
-            m.addAttribute("bookDto", bookDto);
-            m.addAttribute("writer", writer);
-            m.addAttribute("publisher", publisher);
-            m.addAttribute("reviewCnt", reviewCnt);
-            m.addAttribute("isLikeUser", isLikeUser);
-            m.addAttribute("memberId", memberId);
-            m.addAttribute("category", categoryResponse);
-            m.addAttribute("rating", rating);
-            m.addAttribute("isMember", isMember);
-            m.addAttribute("userId", userId);
-            System.out.println("bookDetail//isLikeUser = " + isLikeUser);
-
-
-            System.out.println("ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ");
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-
+        m.addAttribute("bookDetailResponse", bookDetailResponse);
 
         return "book/book-detail";
     }

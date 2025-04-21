@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from transformers import AutoTokenizer, PreTrainedTokenizerFast, BartForConditionalGeneration
 from model.mbtimlp import MBTIModel
 import matplotlib.pyplot as plt
+import matplotlib
 from sklearn.decomposition import PCA
 from tqdm import tqdm
 import re
@@ -196,6 +197,7 @@ for dist, title, para, mbti in dataset[:5]:
 plt.rcParams['font.family'] = 'Malgun Gothic'  # Windows용
 # plt.rcParams['font.family'] = 'AppleGothic'  # macOS용
 # plt.rcParams['font.family'] = 'NanumGothic'  # Linux용 (nanum 설치 필요)
+matplotlib.use("TkAgg")
 
 # ===== MBTI 점수들 → 2차원 PCA =====
 book_mbti_vectors = [list(mbti.values()) for _, _, _, mbti in dataset]

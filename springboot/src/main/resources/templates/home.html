@@ -161,12 +161,12 @@
     </div>
     <div class="product-grid">
         <div class="ranking_books" th:each="book : ${rankedBooks}" >
-            <a th:href="@{'/bookDetail?bookId='+${book.bookAndCategory.bookId}}">
+            <a th:href="@{'/book/bookDetail?bookId='+${book.bookAndCategory.bookId}}">
                 <img th:src="${book.bookAndCategory.image}" th:alt="${book.bookAndCategory.name}">
             </a>
             <div id="book-text">
                 <p class="ranking-book-category" th:text="${book.bookAndCategory.categoryMediumName} + '/' + ${book.bookAndCategory.categorySmallName}">카테고리</p>
-                <a id="ranking-book-name" th:href="@{'/bookDetail?bookId='+${book.bookAndCategory.bookId}}">
+                <a id="ranking-book-name" th:href="@{'/book/bookDetail?bookId='+${book.bookAndCategory.bookId}}">
                     <p class="ranking-book-name" th:text="${book.bookAndCategory.name}">도서명</p>
                 </a>
                 <p class="ranking-book-writers" id="ranking-book-writers">

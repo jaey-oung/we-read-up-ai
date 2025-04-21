@@ -70,6 +70,27 @@
                 WHERE bs.category_small_id = category_small.category_small_id) AS cs
         WHERE cs.category_medium_id=m.category_medium_id
     </select>
+    <!-- 카테고리 전부 조회 -->
+    <select id="selectCategoryAll" parameterType="int" resultType="CategoryResponse" resultMap="categoryResultMap">
+        SELECT
+            b.category_large_id,
+            b.category_medium_id,
+            b.category_small_id,
+
+            (SELECT cl.name
+             FROM category_large cl
+             WHERE cl.category_large_id = b.category_large_id) AS category_large_name,
+
+            (SELECT cm.name
+             FROM category_medium cm
+             WHERE cm.category_medium_id = b.category_medium_id) AS category_medium_name,
+
+            (SELECT cs.name
+             FROM category_small cs
+             WHERE cs.category_small_id = b.category_small_id) AS category_small_name
+        FROM book b
+        WHERE b.book_id=#{bookId}
+    </select>
 
     <!-- 카테고리 대 조회 -->
     <select id="selectCategoryLarge" resultType="CategoryResponse" resultMap="categoryResultMap">
