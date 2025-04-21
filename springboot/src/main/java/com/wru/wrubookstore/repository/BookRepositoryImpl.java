@@ -8,6 +8,7 @@ import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
 import com.wru.wrubookstore.dto.response.publisher.PublisherListResponse;
 import com.wru.wrubookstore.dto.response.writer.WriterListResponse;
+import jdk.jfr.Category;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -24,6 +25,12 @@ public class BookRepositoryImpl implements BookRepository {
     }
 
     private final String namespace = "com.wru.wrubookstore.mapper.BookMapper.";
+
+    // 해당 책의 카테고리 정보 모두 조회
+    @Override
+    public CategoryResponse selectCategoryAll(Integer bookId) throws Exception{
+        return session.selectOne(namespace + "selectCategoryAll", bookId);
+    }
 
     // 카테고리 정보 조회
     @Override

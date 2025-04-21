@@ -4,10 +4,15 @@ import com.wru.wrubookstore.domain.MainSearchCondition;
 import com.wru.wrubookstore.dto.BookDto;
 import com.wru.wrubookstore.dto.CategoryDto;
 import com.wru.wrubookstore.dto.RankedBookDto;
+import com.wru.wrubookstore.dto.response.book.BookDetailResponse;
 import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
 import com.wru.wrubookstore.dto.response.publisher.PublisherListResponse;
 import com.wru.wrubookstore.dto.response.writer.WriterListResponse;
+import com.wru.wrubookstore.error.exception.BookNotFoundException;
+import com.wru.wrubookstore.error.exception.MemberNotFoundException;
+import com.wru.wrubookstore.error.exception.PublisherNotFoundException;
+import com.wru.wrubookstore.error.exception.WriterNotFoundException;
 import com.wru.wrubookstore.repository.BookRepository;
 import com.wru.wrubookstore.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -20,10 +25,22 @@ import java.util.Map;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final OrderRepository orderRepository;
+    private final LikeService likeService;
+    private final ReviewService reviewService;
+    private final MemberService memberService;
 
-    public BookServiceImpl(BookRepository bookRepository, OrderRepository orderRepository) {
+    public BookServiceImpl(BookRepository bookRepository, OrderRepository orderRepository, LikeService likeService, ReviewService reviewService, MemberService memberService) {
         this.bookRepository = bookRepository;
         this.orderRepository = orderRepository;
+        this.likeService = likeService;
+        this.reviewService = reviewService;
+        this.memberService = memberService;
+    }
+
+    // 해당 책의 카테고리 정보 모두 조회
+    @Override
+    public CategoryResponse selectCategoryAll(Integer bookId) throws Exception{
+        return bookRepository.selectCategoryAll(bookId);
     }
 
     // 카테고리 정보 조회
@@ -108,10 +125,46 @@ public class BookServiceImpl implements BookService {
         return bookRepository.selectCategorySmall(categoryResponse);
     }
 
-    // 책 번호로 한개 조회
+    // 책 번호로 상품 정보 조회
     @Override
-    public BookDto select(Integer bookId) throws Exception{
-        return bookRepository.select(bookId);
+    public BookDetailResponse select(Integer bookId, Integer userId) throws Exception{
+
+        // 리뷰가 없을때 ArithmeticException 방지용
+        final int ZERO_RATING = 0;
+        // 해당 책의 상품 정보, 지은이 정보, 출판사 정보, 리뷰 정보, 좋아요 정보, 카테고리 정보를 담을 Dto
+        BookDetailResponse bookDetailResponse = new BookDetailResponse();
+
+        // 현재 세션의 멤버 조회
+        bookDetailResponse.setMemberDto(memberService.selectMember(userId));
+        // 좋아요 상태 조회
+        bookDetailResponse.setLikeStatus(likeService.selectLikeMember(bookId, userId));
+        // 상품 정보 조회
+        bookDetailResponse.setBookDto(bookRepository.select(bookId));
+        if(bookDetailResponse.getBookDto() == null) {
+            throw new BookNotFoundException(bookId);
+        }
+        // 지은이 정보 조회
+        bookDetailResponse.setWriter(bookRepository.selectWriter(bookId));
+        if(bookDetailResponse.getWriter().isEmpty()) {
+            throw new WriterNotFoundException(bookId);
+        }
+        // 출판사 정보 조회
+        bookDetailResponse.setPublisher(bookRepository.selectPublisher(bookId));
+        if(bookDetailResponse.getPublisher() == null) {
+            throw new PublisherNotFoundException(bookId);
+        }
+        // 리뷰 정보 조회
+        bookDetailResponse.setReview(reviewService.selectReview(bookId));
+        // 리뷰가 0개일 경우 별점 조회
+        bookDetailResponse.setRating(ZERO_RATING);
+        // 별점 조회
+        if(!bookDetailResponse.getReview().isEmpty()) {
+            bookDetailResponse.setRating(reviewService.ratingReview(bookId));
+        }
+        // 카테고리 조회
+        bookDetailResponse.setCategoryResponse(bookRepository.selectCategoryAll(bookId));
+
+        return bookDetailResponse;
     }
 
     // 테스트용 insert

@@ -12,7 +12,7 @@ class MBTIModel(nn.Module):
             nn.Linear(256, 128),
             nn.ReLU(),
             nn.Linear(128, 8),
-            nn.Sigmoid()
+            nn.Tanh()
         )
 
     def forward(self, input_ids, attention_mask):
