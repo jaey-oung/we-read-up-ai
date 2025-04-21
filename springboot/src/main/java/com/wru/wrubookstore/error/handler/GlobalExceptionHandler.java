@@ -13,6 +13,34 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 리뷰 추가에 실패했을 경우 발생
+    @ExceptionHandler(ReviewInsertFailException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handlerReviewInsertFail(ReviewInsertFailException e, Model model) {
+        model.addAttribute("errorMessage", e.getMessage());
+        return "error/error";
+    }
+    // 리뷰 삭제에 실패했을 경우 발생
+    @ExceptionHandler(ReviewDeleteFailException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handlerReviewDeleteFail(ReviewDeleteFailException e, Model model) {
+        model.addAttribute("errorMessage", e.getMessage());
+        return "error/error";
+    }
+    // 리뷰 수정에 실패했을 경우 발생
+    @ExceptionHandler(ReviewModifyFailException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handlerReviewModifyFail(ReviewModifyFailException e, Model model) {
+        model.addAttribute("errorMessage", e.getMessage());
+        return "error/error";
+    }
+    // 세션의 로그인중인 유저의 memberId와 등록된 리뷰의 memberId가 같지 않을경우 발생
+    @ExceptionHandler(ReviewAuthorMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handlerReviewAuthorMismatch(ReviewAuthorMismatchException e, Model model) {
+        model.addAttribute("errorMessage", e.getMessage());
+        return "error/error";
+    }
     // 삭제할 좋아요를 찾지 못했을 경우 발생
     @ExceptionHandler(LikeNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

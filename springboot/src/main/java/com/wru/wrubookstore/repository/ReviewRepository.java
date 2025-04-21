@@ -14,13 +14,13 @@ public interface ReviewRepository {
     List<ReviewListResponse> selectReview(Integer bookId) throws Exception;
 
     // 해당 책에 리뷰 추가
-    void insertReview(ReviewDto reviewDto) throws Exception;
+    int insertReview(ReviewDto reviewDto) throws Exception;
 
     // 해당 책에 리뷰 삭제
-    void deleteReview(ReviewDto reviewDto) throws Exception;
+    int deleteReview(ReviewDto reviewDto) throws Exception;
 
     // 해당 책에 리뷰 수정
-    void modifyReview(ReviewDto reviewDto) throws Exception;
+    int modifyReview(ReviewDto reviewDto) throws Exception;
 
     // 해당 책의 등록된 리뷰의 점수 조회
     double ratingReview(Integer bookId) throws Exception;
