@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/css/home.css">
 </head>
 <body th:attr="data-msg=${msg}">
-<!-- 시작 화면 팝업 -->
+<!-- 독서 성향 테스트 시작 팝업 -->
 <div id="popup-container">
     <div class="popup-box">
         <button id="popup-close-btn">&times;</button>
@@ -21,10 +21,10 @@
     </div>
 </div>
 
-<!-- 설문 질문 컨테이너 -->
+<!-- 독서 성향 테스트 질문 컨테이너 -->
 <div id="questions-container">
     <div class="popup-box">
-        <button id="quiz-close-btn">&times;</button>
+        <button id="ques-close-btn">&times;</button>
         <h2>어떤 쪽을 더 선호하시나요?</h2>
 
         <!-- 진행 상태 표시 -->
@@ -35,63 +35,105 @@
             <div class="progress-text">1/4</div>
         </div>
 
-        <!-- 질문 1: 현실/상상 -->
+        <!-- 질문 1: 현실/상상 (S/I) -->
         <div class="question-container active" id="q1">
-            <p class="question-text">실제 이야기를 바탕으로 한 논픽션이 끌리시나요?<br>아니면 상상력이 돋보이는 픽션이 끌리시나요?</p>
-            <div class="quiz-body">
-                <button class="nav-btn prev-btn invisible" data-question="1">&lt;</button>
+            <p class="question-text" data-question="1">
+                실제 이야기를 바탕으로 한 논픽션이 끌리시나요?<br>아니면 상상력이 돋보이는 픽션이 끌리시나요?
+                <button class="nav-btn next-btn">&gt;</button>
+            </p>
+            <div class="ques-body">
                 <div class="choice-container">
-                    <div class="choice-box" data-code="S">현실 기반</div>
-                    <span class="vs-text">vs</span>
-                    <div class="choice-box" data-code="I">상상 기반</div>
+                    <div class="scale-container" data-left-code="S" data-right-code="I">
+                        <div class="scale-option" data-score="1">현실 중심 책에<br>가장 끌림</div>
+                        <div class="scale-option" data-score="2">현실 중심 책에<br>조금 더 끌림</div>
+                        <div class="scale-option" data-score="3">상상 중심 책에<br>조금 더 끌림</div>
+                        <div class="scale-option" data-score="4">상상 중심 책에<br>가장 끌림</div>
+                    </div>
                 </div>
-                <button class="nav-btn next-btn" data-question="1">&gt;</button>
             </div>
         </div>
 
-        <!-- 질문 2: 감성/정보 -->
+        <!-- 질문 2: 감성/정보 (F/D) -->
         <div class="question-container" id="q2">
-            <p class="question-text">감성과 분위기가 중요하신가요?<br>아니면 정보와 전문성이 중요하신가요?</p>
-            <div class="quiz-body">
-                <button class="nav-btn prev-btn" data-question="2">&lt;</button>
+            <p class="question-text" data-question="2">
+                <button class="nav-btn prev-btn">&lt;</button>
+                감성과 분위기가 중요하신가요?<br>아니면 정보와 전문성이 중요하신가요?
+                <button class="nav-btn next-btn">&gt;</button>
+            </p>
+            <div class="ques-body">
                 <div class="choice-container">
-                    <div class="choice-box" data-code="F">감성 중심</div>
-                    <span class="vs-text">vs</span>
-                    <div class="choice-box" data-code="D">정보 중심</div>
+                    <div class="scale-container" data-left-code="F" data-right-code="D">
+                        <div class="scale-option" data-score="1">감성 중심 책에<br>강하게 끌림</div>
+                        <div class="scale-option" data-score="2">감성 중심 책에<br>약간 끌림</div>
+                        <div class="scale-option" data-score="3">정보 중심 책에<br>약간 끌림</div>
+                        <div class="scale-option" data-score="4">정보 중심 책에<br>강하게 끌림</div>
+                    </div>
                 </div>
-                <button class="nav-btn next-btn" data-question="2">&gt;</button>
             </div>
         </div>
 
-        <!-- 질문 3: 이야기/메시지 -->
+        <!-- 질문 3: 이야기/메시지 (N/M) -->
         <div class="question-container" id="q3">
-            <p class="question-text">이야기의 전개와 인물에 집중하시나요?<br>아니면 작품의 주제와 메시지에 집중하시나요?</p>
-            <div class="quiz-body">
-                <button class="nav-btn prev-btn" data-question="3">&lt;</button>
+            <p class="question-text" data-question="3">
+                <button class="nav-btn prev-btn">&lt;</button>
+                이야기의 전개와 인물에 집중하시나요?<br>아니면 작품의 주제와 메시지에 집중하시나요?
+                <button class="nav-btn next-btn">&gt;</button>
+            </p>
+            <div class="ques-body">
                 <div class="choice-container">
-                    <div class="choice-box" data-code="N">이야기 몰입</div>
-                    <span class="vs-text">vs</span>
-                    <div class="choice-box" data-code="M">메시지 중심</div>
+                    <div class="scale-container" data-left-code="N" data-right-code="M">
+                        <div class="scale-option" data-score="1">이야기 중심 책에<br>가장 끌림</div>
+                        <div class="scale-option" data-score="2">이야기 중심 책에<br>약간 끌림</div>
+                        <div class="scale-option" data-score="3">메시지 중심 책에<br>약간 끌림</div>
+                        <div class="scale-option" data-score="4">메시지 중심 책에<br>가장 끌림</div>
+                    </div>
                 </div>
-                <button class="nav-btn next-btn" data-question="3">&gt;</button>
             </div>
         </div>
 
-        <!-- 질문 4: 목표/자유 -->
+        <!-- 질문 4: 목표/자유 (Q/A) -->
         <div class="question-container" id="q4">
-            <p class="question-text">목적을 가지고 책을 선택하시나요?<br>아니면 흥미가 가는 대로 선택하시나요?</p>
-            <div class="quiz-body">
-                <button class="nav-btn prev-btn" data-question="4">&lt;</button>
+            <p class="question-text" data-question="4">
+                <button class="nav-btn prev-btn">&lt;</button>
+                목적을 가지고 책을 선택하시나요?<br>아니면 흥미가 가는 대로 선택하시나요?
+            </p>
+            <div class="ques-body">
                 <div class="choice-container">
-                    <div class="choice-box" data-code="Q">목표 중심</div>
-                    <span class="vs-text">vs</span>
-                    <div class="choice-box" data-code="A">자유 탐색</div>
+                    <div class="scale-container" data-left-code="Q" data-right-code="A">
+                        <div class="scale-option" data-score="1">목적 중심 책에<br>가장 끌림</div>
+                        <div class="scale-option" data-score="2">목적 중심 책에<br>약간 끌림</div>
+                        <div class="scale-option" data-score="3">자유 중심 책에<br>약간 끌림</div>
+                        <div class="scale-option" data-score="4">자유 중심 책에<br>가장 끌림</div>
+                    </div>
                 </div>
             </div>
             <button id="submit-btn">제출</button>
         </div>
     </div>
 </div>
+
+<!-- 독서 성향 테스트 결과 팝업 -->
+<div id="result-container" style="display: none">
+    <div class="popup-box">
+
+        <div id="type-info-btn">모든 유형 살펴보기</div>
+        <button id="result-close-btn">&times;</button>
+
+        <div id="type-info-box">
+            <div class="type-grid" id="types-container"></div>
+        </div>
+
+        <h2>📚 당신의 독서 성향은...</h2>
+
+        <div class="result-content">
+            <div class="result-type">
+                <h3 id="result-type-name"></h3>
+                <p id="result-type-description"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{fragments/header :: header}"></div>
 <section class="new-books">
     <div id="h-slider-1" class="h-slider">
@@ -138,6 +180,8 @@
     </div>
 </section>
 <div th:replace="~{fragments/footer :: footer}"></div>
+<!-- Lucide 아이콘 라이브러리 -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="/js/home.js"></script>
 <script src="/js/home-slider.js"></script>
 <script src="/js/display-msg.js"></script>
