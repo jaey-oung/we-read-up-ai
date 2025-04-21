@@ -1,9 +1,6 @@
 import json
-import random
-import os
-from itertools import product
 
-SAVE_PATH = "data/processed/mbti_sample_data.json"
+SAVE_PATH = "../data/processed/book_mbti_sample_data.json"
 
 traits_pairs = [('S', 'I'), ('F', 'D'), ('N', 'M'), ('Q', 'A')]
 
@@ -63,7 +60,6 @@ for trait in range(0, 4):
                         "text": "",
                         "label": label
                     })
-
 
 with open(SAVE_PATH, 'w', encoding='utf-8') as f:
     json.dump(result, f, ensure_ascii=False, indent=2)
