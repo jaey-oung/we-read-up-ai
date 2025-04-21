@@ -4,6 +4,7 @@ import com.wru.wrubookstore.domain.MainSearchCondition;
 import com.wru.wrubookstore.dto.BookDto;
 import com.wru.wrubookstore.dto.CategoryDto;
 import com.wru.wrubookstore.dto.RankedBookDto;
+import com.wru.wrubookstore.dto.response.book.BookDetailResponse;
 import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
 import com.wru.wrubookstore.dto.response.publisher.PublisherListResponse;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface BookService {
+    // 해당 책의 카테고리 정보 모두 조회
+    CategoryResponse selectCategoryAll(Integer bookId) throws Exception;
     // 출판사 이름 조회
     PublisherListResponse selectPublisherName(String publisherId) throws Exception;
     // 지은이 이름 조회
@@ -49,7 +52,7 @@ public interface BookService {
     List<CategoryResponse> selectCategorySmall(CategoryResponse categoryResponse) throws Exception;
 
     // 책 번호로 한개 조회
-    BookDto select(Integer bookId) throws Exception;
+    BookDetailResponse select(Integer bookId, Integer userId) throws Exception;
 
     // 테스트용 insert
     int insert(BookDto book) throws Exception;

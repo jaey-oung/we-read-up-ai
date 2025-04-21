@@ -51,14 +51,14 @@
 
             <!-- 도서 이미지 -->
             <div class="book-image">
-                <a th:href="@{/bookDetail(bookId=${item.bookId})}">
+                <a th:href="@{/book/bookDetail(bookId=${item.bookId})}">
                     <img th:src="${item.image}" alt="도서 이미지">
                 </a>
             </div>
 
             <!-- 도서 명 -->
             <div class="book-name">
-                <a th:href="@{/bookDetail(bookId=${item.bookId})}">
+                <a th:href="@{/book/bookDetail(bookId=${item.bookId})}">
                     <h3 th:text="${item.name}">도서명</h3>
                 </a>
             </div>

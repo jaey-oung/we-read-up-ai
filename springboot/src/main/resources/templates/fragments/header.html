@@ -24,7 +24,7 @@
                     <img src="/img/read-up-logo.png" alt="로고" height="100px">
                 </a>
             </div>
-            <form action="/search" method="get" class="search-container">
+            <form action="/book/search" method="get" class="search-container">
                 <select th:name="option">
                     <option th:value="'all'" th:selected="${sc?.option} == 'all'">통합검색</option>
                     <option th:value="'title'" th:selected="${sc?.option} == 'title'">도서명</option>
@@ -44,7 +44,7 @@
     </div>
     <div id="parent-table">
         <div id="table">
-            <form action="/bookList" method="get">
+            <form action="/book/bookList" method="get">
                 <table class="categoryAll">
                     <tr class="categoryHeader">
                         <th>분류</th>

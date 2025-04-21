@@ -19,7 +19,7 @@
     <div class="content">
         <div class="content-head">
             <div class="first-category">
-                <th:block th:if="${uri == '/bookList'}">
+                <th:block th:if="${uri == '/book/bookList'}">
                     <th:block th:if="${category == null}">
                         <div th:switch="${list.get(0).categoryType}">
                             <h1 th:case="'cl'" th:text="${list.get(0).categoryLargeName}" />
@@ -72,7 +72,7 @@
         <!-- 상품 목록 -->
         <div class="product-grid" th:if="${not #lists.isEmpty(list)}">
             <!-- 쿼리 스트링으로 값 넘겨주기 -->
-            <a style="text-decoration:none;" th:each="item : ${list}" th:href="@{'/bookDetail?bookId='+${item.bookId}+'&page='+${ph.page}+'&category='+${category}+'&pageSize='+${ph.pageSize}}" class="product">
+            <a style="text-decoration:none;" th:each="item : ${list}" th:href="@{'/book/bookDetail?bookId='+${item.bookId}+'&page='+${ph.page}+'&category='+${category}+'&pageSize='+${ph.pageSize}}" class="product">
                 <img style="height:80%;width:100%" th:src="${item.image}" th:alt="${item.name}">
                 <div class="hover-buttons">
                     <!-- 장바구니 추가 -->
@@ -159,9 +159,9 @@
             let option = $('#option').val();
             let keyword = $('#keyword').val();
             if(option || keyword){
-                window.location.href = '/search?sort=' + $(this).val() + '&category='+$('#category').val()+'&option='+$('#option').val()+'&keyword='+$('#keyword').val();
+                window.location.href = '/book/search?sort=' + $(this).val() + '&category='+$('#category').val()+'&option='+$('#option').val()+'&keyword='+$('#keyword').val();
             } else{
-                window.location.href = '/bookList?sort=' + $(this).val() + '&category='+$('#category').val();
+                window.location.href = '/book/bookList?sort=' + $(this).val() + '&category='+$('#category').val();
             }
 
         });

@@ -21,55 +21,67 @@
     <div class="content">
         <div class="content-head">
             <div class="first-category">
-                <span th:text="${category.categoryMediumName+' / '+category.categorySmallName}">홈 / 아우터</span>
+                <!-- 소, 중 카테고리가 모두 있을 때 -->
+                <span th:if="${bookDetailResponse.categoryResponse.categoryMediumName != null
+                    && bookDetailResponse.categoryResponse.categorySmallName != null}"
+                      th:text="${bookDetailResponse.categoryResponse.categoryMediumName+' / '
+                +bookDetailResponse.categoryResponse.categorySmallName}">홈 / 아우터
+                </span>
+                <!-- 소, 중 카테고리 중 하나라도 없을 때 -->
+                <span th:if="${bookDetailResponse.categoryResponse.categoryMediumName == null
+                    || bookDetailResponse.categoryResponse.categorySmallName == null}"
+                      th:text="${bookDetailResponse.categoryResponse.categoryLargeName}">홈 / 아우터
+                </span>
             </div>
 
             <div class="second-category">
                 <!-- 상품 이미지 -->
                 <div class="product-image">
-                    <img th:src="${bookDto.image}" th:alt="${bookDto.name}">
+                    <img th:src="${bookDetailResponse.bookDto.image}" th:alt="${bookDetailResponse.bookDto.name}">
                 </div>
 
                 <!-- 상품 정보 -->
                 <div class="product-info">
-                    <h1 class="product-title" th:text="${bookDto.name}">캐시미어 베이직 니트</h1>
+                    <h1 class="product-title" th:text="${bookDetailResponse.bookDto.name}">캐시미어 베이직 니트</h1>
                     <!-- 지은이 (여러명가능)추가, 출판사 조인-->
                     <p>
-                        <span th:each="i, stat: ${writer}" style="display:inline-block">
+                        <span th:each="i, stat: ${bookDetailResponse.writer}" style="display:inline-block">
                             <span th:if="${stat.size != stat.count}" th:text="${i}+',&nbsp;'"></span>
                             <span th:if="${stat.size == stat.count}" th:text="${i}+' (지은이) |'"></span>
                         </span>
-                        <span th:text="${bookDto.translator}+' (역자) |'"></span>
-                        <span th:text="${publisher}+' |'"></span>
-                        <span th:text="${#dates.format(bookDto.releaseDate, 'yyyy-MM-dd')}"></span>
+                        <span th:if="${bookDetailResponse.bookDto.translator != null}"
+                              th:text="${bookDetailResponse.bookDto.translator}+' (역자) |'"></span>
+                        <span th:text="${bookDetailResponse.publisher}+' |'"></span>
+                        <span th:text="${#dates.format(bookDetailResponse.bookDto.releaseDate, 'yyyy-MM-dd')}"></span>
                     </p>
 
                     <div class="addtional-info">
-                        <p><strong>정가</strong><span th:text="${#numbers.formatInteger(bookDto.originalPrice,3,'COMMA')}+'원'" style="margin-left:63px"></span></p>
+                        <p><strong>정가</strong>
+                            <span th:text="${#numbers.formatInteger(bookDetailResponse.bookDto.originalPrice,3,'COMMA')}+'원'" style="margin-left:63px"></span></p>
                         <p><strong>판매가</strong>
-                            <span th:text="${#numbers.formatInteger(bookDto.salePrice,3,'COMMA')}+'원'" style="font-size:23px; vertical-align: -3px; margin-left:43px"></span>
-                            <span th:text="'('+${#numbers.formatInteger(bookDto.discountPercent*100, 0)}+'%, '+${#numbers.formatInteger(bookDto.discountPrice,3,'COMMA')}+'원 할인)'"></span>
+                            <span th:text="${#numbers.formatInteger(bookDetailResponse.bookDto.salePrice,3,'COMMA')}+'원'" style="font-size:23px; vertical-align: -3px; margin-left:43px"></span>
+                            <span th:text="'('+${#numbers.formatInteger(bookDetailResponse.bookDto.discountPercent*100, 0)}+'%, '+${#numbers.formatInteger(bookDetailResponse.bookDto.discountPrice,3,'COMMA')}+'원 할인)'"></span>
                         </p>
                         <p><strong>마일리지</strong>
-                            <span th:text="${#numbers.formatInteger(#numbers.formatInteger(bookDto.originalPrice*0.05,0),3,'COMMA')}+'원(5%) + 멤버십(최대6%)'" style="margin-left:29px"></span>
+                            <span th:text="${#numbers.formatInteger(#numbers.formatInteger(bookDetailResponse.bookDto.originalPrice*0.05,0),3,'COMMA')}+'원(5%) + 멤버십(최대6%)'" style="margin-left:29px"></span>
                         </p>
                         <p><strong>배송방법</strong><span style="margin-left:34px">택배</span></p>
                         <p><strong>배송비</strong><span style="margin-left:49px">무료</span></p>
                         <p><span>
                             <span class="custom-rating2">
                                 <th:block th:each="i : ${#numbers.sequence(1,5)}">
-                                    <th:block th:if="${rating == 0}">
+                                    <th:block th:if="${bookDetailResponse.rating == 0}">
                                             <i class="far fa-star" style="color:#ff1493; margin-left:-5px;font-size:20px"></i>
                                     </th:block>
                                     <!-- rating이 i보다 작으면 꽉찬별 -->
-                                    <th:block th:if="${rating >= i}">
+                                    <th:block th:if="${bookDetailResponse.rating >= i}">
                                         <i class="fas fa-star" style="color:#ff1493;margin-left:-5px;font-size:20px"></i>
                                     </th:block>
-                                    <th:block th:if="${rating < i}">
-                                        <th:block th:if="${i - rating >= 1 && rating != 0}">
+                                    <th:block th:if="${bookDetailResponse.rating < i}">
+                                        <th:block th:if="${i - bookDetailResponse.rating >= 1 && bookDetailResponse.rating != 0}">
                                             <i class="far fa-star" style="color:#ff1493;margin-left:-5px;font-size:20px"></i>
                                         </th:block>
-                                        <th:block th:if="${i - rating < 1}">
+                                        <th:block th:if="${i - bookDetailResponse.rating < 1}">
                                              <i class="fas fa-star-half-alt" style="color:#ff1493;margin-left:-5px;font-size:20px"></i>
                                         </th:block>
                                     </th:block>
@@ -79,8 +91,8 @@
 <!--                                    <i class="fas fa-star-half-alt"></i>-->
 <!--                                    <i class="far fa-star"></i>-->
                             </span>
-                            <span th:text="${rating}" style="margin-left:5px;color:#ff1493;font-weight: bold "></span>
-                        </span><span th:text="${'리뷰('+reviewCnt+')'}" style="margin-left:15px"></span></p>
+                            <span th:text="${bookDetailResponse.rating}" style="margin-left:5px;color:#ff1493;font-weight: bold "></span>
+                        </span><span th:text="${'리뷰('+bookDetailResponse.review.size()+')'}" style="margin-left:15px"></span></p>
 
                     </div>
 
@@ -98,34 +110,34 @@
                     <!-- 총 가격 -->
                     <div class="total" id="total">
                         TOTAL (Quantity)
-                        <span class="total-price" id="total-price" th:text="${#numbers.formatInteger(bookDto.getSalePrice(), 3, 'COMMA')}+'원'">500,000원 (1개)</span>
+                        <span class="total-price" id="total-price" th:text="${#numbers.formatInteger(bookDetailResponse.bookDto.getSalePrice(), 3, 'COMMA')}+'원'">500,000원 (1개)</span>
                     </div>
 
                     <!-- 구매, 장바구니, 위시리스트 버튼 추가 해야됨 -->
 
                     <form class="button-group" id="btnForm">
-                        <th:block th:if="${bookDto.stockQuantity != 0}">
+                        <th:block th:if="${bookDetailResponse.bookDto.stockQuantity != 0}">
                             <button type="button" class="buy-now" onclick="buyNow(this)"
-                                    th:attr="data-book-id=${bookDto.bookId}, data-image=${bookDto.image},
-                            data-name=${bookDto.name}, data-price=${bookDto.salePrice}">
+                                    th:attr="data-book-id=${bookDetailResponse.bookDto.bookId}, data-image=${bookDetailResponse.bookDto.image},
+                            data-name=${bookDetailResponse.bookDto.name}, data-price=${bookDetailResponse.bookDto.salePrice}">
                                 구매하기
                             </button>
                         </th:block>
-                        <th:block th:if="${bookDto.stockQuantity == 0}">
+                        <th:block th:if="${bookDetailResponse.bookDto.stockQuantity == 0}">
                             <button type="button" class="buy-now" id="buy-BTN">
                                 구매하기
                             </button>
                         </th:block>
 
-                        <th:block th:if="${bookDto.stockQuantity != 0}">
+                        <th:block th:if="${bookDetailResponse.bookDto.stockQuantity != 0}">
                             <button type="button" class="cart" id="cart"
-                                    th:attr="data-book-id=${bookDto.bookId},
+                                    th:attr="data-book-id=${bookDetailResponse.bookDto.bookId},
                             data-quantity=1,
-                            data-price=${bookDto.salePrice}">
+                            data-price=${bookDetailResponse.bookDto.salePrice}">
                                 장바구니
                             </button>
                         </th:block>
-                        <th:block th:if="${bookDto.stockQuantity == 0}">
+                        <th:block th:if="${bookDetailResponse.bookDto.stockQuantity == 0}">
                             <button type="button" class="cart" id="cart-BTN">
                                 장바구니
                             </button>
@@ -135,13 +147,10 @@
 
                     <!-- 구매, 장바구니, 위시리스트 버튼 추가 해야됨 -->
 
-                        <button class="wishlist" id="likeButton" th:style="'color:'+${isLikeUser == 0 ? 'black' : 'red'}" th:text="${isLikeUser == 0 ? '&#x2764;' : '&#x2764;'}"></button>
-                        <input type="hidden" id="bookId" name="bookId" th:value="${bookDto.bookId}"/>
-
-                        <input type="hidden" id="isMember" th:value="${isMember}"/>
-                        <input type="hidden" id="userId" th:value="${userId}"/>
-                        <input type="hidden" id="memberId" th:value="${memberId}"/>
-                        <input type="hidden" id="isLikeUser" th:value="${isLikeUser}"/>
+                        <button class="wishlist" id="likeButton" th:style="'color:'+${bookDetailResponse.likeStatus == 0 ? 'black' : 'red'}" th:text="${bookDetailResponse.likeStatus == 0 ? '&#x2764;' : '&#x2764;'}"></button>
+                        <input type="hidden" id="bookId" name="bookId" th:value="${bookDetailResponse.bookDto.bookId}"/>
+                        <input type="hidden" id="memberId" th:if="${bookDetailResponse.memberDto != null}" th:value="${bookDetailResponse.memberDto.memberId}"/>
+                        <input type="hidden" id="likeStatus" th:value="${bookDetailResponse.likeStatus}"/>
                     </form>
                 </div>
             </div>
@@ -151,10 +160,10 @@
                 <div class="info-title">기본정보</div>
                 <div class="custom-wow">
                     <div class="book-info2">
-                        <span th:text="${bookDto.page}+'쪽'" class="mag">216쪽</span>
-                        <span th:text="${bookDto.size}+'mm'" class="mag">145*210mm</span>
-                        <span th:text="${bookDto.weight}+'g'" class="mag">300g</span>
-                        <span th:text="'ISBN : '+${bookDto.isbn}" class="mag">ISBN : 9788936434120</span>
+                        <span th:text="${bookDetailResponse.bookDto.page}+'쪽'" class="mag">216쪽</span>
+                        <span th:text="${bookDetailResponse.bookDto.size}+'mm'" class="mag">145*210mm</span>
+                        <span th:text="${bookDetailResponse.bookDto.weight}+'g'" class="mag">300g</span>
+                        <span th:text="'ISBN : '+${bookDetailResponse.bookDto.isbn}" class="mag">ISBN : 9788936434120</span>
                     </div>
 
                     <br>
@@ -163,7 +172,18 @@
                         <div><strong style="color:#000000">주제 분류</strong></div>
                         <!-- 추가 예정 -->
                         <br>
-                        <div style="color:#000000" th:text="${category.categoryLargeName+' > '+category.categoryMediumName+' > '+category.categorySmallName}">카테고리</div>
+                        <!-- 상품 정보에 카테고리(대,중,소)가 있을 때 -->
+                        <div style="color:#000000"
+                             th:if="${bookDetailResponse.categoryResponse.categorySmallName != null && bookDetailResponse.categoryResponse.categoryMediumName != null}"
+                             th:text="${bookDetailResponse.categoryResponse.categoryLargeName+' > '+bookDetailResponse.categoryResponse.categoryMediumName+' > '+bookDetailResponse.categoryResponse.categorySmallName}">카테고리</div>
+                        <!-- 상품 정보에 카테고리(대,중)가 있을 때 -->
+                        <div style="color:#000000"
+                             th:if="${bookDetailResponse.categoryResponse.categorySmallName == null && bookDetailResponse.categoryResponse.categoryMediumName != null}"
+                             th:text="${bookDetailResponse.categoryResponse.categoryLargeName+' > '+bookDetailResponse.categoryResponse.categoryMediumName}">카테고리</div>
+                        <!-- 상품 정보에 카테고리(대)가 있을 때 -->
+                        <div style="color:#000000"
+                             th:if="${bookDetailResponse.categoryResponse.categorySmallName == null && bookDetailResponse.categoryResponse.categoryMediumName == null}"
+                             th:text="${bookDetailResponse.categoryResponse.categoryLargeName}">카테고리</div>
                     </div>
                 </div>
             </div>
@@ -173,7 +193,7 @@
                 <div class="custom-wow">
                 <div class="book-info2" id="book">
                     <!-- 목차 라인 수 제한 + 더보기 추가 -->
-                    <div th:utext="${bookDto.tableOfContent}" class="tableOfCon"></div>
+                    <div th:utext="${bookDetailResponse.bookDto.tableOfContent}" class="tableOfCon"></div>
                     <div class="read-more" th:text="'더보기▼'" data-value="0"></div>
                 </div>
                 </div>
@@ -183,7 +203,7 @@
                 <div class="info-title">책소개</div>
                 <div class="custom-wow">
                 <div class="book-info2">
-                    <div th:utext="${bookDto.description}" style="color:#000000; display:inline-block"></div>
+                    <div th:utext="${bookDetailResponse.bookDto.description}" style="color:#000000; display:inline-block"></div>
                 </div>
                 </div>
             </div>
@@ -204,7 +224,7 @@
                         </div>
                         <div class="custom-review-right">
 
-                            <textarea class="custom-review-content" th:placeholder="${isMember == 0 ? '리뷰는 회원만 작성 가능합니다' : '리뷰를 작성해주세요...'}" id="content" th:readonly="${isMember == 0 ? 'readonly' : 'false'}"></textarea>
+                            <textarea class="custom-review-content" th:placeholder="${bookDetailResponse.memberDto == null ? '리뷰는 회원만 작성 가능합니다' : '리뷰를 작성해주세요...'}" id="content" th:readonly="${bookDetailResponse.memberDto == null ? 'readonly' : 'false'}"></textarea>
                             <div class="custom-review-action">
                                 <button class="custom-submit-btn" id="reviewBtn">등록</button>
                             </div>
@@ -212,9 +232,9 @@
                     </div>
 
                     <!-- 기존 리뷰들 -->
-                    <div th:if="${reviewCnt != 0 }" style="position:relative; left:180px">
+                    <div th:if="${bookDetailResponse.review.size() != 0 }" style="position:relative; left:180px">
                         <div class="review-container">
-                            <div class="review" th:each="i : ${review}">
+                            <div class="review" th:each="i : ${bookDetailResponse.review}">
                                 <div class="review-left">
                                     <div class="rating" id="modRating">
                                         <div th:each="j : ${#numbers.sequence(1, 5)}">
@@ -231,8 +251,7 @@
                                         <input type="hidden" class="reviewId" id="reviewId" th:value="${i.reviewId}"/>
                                         <span class="review-author" th:text="${i.nickname}">이훈</span>
                                         <span class="review-date" th:text="${#dates.format(i.regDate, 'yyyy-MM-dd')}">2025-03-19</span>
-
-                                        <th:block th:if="${i.memberId==memberId}">
+                                        <th:block th:if="${bookDetailResponse.memberDto != null and i.memberId==bookDetailResponse.memberDto.memberId}">
                                             <button id="delBtn" style="position:relative;left:500px">삭제</button>
                                             <button id="modBtn" class="modBtn" style="position:relative;left:400px">수정</button>
                                         </th:block>
@@ -245,7 +264,7 @@
                     </div>
 
                     <!-- 리뷰가 없을 때 이거 가운데로 옮겨 줘야됨 -->
-                    <div class="book-info" th:if="${reviewCnt == 0}">
+                    <div class="book-info" th:if="${bookDetailResponse.review.size() == 0}">
                         <div style="margin-left:500px">등록된 리뷰가 없습니다!</div>
                     </div>
                 </div>
@@ -262,6 +281,7 @@
     $(document).ready(function () {
         var contentElement = $('.tableOfCon');
         let bookId = $('#bookId').val();
+        let memberId = $('#memberId').val();
 
         if (contentElement[0].scrollHeight > 300) {
             $('.read-more').show();  // 내용이 300px을 넘으면 버튼을 보여줍니다.
@@ -476,26 +496,21 @@
             event.preventDefault(); // 기본 동작 방지 (페이지 새로고침 방지)
             let bookId = $('#bookId').val();
             let {text} = $(this); // 현재 클릭된 버튼
-            let isLikeUser = parseInt($('#isLikeUser').val());
-            console.log(isLikeUser);
+            let likeStatus = parseInt($('#likeStatus').val());
+            console.log(likeStatus);
             console.log(memberId);
 
-            if(!userId){
+            if(!memberId){
                 if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
                     window.location.href = '/login/login';
                 }
                 return false;
             }
 
-            if(isMember === '0'){
-                alert('좋아요는 회원만 가능합니다!');
-                location.reload();
-            }
-
             // 버튼 텍스트와 배경 색상을 즉시 변경
-            if (isLikeUser === 0 && memberId !== '0') {
+            if (likeStatus === 0 && memberId !== '0') {
                 $(this).html('&#x2764;').css('color', 'red');    // UNLIKE로 변경
-                $('#isLikeUser').val(1);
+                $('#likeStatus').val(1);
 
                 $(this).css('animation', 'none');
                 setTimeout(() => {
@@ -503,7 +518,7 @@
                 }, 10);  // 아주 짧은 시간 후 애니메이션을 재적용
             } else{
                 $(this).html('&#x2764;').css('color', 'black');     // LIKE로 변경
-                $('#isLikeUser').val(0);
+                $('#likeStatus').val(0);
 
                 $(this).css('animation', 'none');
                 setTimeout(() => {
@@ -535,16 +550,11 @@
 
         // 별점 1
         $('#star1').click(function(){
-            if(!userId){
+            if(!memberId){
                 if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
                     window.location.href = '/login/login';
                 }
                 return false;
-            }
-
-            if(isMember === '0'){
-                alert('리뷰는 회원만 등록가능합니다!');
-                location.reload();
             }
             let star = $(this).data('value');
             $('#star1').html('★').css('color', '#ff1493');
@@ -558,17 +568,13 @@
         });
         // 별점 2
         $('#star2').click(function(){
-            if(!userId){
+            if(!memberId){
                 if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
                     window.location.href = '/login/login';
                 }
                 return false;
             }
 
-            if(isMember === '0'){
-                alert('리뷰는 회원만 등록가능합니다!');
-                location.reload();
-            }
             let star = $(this).data('value');
             $('#star1').html('★').css('color', '#ff1493');
             $('#star2').html('★').css('color', '#ff1493');
@@ -581,17 +587,13 @@
         });
         // 별점 3
         $('#star3').click(function(){
-            if(!userId){
+            if(!memberId){
                 if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
                     window.location.href = '/login/login';
                 }
                 return false;
             }
 
-            if(isMember === '0'){
-                alert('리뷰는 회원만 등록가능합니다!');
-                location.reload();
-            }
             let star = $(this).data('value');
             $('#star1').html('★').css('color', '#ff1493');
             $('#star2').html('★').css('color', '#ff1493');
@@ -604,17 +606,13 @@
         });
         // 별점 4
         $('#star4').click(function(){
-            if(!userId){
+            if(!memberId){
                 if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
                     window.location.href = '/login/login';
                 }
                 return false;
             }
 
-            if(isMember === '0'){
-                alert('리뷰는 회원만 등록가능합니다!');
-                location.reload();
-            }
             let star = $(this).data('value');
             $('#star1').html('★').css('color', '#ff1493');
             $('#star2').html('★').css('color', '#ff1493');
@@ -627,17 +625,13 @@
         });
         // 별점 5
         $('#star5').click(function(){
-            if(!userId){
+            if(!memberId){
                 if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
                     window.location.href = '/login/login';
                 }
                 return false;
             }
 
-            if(isMember === '0'){
-                alert('리뷰는 회원만 등록가능합니다!');
-                location.reload();
-            }
             let star = $(this).data('value');
             $('#star1').html('★').css('color', '#ff1493');
             $('#star2').html('★').css('color', '#ff1493');
@@ -653,16 +647,11 @@
             let content = $('#content').val();
             let rating = $('#rating').val();
 
-            if(!userId){
+            if(!memberId){
                 if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
                     window.location.href = '/login/login';
                 }
                 return false;
-            }
-
-            if(isMember === '0'){
-                alert('리뷰는 회원만 등록가능합니다!');
-                location.reload();
             }
 
             if(memberId !== '0'){
@@ -694,14 +683,12 @@
             }
         });
     });
-    let memberId = $('#memberId').val();
-    let userId = $('#userId').val();
-    let isMember = $('#isMember').val();
 
     // 구매 버튼
     function buyNow(button) {
+        let memberId = $('#memberId').val();
 
-        if(!userId){
+        if(!memberId){
             if (confirm('로그인이 필요합니다. 로그인 페이지로 이동할까요?')) {
                 window.location.href = '/login/login';
             }

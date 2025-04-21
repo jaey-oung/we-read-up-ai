@@ -3,6 +3,7 @@ package com.wru.wrubookstore.service;
 import com.wru.wrubookstore.domain.PageHandler;
 import com.wru.wrubookstore.dto.BookDto;
 import com.wru.wrubookstore.dto.LikeDto;
+import com.wru.wrubookstore.dto.MemberDto;
 import com.wru.wrubookstore.repository.LikeRepository;
 import com.wru.wrubookstore.repository.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,11 @@ import java.util.Map;
 public class LikeServiceImpl implements LikeService {
 
     private final LikeRepository likeRepository;
+    private final MemberService memberService;
 
-    LikeServiceImpl(LikeRepository likeRepository){
+    LikeServiceImpl(LikeRepository likeRepository, MemberService memberService){
         this.likeRepository = likeRepository;
+        this.memberService = memberService;
     }
 
     // 해당 책의 좋아요 수 조회
@@ -27,8 +30,27 @@ public class LikeServiceImpl implements LikeService {
 
     // 현재 유저가 해당 책을 좋아요 눌렀는지 확인
     @Override
-    public Integer selectLikeMember(LikeDto likeDto) throws Exception{
-        return likeRepository.selectLikeMember(likeDto);
+    public Integer selectLikeMember(Integer bookId, Integer userId) throws Exception{
+        // 해당 책에 대하여 현재 유저가 좋아요를 안눌렀을 경우
+        final int LIKE_OFF = 0;
+
+        try{
+            // 비로그인시 좋아요를 누르지 않은 상태를 반환
+            if(userId == null) return LIKE_OFF;
+
+            // 맴버 아이디 조회
+            MemberDto memberDto = memberService.selectMember(userId);
+
+            int memberId = memberDto.getMemberId();
+
+            LikeDto likeDto = new LikeDto(bookId, memberId);
+
+            // 로그인 상태일 경우 해당 상품에 대한 회원의 좋아요 상태를 반환
+            return likeRepository.selectLikeMember(likeDto);
+        } catch(Exception e){
+            e.printStackTrace();
+            return LIKE_OFF;
+        }
     }
 
     @Override

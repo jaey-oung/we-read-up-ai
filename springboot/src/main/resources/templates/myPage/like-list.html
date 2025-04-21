@@ -39,11 +39,11 @@
                     <label>
                         <input type="checkbox" name="bookId" th:value="${likeBook.bookId}">
                     </label>
-                    <a th:href="@{/bookDetail(bookId=${likeBook.bookId})}">
+                    <a th:href="@{/book/bookDetail(bookId=${likeBook.bookId})}">
                         <img src="https://via.placeholder.com/50" alt="상품 이미지" th:src="${likeBook.image}">
                     </a>
                     <div class="product-info">
-                        <a th:href="@{/bookDetail(bookId=${likeBook.bookId})}">
+                        <a th:href="@{/book/bookDetail(bookId=${likeBook.bookId})}">
                             <p><strong th:text="${likeBook.name}">샘플상품 1</strong></p>
                         </a>
                         <p th:text="|${#numbers.formatDecimal(likeBook.salePrice, 1, 'COMMA', 0, 'POINT')}원|">5,000원</p>

@@ -14,6 +14,9 @@ import java.util.Map;
 
 public interface BookRepository {
 
+    // 해당 책의 카테고리 정보 모두 조회
+    CategoryResponse selectCategoryAll(Integer bookId) throws Exception;
+
     // 출판사 이름 조회
     PublisherListResponse selectPublisherName(String publisherId) throws Exception;
     // 지은이 이름 조회
