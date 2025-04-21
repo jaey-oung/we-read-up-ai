@@ -8,6 +8,7 @@ out/
 # gradle
 springboot/.gradle/
 springboot/build/
+springboot/logs/
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
