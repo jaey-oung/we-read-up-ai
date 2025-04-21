@@ -494,6 +494,8 @@
         // 좋아요 버튼
         $('#likeButton').click(function(event) {
             event.preventDefault(); // 기본 동작 방지 (페이지 새로고침 방지)
+            let LIKE_OFF = 0;
+            let LIKE_ON = 1;
             let bookId = $('#bookId').val();
             let {text} = $(this); // 현재 클릭된 버튼
             let likeStatus = parseInt($('#likeStatus').val());
@@ -508,9 +510,9 @@
             }
 
             // 버튼 텍스트와 배경 색상을 즉시 변경
-            if (likeStatus === 0 && memberId !== '0') {
+            if (likeStatus === LIKE_OFF && memberId !== '0') {
                 $(this).html('&#x2764;').css('color', 'red');    // UNLIKE로 변경
-                $('#likeStatus').val(1);
+                $('#likeStatus').val(LIKE_ON);
 
                 $(this).css('animation', 'none');
                 setTimeout(() => {
@@ -518,7 +520,7 @@
                 }, 10);  // 아주 짧은 시간 후 애니메이션을 재적용
             } else{
                 $(this).html('&#x2764;').css('color', 'black');     // LIKE로 변경
-                $('#likeStatus').val(0);
+                $('#likeStatus').val(LIKE_OFF);
 
                 $(this).css('animation', 'none');
                 setTimeout(() => {
@@ -528,23 +530,9 @@
 
             if(memberId !== '0'){
                 // 서버에 bookId만 전송
-                axios.post('/book/like', {bookId, memberId}, {
+                axios.post(likeStatus===LIKE_OFF ? '/like/insert' : '/like/delete', {bookId}, {
                     headers: { "content-type": "application/json" }
-                })
-                    .then(function(response) {
-                        if (response.data === 'success') {
-                            // 성공 시 아무런 추가 작업 필요
-                        } else {
-                            alert('Error: ' + response.data);
-                            // 오류 발생 시 버튼을 원래 상태로 복원
-                            $(this).html('&#x2764;').css('color', 'black');
-                        }
-                    })
-                    .catch(function(error) {
-                        alert('Error: ' + error);
-                        // 오류 발생 시 버튼을 원래 상태로 복원
-                        $(this).html('&#x2764;').css('color', 'black');
-                    });
+                });
             }
         });
 

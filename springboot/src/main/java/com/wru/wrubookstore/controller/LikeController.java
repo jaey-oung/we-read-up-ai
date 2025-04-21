@@ -3,6 +3,7 @@ package com.wru.wrubookstore.controller;
 import com.wru.wrubookstore.domain.PageHandler;
 import com.wru.wrubookstore.dto.BookDto;
 import com.wru.wrubookstore.dto.LikeDto;
+import com.wru.wrubookstore.dto.MemberDto;
 import com.wru.wrubookstore.service.LikeService;
 import com.wru.wrubookstore.service.MemberService;
 import jakarta.servlet.http.HttpSession;
@@ -70,33 +71,23 @@ public class LikeController {
         return "redirect:/myPage/like/list";
     }
 
-    @PostMapping("/book/like")
+    // 현재 세션에 로그인 중인 유저의 해당 책에 대한 좋아요를 추가
+    @PostMapping("/like/insert")
     @ResponseBody
-    public String likeList(@RequestBody LikeDto likeDto,
-                           @SessionAttribute(value = "userId", required = false) Integer userId,
-                           HttpSession session, Model m){
-        // book-detail.html에서 like를 눌러서 bookId와 session에 등록된 id를 넘겨주면
-        // [세션에 등록된 id에서 member_id를 조인해와서]
-        // 검증... like에 member_id중 book_id가 이미 있다면 like 삭제
-        // like에 member_id중 book_id가 없다면 like추가
+    public String insertLike(@RequestBody LikeDto likeDto,
+                             @SessionAttribute(value = "userId", required = false) Integer userId) throws Exception{
+        if(userId == null) return "userNotLogin";
 
-        try{
-            int likeStatus = likeService.selectLikeMember(likeDto.getBookId(), userId);
-            m.addAttribute("likeStatus", likeStatus);
+        return likeService.insertLike(likeDto, userId);
+    }
 
-            // member_id가 book_id를 like하지 않음 - like 추가
-            if (likeStatus == 0) {
-                likeService.insertLike(likeDto);
-            } else {
-                likeService.deleteLike(likeDto);
-            }
+    // 현재 세션에 로그인 중인 유저의 해당 책에 대한 좋아요를 삭제
+    @PostMapping("/like/delete")
+    @ResponseBody
+    public String deleteLike(@RequestBody LikeDto likeDto,
+                             @SessionAttribute(value = "userId", required = false) Integer userId) throws Exception {
+        if(userId == null) return "userNotLogin";
 
-            return "success";
-
-        } catch(Exception e){
-            e.printStackTrace();
-            return "error";
-        }
-
+        return likeService.deleteLike(likeDto, userId);
     }
 }

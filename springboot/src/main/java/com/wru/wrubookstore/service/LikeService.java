@@ -21,10 +21,10 @@ public interface LikeService {
     List<BookDto> selectListByPh(Integer memberId, PageHandler ph) throws Exception;
 
     // 해당 책을 좋아요에 추가
-    void insertLike(LikeDto likeDto) throws Exception;
+    String insertLike(LikeDto likeDto, Integer userId) throws Exception;
 
     // 해당 책에 누른 좋아요 삭제
-    void deleteLike(LikeDto likeDto) throws Exception;
+    String deleteLike(LikeDto likeDto, Integer userId) throws Exception;
 
     // 해당 회원의 좋아요 모두 삭제
     void deleteAll(Integer memberId) throws Exception;
