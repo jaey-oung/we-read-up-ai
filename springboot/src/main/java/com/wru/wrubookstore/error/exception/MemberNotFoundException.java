@@ -4,9 +4,9 @@ public class MemberNotFoundException extends RuntimeException implements Debugga
 
     private final String debugMessage;
 
-    public MemberNotFoundException(Integer memberId){
+    public MemberNotFoundException(Integer userId){
         super("회원 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
-        this.debugMessage = "memberid="+memberId;
+        this.debugMessage = "userId="+userId;
     }
 
     public String getDebugMessage(){
