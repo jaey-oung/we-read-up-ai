@@ -1,12 +1,11 @@
 package com.wru.wrubookstore.controller;
 
-import com.wru.wrubookstore.dto.CommentDto;
 import com.wru.wrubookstore.dto.MemberDto;
 import com.wru.wrubookstore.dto.NoticeDto;
 import com.wru.wrubookstore.domain.NoticepageHandler;
 import com.wru.wrubookstore.domain.SearchCondition;
 import com.wru.wrubookstore.service.MemberService;
-import com.wru.wrubookstore.service.NoticeService;
+import com.wru.wrubookstore.service.NoticeServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
@@ -23,11 +22,11 @@ import java.util.List;
 @RequestMapping("/board")
 public class NoticeController {
 
-    private final NoticeService noticeService;
+    private final NoticeServiceImpl noticeServiceImpl;
     private final MemberService memberService;
 
-    public NoticeController(NoticeService noticeService, MemberService memberService) {
-        this.noticeService = noticeService;
+    public NoticeController(NoticeServiceImpl noticeServiceImpl, MemberService memberService) {
+        this.noticeServiceImpl = noticeServiceImpl;
         this.memberService = memberService;
     }
 
@@ -37,7 +36,7 @@ public class NoticeController {
 //        String employee_id = "emp_1";
         noticeDto.setEmployeeId(employee_id);
         try {
-            int rowCnt = noticeService.modify(noticeDto);  // insert
+            int rowCnt = noticeServiceImpl.modify(noticeDto);  // insert
 
             if(rowCnt!=1)
                 throw new Exception("Modify failed");
@@ -66,7 +65,7 @@ public class NoticeController {
         noticeDto.setEmployeeId(employeeId);
 
         try {
-            int rowCnt = noticeService.write(noticeDto);  // insert
+            int rowCnt = noticeServiceImpl.write(noticeDto);  // insert
 
 //            System.out.println("noticeDto: " + noticeDto);
 
@@ -94,7 +93,7 @@ public class NoticeController {
 //            System.out.println("notice_id = " + noticeId);
 //            System.out.println("employee_id = " + employeeId);
 
-            int rowCnt = noticeService.remove(noticeId, employeeId);
+            int rowCnt = noticeServiceImpl.remove(noticeId, employeeId);
 
             if(rowCnt!=1)
                 throw new Exception("board remove error");
@@ -111,7 +110,7 @@ public class NoticeController {
     @GetMapping("/notice-detail")
     public String read(@RequestParam("notice_id")Integer notice_id, Integer page, Integer pageSize, Model m,HttpSession session) {
         try {
-            NoticeDto noticeDto = noticeService.read(notice_id);
+            NoticeDto noticeDto = noticeServiceImpl.read(notice_id);
             String employeeId = (String) session.getAttribute("employeeId");
             Integer userId = (Integer) session.getAttribute("userId");
             noticeDto.setEmployeeId(employeeId);
@@ -147,12 +146,12 @@ public class NoticeController {
         noticeDto.setEmployeeId(employeeId);
         System.out.println("employeeId = " + employeeId);
         try {
-            int totalCnt = noticeService.getSearchResultCnt(sc);
+            int totalCnt = noticeServiceImpl.getSearchResultCnt(sc);
             m.addAttribute("totalCnt", totalCnt);
 
             NoticepageHandler noticepageHandler = new NoticepageHandler(totalCnt, sc);
 
-            List<NoticeDto> list = noticeService.getSearchResultPage(sc);
+            List<NoticeDto> list = noticeServiceImpl.getSearchResultPage(sc);
             m.addAttribute("list", list);
             m.addAttribute("ph", noticepageHandler);
             m.addAttribute("employeeId", employeeId);

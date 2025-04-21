@@ -76,6 +76,7 @@ public class NoticeRepositoryImpl implements NoticeRepository {
         return session.selectList(namespace+"searchSelectPage", sc);
     } // List<E> selectList(String statement, Object parameter)
 
+    @Override
     public int deleteCommentsByNoticeId(Integer noticeId) throws Exception {
         return session.delete(namespace + "deleteCommentsByNoticeId", noticeId);
     }
