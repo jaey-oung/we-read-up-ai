@@ -7,8 +7,7 @@ const LAST_QUESTION = 4;
 // 각 성향 축(S/I, F/D, N/M, Q/A)에 대한 사용자 응답 점수를 저장하는 객체
 const answers = { S: 0, I: 0, F: 0, D: 0, N: 0, M: 0, Q: 0, A: 0 };
 
-// 추천 책 관련 상태
-let currentBookIndex = 0;
+// 추천 도서 리스트
 let recommendedBooks = [];
 
 /* ===== 독서 성향 유형 데이터 ===== */
@@ -113,6 +112,21 @@ const readerTypes = {
 };
 
 /* ===== 유틸리티 함수 ===== */
+// 팝업 초기 표시 여부 처리
+function handlePopupVisibility() {
+    const popup = document.getElementById("popup-container");
+    const banner = document.getElementById("mbti-banner");
+    const hideUntil = localStorage.getItem("mbti-popup-hide-until");
+
+    if (!hideUntil || new Date() >= new Date(hideUntil)) {
+        popup.classList.add("active");
+        banner.classList.add("active");
+    } else {
+        popup.classList.remove("active");
+        banner.classList.remove("active");
+    }
+}
+
 // 사용자 응답 점수를 바탕으로 4자리 성향 코드 생성
 function calculateType() {
     const types = [
@@ -186,7 +200,7 @@ function loadRecommendedBooks(typeCode) {
             author: "저자 5",
             cover: "/img/book-cover-5.jpg",
             description:
-                "책 설명 1",
+                "책 설명 5",
         },
     ];
 
@@ -224,10 +238,12 @@ function toggleRecommendedBooks() {
     button.classList.toggle("active");
 }
 
-// 일치하는 성향 코드가 보여주기
+// 일치하는 성향 코드 보여주기
 function showResult(type) {
     const resultContainer = document.getElementById("result-container");
     const container = document.getElementById("types-container");
+
+    container.innerHTML = "";
 
     // 완전 일치 시 우선 처리
     if (readerTypes[type])
@@ -252,10 +268,10 @@ function showResult(type) {
         container.appendChild(item);
     });
 
-    // lucide 아이콘 다시 렌더링
+    // // lucide 아이콘 다시 렌더링
     lucide.createIcons();
 
-    resultContainer.style.display = "flex";
+    resultContainer.classList.add("active");
 }
 
 /* ===== 초기화 함수 ===== */
@@ -266,9 +282,11 @@ function init() {
     const questions = document.getElementById("questions-container");
     const resultContainer = document.getElementById("result-container");
     const typeInfoBox = document.getElementById("type-info-box");
+    const mbtiBanner = document.getElementById("mbti-banner");
 
     // 버튼 요소
     const startBtn = document.getElementById("popup-start-btn");
+    const hideBtn = document.getElementById("popup-hide-btn");
     const popupCloseBtn = document.getElementById("popup-close-btn");
     const quesCloseBtn = document.getElementById("ques-close-btn");
     const nextBtns = document.querySelectorAll(".next-btn");
@@ -276,6 +294,7 @@ function init() {
     const submitBtn = document.getElementById("submit-btn");
     const typeInfoBtn = document.getElementById("type-info-btn");
     const recommendBooksBtn = document.getElementById("recommend-btn");
+    const recommendedBooksCloseBtn = document.getElementById("modal-close-btn");
 
     // 선택 및 진행 상태 요소
     const progressFill = document.querySelector(".progress-fill");
@@ -298,29 +317,15 @@ function init() {
         submitBtn.classList.toggle("active", allAnswered);
     }
 
-    // 현재 질문 보여주기 및 버튼 상태 업데이트
+    // 모든 질문 숨기고 현재 질문만 보여주기
     function showQuestion(num) {
+        document.querySelectorAll(".question-container").forEach(q => q.classList.remove("active"));
         document.getElementById(`q${num}`).classList.add("active");
-        updateNavigationButtons();
     }
 
     // 현재 질문 숨기기
     function hideQuestion(num) {
         document.getElementById(`q${num}`).classList.remove("active");
-    }
-
-    // 질문 번호에 따라 이전/다음 버튼 표시 여부 결정
-    function updateNavigationButtons() {
-        const prevBtns = document.querySelectorAll(".prev-btn");
-        const nextBtns = document.querySelectorAll(".next-btn");
-
-        prevBtns.forEach((btn) => {
-            btn.style.display = parseInt(btn.closest(".question-text").dataset.question) === FIRST_QUESTION ? "none" : "flex";
-        });
-
-        nextBtns.forEach((btn) => {
-            btn.style.display = parseInt(btn.closest(".question-text").dataset.question) === LAST_QUESTION ? "none" : "flex";
-        });
     }
 
     // 점수 계산 후 최종 성향 판단 → 결과 출력 및 팝업 닫기
@@ -347,7 +352,7 @@ function init() {
         const type = calculateType();
         showResult(type);
         alert("당신의 독서 성향 점수:\n" + JSON.stringify(answers, null, 2));
-        questions.style.display = "none";
+        questions.classList.remove("active")
 
         // TODO: 백엔드로 결과 전송
     }
@@ -365,18 +370,26 @@ function init() {
     /* ===== 이벤트 리스너 등록 ===== */
     // 설문 시작 버튼 클릭 시 팝업 닫고 질문 화면으로 전환
     startBtn.addEventListener("click", () => {
-        popup.style.display = "none";
-        questions.style.display = "flex";
+        popup.classList.remove("active");
+        questions.classList.add("active");
         showQuestion(currentQuestion);
         updateProgress();
         updateSubmitButton();
     });
 
+    // 설문 숨기기 버튼 클릭 시 24시간 동안 보이지 않음
+    hideBtn.addEventListener("click", () => {
+        const until = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24시간 후
+        localStorage.setItem("mbti-popup-hide-until", until.toISOString());
+        popup.classList.remove("active");
+        mbtiBanner.classList.remove("active");
+    });
+
     // 시작 팝업 닫기 버튼 클릭 시 팝업 닫힘
-    popupCloseBtn.addEventListener("click", () => popup.style.display = "none");
+    popupCloseBtn.addEventListener("click", () => popup.classList.remove("active"));
 
     // 질문 화면 닫기 버튼 클릭 시 질문 창 닫힘
-    quesCloseBtn.addEventListener("click", () => questions.style.display = "none");
+    quesCloseBtn.addEventListener("click", () => questions.classList.remove("active"));
 
     // 제출 버튼 클릭 시 점수 계산 및 결과 출력
     submitBtn.addEventListener("click", handleSubmitClick);
@@ -408,19 +421,19 @@ function init() {
         option.addEventListener("click", handleScaleOptionClick);
     });
 
-    // 추천 책 관련 버튼 이벤트 리스너
-    const recommendedBooksCloseBtn = document.getElementById("modal-close-btn");
-
-    recommendBooksBtn.addEventListener("click", toggleRecommendedBooks);
+    // 도서 추천 팝업 화면 닫기 버튼 클릭 시 팝업 창 닫힘
     recommendedBooksCloseBtn.addEventListener("click", () => {
         document.getElementById("book-recommendation-modal").classList.remove("active");
         document.getElementById("recommend-btn").classList.remove("active");
     });
 
+    // 도서 추천 버튼 토글 형식으로 사용
+    recommendBooksBtn.addEventListener("click", toggleRecommendedBooks);
+
     // lucide 아이콘 최초 초기화
     lucide.createIcons();
 
-    // 결과창이 열릴 때마다 아이콘을 새로 렌더링 (DOM style 변경 감지)
+    // 결과창이 열릴 때마다 아이콘을 새로 렌더링
     new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.type === "attributes" && mutation.attributeName === "style") {
@@ -433,19 +446,36 @@ function init() {
 
     // 마우스 올릴 시 유형 박스 표시
     typeInfoBtn.addEventListener("mouseenter", () => {
-        typeInfoBox.style.display = "block";
+        typeInfoBox.classList.add("active");
     });
 
     // 마우스 떠날 시 유형 박스 숨김
     typeInfoBox.addEventListener("mouseleave", () => {
-        typeInfoBox.style.display = "none";
+        typeInfoBox.classList.remove("active");
+    });
+
+    // 배너 클릭 시 설문 팝업 표시
+    mbtiBanner.addEventListener("click", () => {
+        // 팝업 숨김, 질문 창 활성화
+        popup.classList.add("active");
+
+        // 답변 초기화
+        Object.keys(answers).forEach((key) => answers[key] = 0);
+        document.querySelectorAll(".scale-option").forEach(opt => opt.classList.remove("selected"));
+
+        // 질문 초기화
+        currentQuestion = FIRST_QUESTION;
+        showQuestion(currentQuestion);
+        updateProgress();
+        updateSubmitButton();
     });
 }
 
 /* ===== 초기 실행 ===== */
+document.addEventListener("DOMContentLoaded", handlePopupVisibility);
 document.addEventListener("DOMContentLoaded", init);
 
 // 결과 팝업 닫힘
 document.getElementById("result-close-btn").addEventListener("click", () => {
-    document.getElementById("result-container").style.display = "none";
+    document.getElementById("result-container").classList.remove("active");
 });
