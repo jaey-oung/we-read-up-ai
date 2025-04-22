@@ -7,40 +7,124 @@ const LAST_QUESTION = 4;
 // 각 성향 축(S/I, F/D, N/M, Q/A)에 대한 사용자 응답 점수를 저장하는 객체
 const answers = { S: 0, I: 0, F: 0, D: 0, N: 0, M: 0, Q: 0, A: 0 };
 
+// 추천 책 관련 상태
+let currentBookIndex = 0;
+let recommendedBooks = [];
+
 /* ===== 독서 성향 유형 데이터 ===== */
 // 각 MBTI 성향 조합에 따른 결과 정보 정의
 const readerTypes = {
-    SFNQ: { name: "몰입형 이야기꾼", description: "감성적으로 공감하며 이야기 자체에 몰입하는 독서형 감성러입니다.", icon: "book-open" },
-    SFNA: { name: "스토리 헌터", description: "감성과 현실에 기반해 목표한 이야기를 집중적으로 찾아 읽는 탐색자입니다.", icon: "compass" },
-    SFMQ: { name: "따뜻한 의미 수집가", description: "감성으로 의미를 찾아내며 이야기 안팎에서 여운을 곱씹는 독서가입니다.", icon: "heart" },
-    SFMA: { name: "정보형 탐험가", description: "현실적이며 감성적인 성격으로 메시지를 중심으로 자유롭게 독서를 탐험하는 타입입니다.", icon: "map" },
-    SDNQ: { name: "사색적 분석가", description: "이야기에서 논리적 흐름을 읽어내며 분석하는 독서형 지성인입니다.", icon: "brain" },
-    SDNA: { name: "현실주의 전략가", description: "데이터 기반 현실주의자로 목표 독서 리스트를 체계적으로 공략하는 독자입니다.", icon: "target" },
-    SDMQ: { name: "지식 탐험가", description: "데이터 중심 사고로 깊은 의미를 자유롭게 탐험하며 책을 즐기는 탐색가입니다.", icon: "search" },
-    SDMA: { name: "메시지 설계자", description: "정보 중심 메시지를 중시하며 구조적이고 의도된 독서를 추구하는 성격입니다.", icon: "layout" },
-    IFNQ: { name: "이야기 연금술사", description: "풍부한 감성과 상상력으로 이야기를 자신의 세계로 재해석하는 독자입니다.", icon: "wand" },
-    IFNA: { name: "몽상형 독서가", description: "감성과 상상을 바탕으로 목표 독서를 즐기는 꿈꾸는 독서가입니다.", icon: "moon" },
-    IFMQ: { name: "직관형 감정가", description: "상상 속 의미를 자유롭게 해석하며 감정을 중심으로 책을 경험하는 성격입니다.", icon: "feather" },
-    IFMA: { name: "감성 큐레이터", description: "상상력을 자극하는 메시지를 감성적으로 수집하고 정리하는 예술적 독서가입니다.", icon: "palette" },
-    IDNQ: { name: "창조적 탐색가", description: "이야기에서 새로운 패턴과 통찰을 끌어내는 분석형 탐색가입니다.", icon: "puzzle" },
-    IDNA: { name: "분석형 비전가", description: "상상과 데이터를 조합해 목표한 독서 목표를 논리적으로 완수하는 독서가입니다.", icon: "lightbulb" },
-    IDMQ: { name: "지식 개척자", description: "지적 호기심을 기반으로 자유롭게 독서를 넘나드는 창의적 유형입니다.", icon: "rocket" },
-    IDMA: { name: "비전 메이커", description: "메시지를 통해 상상과 사실을 엮으며 깊이 있는 통찰을 추구하는 독자입니다.", icon: "eye" },
+    SFNQ: {
+        name: "몰입형 이야기꾼",
+        description:
+            "감성적으로 공감하며 이야기 자체에 몰입하는 독서형 감성러입니다.",
+        icon: "book-open",
+    },
+    SFNA: {
+        name: "스토리 헌터",
+        description:
+            "감성과 현실에 기반해 목표한 이야기를 집중적으로 찾아 읽는 탐색자입니다.",
+        icon: "compass",
+    },
+    SFMQ: {
+        name: "따뜻한 의미 수집가",
+        description:
+            "감성으로 의미를 찾아내며 이야기 안팎에서 여운을 곱씹는 독서가입니다.",
+        icon: "heart",
+    },
+    SFMA: {
+        name: "정보형 탐험가",
+        description:
+            "현실적이며 감성적인 성격으로 메시지를 중심으로 자유롭게 독서를 탐험하는 타입입니다.",
+        icon: "map",
+    },
+    SDNQ: {
+        name: "사색적 분석가",
+        description:
+            "이야기에서 논리적 흐름을 읽어내며 분석하는 독서형 지성인입니다.",
+        icon: "brain",
+    },
+    SDNA: {
+        name: "현실주의 전략가",
+        description:
+            "데이터 기반 현실주의자로 목표 독서 리스트를 체계적으로 공략하는 독자입니다.",
+        icon: "target",
+    },
+    SDMQ: {
+        name: "지식 탐험가",
+        description:
+            "데이터 중심 사고로 깊은 의미를 자유롭게 탐험하며 책을 즐기는 탐색가입니다.",
+        icon: "search",
+    },
+    SDMA: {
+        name: "메시지 설계자",
+        description:
+            "정보 중심 메시지를 중시하며 구조적이고 의도된 독서를 추구하는 성격입니다.",
+        icon: "layout",
+    },
+    IFNQ: {
+        name: "이야기 연금술사",
+        description:
+            "풍부한 감성과 상상력으로 이야기를 자신의 세계로 재해석하는 독자입니다.",
+        icon: "wand",
+    },
+    IFNA: {
+        name: "몽상형 독서가",
+        description:
+            "감성과 상상을 바탕으로 목표 독서를 즐기는 꿈꾸는 독서가입니다.",
+        icon: "moon",
+    },
+    IFMQ: {
+        name: "직관형 감정가",
+        description:
+            "상상 속 의미를 자유롭게 해석하며 감정을 중심으로 책을 경험하는 성격입니다.",
+        icon: "feather",
+    },
+    IFMA: {
+        name: "감성 큐레이터",
+        description:
+            "상상력을 자극하는 메시지를 감성적으로 수집하고 정리하는 예술적 독서가입니다.",
+        icon: "palette",
+    },
+    IDNQ: {
+        name: "창조적 탐색가",
+        description:
+            "이야기에서 새로운 패턴과 통찰을 끌어내는 분석형 탐색가입니다.",
+        icon: "puzzle",
+    },
+    IDNA: {
+        name: "분석형 비전가",
+        description:
+            "상상과 데이터를 조합해 목표한 독서 목표를 논리적으로 완수하는 독서가입니다.",
+        icon: "lightbulb",
+    },
+    IDMQ: {
+        name: "지식 개척자",
+        description:
+            "지적 호기심을 기반으로 자유롭게 독서를 넘나드는 창의적 유형입니다.",
+        icon: "rocket",
+    },
+    IDMA: {
+        name: "비전 메이커",
+        description:
+            "메시지를 통해 상상과 사실을 엮으며 깊이 있는 통찰을 추구하는 독자입니다.",
+        icon: "eye",
+    },
 };
 
 /* ===== 유틸리티 함수 ===== */
 // 사용자 응답 점수를 바탕으로 4자리 성향 코드 생성
 function calculateType() {
     const types = [
-        { left: 'S', right: 'I' },
-        { left: 'F', right: 'D' },
-        { left: 'N', right: 'M' },
-        { left: 'Q', right: 'A' }
+        { left: "S", right: "I" },
+        { left: "F", right: "D" },
+        { left: "N", right: "M" },
+        { left: "Q", right: "A" },
     ];
 
-    return types.map(({ left, right }) =>
-        answers[left] >= answers[right] ? left : right
-    ).join('');
+    return types
+        .map(({ left, right }) => (answers[left] >= answers[right] ? left : right))
+        .join("");
 }
 
 // 결과 DOM을 받아온 성향 유형 정보로 업데이트
@@ -54,6 +138,90 @@ function displayResult(code, info) {
         <span class="result-name">${info.name}</span>
     `;
     resultTypeDescription.textContent = info.description;
+
+    // 성향 유형에 맞는 추천 책 데이터 로드
+    loadRecommendedBooks(code);
+}
+
+// 성향 유형에 맞는 추천 책 데이터 로드
+function loadRecommendedBooks(typeCode) {
+    // 여기서는 예시 데이터를 사용
+    // 추후에 서버에서 데이터 가져옴
+    recommendedBooks = [
+        {
+            id: 1,
+            title: "책 제목 1",
+            author: "저자 1",
+            cover: "/img/book-cover-1.jpg",
+            description:
+                "책 설명 1",
+        },
+        {
+            id: 2,
+            title: "책 제목 2",
+            author: "저자 2",
+            cover: "/img/book-cover-2.jpg",
+            description:
+                "책 설명 2",
+        },
+        {
+            id: 3,
+            title: "책 제목 3",
+            author: "저자 3",
+            cover: "/img/book-cover-3.jpg",
+            description:
+                "책 설명 3",
+        },
+        {
+            id: 4,
+            title: "책 제목 4",
+            author: "저자 4",
+            cover: "/img/book-cover-4.jpg",
+            description:
+                "책 설명 4",
+        },
+        {
+            id: 5,
+            title: "책 제목 5",
+            author: "저자 5",
+            cover: "/img/book-cover-5.jpg",
+            description:
+                "책 설명 1",
+        },
+    ];
+
+    // 추천 책 그리드 초기화
+    initBooksGrid();
+}
+
+// 추천 책 그리드 초기화
+function initBooksGrid() {
+    const gridContainer = document.querySelector(".recommendation-card-grid");
+
+    // 그리드 컨테이너 초기화
+    gridContainer.innerHTML = "";
+
+    // 각 책 아이템 추가
+    recommendedBooks.forEach((book) => {
+        const bookItem = document.createElement("div");
+        bookItem.className = "recommended-book-item";
+        bookItem.innerHTML = `
+          <img src="${book.cover}" alt="${book.title}" class="recommended-book-cover">
+          <h4 class="recommended-book-title">${book.title}</h4>
+          <p class="recommended-book-author">${book.author}</p>
+          <p class="recommended-book-description">${book.description}</p>
+        `;
+        gridContainer.appendChild(bookItem);
+    });
+}
+
+// 추천 책 섹션 토글
+function toggleRecommendedBooks() {
+    const section = document.getElementById("book-recommendation-modal");
+    const button = document.getElementById("recommend-btn");
+
+    section.classList.toggle("active");
+    button.classList.toggle("active");
 }
 
 // 일치하는 성향 코드가 보여주기
@@ -107,6 +275,7 @@ function init() {
     const prevBtns = document.querySelectorAll(".prev-btn");
     const submitBtn = document.getElementById("submit-btn");
     const typeInfoBtn = document.getElementById("type-info-btn");
+    const recommendBooksBtn = document.getElementById("recommend-btn");
 
     // 선택 및 진행 상태 요소
     const progressFill = document.querySelector(".progress-fill");
@@ -237,6 +406,15 @@ function init() {
     // 척도 선택 클릭 시 선택 상태 갱신 및 제출 버튼 활성화 여부 확인
     document.querySelectorAll(".scale-option").forEach((option) => {
         option.addEventListener("click", handleScaleOptionClick);
+    });
+
+    // 추천 책 관련 버튼 이벤트 리스너
+    const recommendedBooksCloseBtn = document.getElementById("modal-close-btn");
+
+    recommendBooksBtn.addEventListener("click", toggleRecommendedBooks);
+    recommendedBooksCloseBtn.addEventListener("click", () => {
+        document.getElementById("book-recommendation-modal").classList.remove("active");
+        document.getElementById("recommend-btn").classList.remove("active");
     });
 
     // lucide 아이콘 최초 초기화

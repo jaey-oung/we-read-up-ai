@@ -32,7 +32,7 @@
             <div class="progress-bar">
                 <div class="progress-fill"></div>
             </div>
-            <div class="progress-text">1/4</div>
+            <div class="progress-text"></div>
         </div>
 
         <!-- 질문 1: 현실/상상 (S/I) -->
@@ -129,6 +129,24 @@
             <div class="result-type">
                 <h3 id="result-type-name"></h3>
                 <p id="result-type-description"></p>
+            </div>
+
+            <!-- 도서 추천 버튼 -->
+            <div class="recommend-btn-wrapper">
+                <button id="recommend-btn">추천하는 책 알아보기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 추천 도서 리스트 -->
+<div id="book-recommendation-modal">
+    <div class="modal-content-wrapper">
+        <button id="modal-close-btn">&times;</button>
+        <h3>당신을 위한 맞춤 도서 추천</h3>
+        <div class="recommendation-list">
+            <div class="recommendation-slider">
+                <div class="recommendation-card-grid"></div>
             </div>
         </div>
     </div>
