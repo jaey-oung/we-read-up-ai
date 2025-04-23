@@ -4,24 +4,23 @@ import com.wru.wrubookstore.dto.MemberDto;
 import com.wru.wrubookstore.dto.ReviewDto;
 import com.wru.wrubookstore.dto.response.review.ReviewListResponse;
 import com.wru.wrubookstore.error.exception.*;
-import com.wru.wrubookstore.helper.MemberHelper;
+import com.wru.wrubookstore.validator.MemberValidator;
 import com.wru.wrubookstore.repository.ReviewRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
-    private final MemberHelper memberHelper;
+    private final MemberValidator memberValidator;
 
     private final int FAIL = 0;
     private final int ZERO_RATING = 0;
 
-    ReviewServiceImpl(ReviewRepository reviewRepository, MemberHelper memberHelper) {
+    ReviewServiceImpl(ReviewRepository reviewRepository, MemberValidator memberValidator) {
         this.reviewRepository = reviewRepository;
-        this.memberHelper = memberHelper;
+        this.memberValidator = memberValidator;
     }
 
     // 해당 책의 등록된 리뷰의 수 조회
@@ -41,7 +40,7 @@ public class ReviewServiceImpl implements ReviewService {
     public String insertReview(ReviewDto reviewDto, Integer userId) throws Exception{
 
         // 아이디 검증
-        MemberDto memberDto = memberHelper.getValidMember(userId);
+        MemberDto memberDto = memberValidator.getValidMember(userId);
 
         // 내용이 없거나, 별점을 안눌렀으면 리턴
         if (reviewDto.getContent().isEmpty() && reviewDto.getRating() == ZERO_RATING) {
@@ -66,7 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
     public String deleteReview(ReviewDto reviewDto,Integer userId) throws Exception{
 
         // 아이디 검증
-        MemberDto memberDto = memberHelper.getValidMember(userId);
+        MemberDto memberDto = memberValidator.getValidMember(userId);
 
         // 세션의 로그인중인 유저의 memberId와 등록된 리뷰의 memberId가 같지 않으면 에러
         if(!memberDto.getMemberId().equals(reviewDto.getMemberId())){
@@ -87,7 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
     public String modifyReview(ReviewDto reviewDto, Integer userId) throws Exception{
 
         // 아이디 검증
-        MemberDto memberDto = memberHelper.getValidMember(userId);
+        MemberDto memberDto = memberValidator.getValidMember(userId);
 
         // 세션의 로그인중인 유저의 memberId와 등록된 리뷰의 memberId가 같지 않으면 에러
         if(!memberDto.getMemberId().equals(reviewDto.getMemberId())){

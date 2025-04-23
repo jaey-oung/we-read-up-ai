@@ -1,4 +1,4 @@
-package com.wru.wrubookstore.helper;
+package com.wru.wrubookstore.validator;
 
 import com.wru.wrubookstore.dto.MemberDto;
 import com.wru.wrubookstore.error.exception.MemberNotFoundException;
@@ -6,11 +6,11 @@ import com.wru.wrubookstore.service.MemberService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MemberHelper {
+public class MemberValidator {
 
     private final MemberService memberService;
 
-    public MemberHelper(MemberService memberService) {
+    public MemberValidator(MemberService memberService) {
         this.memberService = memberService;
     }
 
