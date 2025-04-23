@@ -1,0 +1,248 @@
+/* 챗봇 아이콘 */
+#chatbot-icon {
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    bottom: 50px;
+    right: 90px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    cursor: pointer;
+}
+
+#chatbot-icon img {
+    margin-bottom: 15px;
+    width: 70px;
+    height: 70px;
+}
+
+#chatbot-icon p {
+    margin: 0;
+    padding: 0;
+    color: skyblue;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* 팝업 */
+.hidden {
+    display: none;
+}
+
+.chatbot-container {
+    position: fixed;
+    bottom: 110px;
+    right: 50px;
+    width: 400px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+.chatbot-header {
+    background: skyblue;
+    color: white;
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.chatbot-header strong {
+    font-size: 25px;
+    display: block;
+}
+
+.chatbot-body {
+    padding: 16px;
+    font-size: 14px;
+}
+
+.chatbot-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 18px;
+}
+
+.chatbot-menu li {
+    display: flex;
+    align-items: center;
+    padding: 11px 0;
+    line-height: 40px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chatbot-menu li:hover {
+    background: #f1f1f1;
+}
+
+.menu-icon {
+    width: 24px;
+    text-align: center;
+    margin-right: 30px;
+    font-size: 18px;
+}
+
+/* 취소 버튼 */
+#cancel-btn {
+    padding: 15px;
+    width: 60px;
+    height: 60px;
+    position: fixed;
+    bottom: 20px;
+    right: 45px;
+    cursor: pointer;
+}
+
+/* 채팅 팝업 */
+.chat-wrapper {
+    position: fixed;
+    bottom: 80px;
+    right: 50px;
+}
+
+.chat-container {
+    width: 700px;
+    height: 486px;
+    margin: 30px auto;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chat-header {
+    position: relative;
+    color: white;
+    background: skyblue;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.chat-header button {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: white;
+    background: none;
+}
+
+.chat-header div {
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.message {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.user {
+    justify-content: flex-end;
+}
+
+.message .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/4712/4712109.png');
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.bubble-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.message.user .bubble-container {
+    align-items: flex-end;
+}
+
+.message .bubble {
+    padding: 10px 15px;
+    border-radius: 15px;
+    position: relative;
+    line-height: 1.4;
+}
+
+.message.bot .bubble {
+    background: #f0f0f0;
+    border-top-left-radius: 0;
+}
+
+.message.user .bubble {
+    background: #d4e8ff;
+    border-top-right-radius: 0;
+}
+
+.timestamp {
+    font-size: 13px;
+    color: #999;
+    margin: 3px 8px;
+}
+
+.chat-footer {
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    gap: 10px;
+    background: #fff;
+}
+
+.chat-footer input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+}
+
+.chat-footer button {
+    padding: 0 15px;
+    border: none;
+    background: #007bff;
+    color: #fff;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.message .button {
+    margin-top: 8px;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.message .button:hover {
+    background: #f0f0f0;
+}

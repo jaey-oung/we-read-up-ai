@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/css/fragments/header.css">
     <link rel="stylesheet" href="/css/fragments/footer.css">
     <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/fragments/chat.css">
     <link rel="stylesheet" href="/css/home.css">
 </head>
 <body th:attr="data-msg=${msg}">
@@ -205,6 +206,7 @@
         </div>
     </div>
 </section>
+<div th:replace="~{fragments/chat :: chatbot}"></div>
 <div th:replace="~{fragments/footer :: footer}"></div>
 <!-- Lucide 아이콘 라이브러리 -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
