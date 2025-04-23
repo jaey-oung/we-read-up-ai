@@ -102,10 +102,10 @@ def get_book_id_by_title(title):
     return None
 
 # ===== 경로 및 파일 설정 ===== #
-dest = os.path.join('data/cache')
-DATA_PATH = 'data/raw/merged_results.json'
-CACHE_DATA_PATH = 'data/cache/paragraph_cached_data.json'
-CACHE_EMB_PATH = 'data/cache/paragraph_embeddings.pt'
+dest = os.path.join('../../data/cache')
+DATA_PATH = '../../data/raw/merged_results.json'
+CACHE_DATA_PATH = '../../data/cache/paragraph_cached_data.json'
+CACHE_EMB_PATH = '../../data/cache/paragraph_embeddings.pt'
 
 # ===== 디바이스 설정 ===== #
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

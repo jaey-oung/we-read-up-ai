@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<div th:fragment="chatbot">
+    <!-- 챗봇 아이콘 -->
+    <button id="chatbot-icon">
+        <img src="/img/chatbot/chat-icon.png" alt="챗봇 아이콘">
+        <p>문의하기</p>
+    </button>
+
+    <!-- 챗봇 팝업 -->
+    <div class="hidden">
+        <div id="chatbot-popup" class="chatbot-container">
+            <div class="chatbot-header">
+                <strong>We Read Up</strong>
+                <span>위리드업 챗봇 입니다.</span>
+            </div>
+            <div class="chatbot-body">
+                <ul class="chatbot-menu">
+                    <li><span class="menu-icon">🎧</span> 실시간 채팅하기</li>
+                    <li><span class="menu-icon">❓</span> 게시판 문의하기</li>
+                    <li><span class="menu-icon">📚</span> 상품 확인하기</li>
+                    <li><span class="menu-icon">👤</span> 마이페이지로 이동하기</li>
+                </ul>
+            </div>
+        </div>
+        <!-- 취소 버튼 -->
+        <img src="/img/chatbot/cancel-btn.png" alt="취소 버튼" id="cancel-btn">
+    </div>
+
+    <!-- 채팅 팝업 -->
+    <div class="chat-wrapper hidden">
+        <div class="chat-container">
+            <div class="chat-header">
+                <button>❮</button>
+                <div>실시간 채팅</div>
+            </div>
+
+            <div class="chat-body">
+                 <!--에이전트 메시지
+                <div class="message agent">
+                    <div class="avatar"></div>
+                    <div class="bubble-container">
+                        <div class="bubble">
+                            챗봇 메시지
+                        </div>
+                        <div class="timestamp">2025-04-21 15:30</div>
+                    </div>
+                </div>
+
+                사용자 메시지
+                <div class="message user">
+                    <div class="bubble-container">
+                        <div class="bubble">사용자 메시지</div>
+                        <div class="timestamp">2025-04-21 15:31</div>
+                    </div>
+                </div>-->
+            </div>
+
+            <div class="chat-footer">
+                <input type="text" placeholder="챗봇에게 질문해 주세요." />
+                <button>전송</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/chat.js"></script>
+</div>
+
+</body>
+</html>
