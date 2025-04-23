@@ -2,7 +2,7 @@ import os
 import pymysql
 from datetime import datetime
 from dotenv import load_dotenv
-from python.chat.chat_model import Chat
+from chat.chat_model import Chat
 from fastapi import APIRouter
 from langchain_upstage import ChatUpstage
 from langchain_core.prompts import PromptTemplate
