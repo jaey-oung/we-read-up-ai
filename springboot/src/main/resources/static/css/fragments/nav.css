@@ -1,8 +1,8 @@
-#parent-table {
+#category-wrapper {
     position: relative;
 }
 
-#table {
+#category-container {
     width: 95%;
     margin: 0 40px 0 40px;
     background-color: #f8f8f8;
@@ -11,52 +11,72 @@
     display: none;
     z-index: 10;
     box-shadow: 0 0 10px #7a7a7a;
-}
-
-.categoryAll {
-    width: 100%;
+    flex-direction: row;
+    padding: 10px;
     text-align: center;
-    justify-content: space-between;
     align-items: center;
-    border: 5px solid #f8f8f8;
-    border-collapse: collapse;
-    font-size: 18px;
 }
 
-.categoryAll button[name="category"] {
-    all: unset;
-    cursor: pointer;
+#category-container > div {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 300px;
+    margin: auto;
+    font-size: 20px;
+    overflow-y: scroll;
+    background-color: #f1f1f1;
+}
+
+#category-container > div span {
     display: block;
-    width: 100%;
-}
-
-.categoryAll td {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    color: #6a6a6a;
-}
-
-.categoryAll td:hover {
+    padding: 10px;
     color: black;
-    text-decoration: underline;
+    border-bottom: 1px solid lightgray;
 }
 
-.categoryAll td:nth-child(3), .categoryAll th:nth-child(3) {
-    border-left: 1px solid #cccccc;
-    border-right: 1px solid #cccccc;
+#category-container > div span a {
+    text-decoration: none;
+    color: black;
 }
 
-.categoryHeader {
-    background-color: #333333;
-    color: white;
-    height: 35px;
+#category-container > div span:hover {
+    cursor: pointer;
+    background-color: #e0ded7;
 }
 
-.categoryHeader > th > button:hover {
-    text-decoration: underline;
-    text-decoration-color: white;
-}
-
-.categoryMedium {
+#category-container > div span:hover a {
     font-weight: bold;
+    color: blue;
+}
+
+#category-medium, #category-small {
+    visibility: hidden;
+}
+
+.category-step {
+    font-size: 50px;
+    font-weight: bold;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    box-shadow: inset 0 0 1px darkgray;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
