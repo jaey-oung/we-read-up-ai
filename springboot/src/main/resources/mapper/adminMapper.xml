@@ -87,17 +87,17 @@
         SELECT *
         FROM writer
         WHERE name=#{name} AND gender=#{gender} AND nationality=#{nationality}
+        <if test="nickname == null or nickname == ''">
+            AND (nickname IS NULL OR nickname = '')
+        </if>
+        <if test="description == null or description == ''">
+            AND (description IS NULL OR description = '')
+        </if>
         <if test="nickname != null">
               AND nickname=#{nickname}
         </if>
-        <if test="nickname == null">
-            AND nickname IS NULL
-        </if>
         <if test="description != null">
             AND description=#{description}
-        </if>
-        <if test="description == null">
-            AND description IS NULL
         </if>
     </select>
     <!-- 지은이 (마지막)코드 조회용 -->
@@ -106,6 +106,20 @@
         FROM writer
         ORDER BY CAST(SUBSTRING(writer_id, 5) AS UNSIGNED ) DESC
         LIMIT 0,1
+    </select>
+    <!-- 지은이 검색 조회 -->
+    <select id="searchWriter" parameterType="String" resultType="WriterDto">
+        SELECT *
+        FROM writer
+        WHERE name LIKE CONCAT('%',#{keyword},'%') OR nickname LIKE CONCAT('%',#{keyword},'%')
+        ORDER BY name
+    </select>
+    <!-- 출판사 검색 조회 -->
+    <select id="searchPublisher" parameterType="String" resultType="PublisherDto">
+        SELECT *
+        FROM publisher
+        WHERE name LIKE CONCAT('%',#{keyword},'%')
+        ORDER BY name
     </select>
     <!-- 책 등록용 -->
     <insert id="insertBook" parameterType="BookDto">
@@ -131,4 +145,16 @@
         INSERT INTO writer_book(writer_book_id, writer_id, book_id)
         VALUES (#{writerBookId},#{writerId},#{bookId})
     </insert>
+    <!-- 관리자용: 책 한권 삭제 -->
+    <delete id="deleteMultipleBook" parameterType="int">
+        DELETE
+        FROM book
+        WHERE book_id=#{bookId}
+    </delete>
+    <update id="addQuantity" parameterType="BookListResponse">
+        UPDATE book
+        SET stock_quantity=#{stockQuantity}
+        WHERE book_id=#{bookId}
+    </update>
+
 </mapper>

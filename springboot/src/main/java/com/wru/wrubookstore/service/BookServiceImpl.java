@@ -97,11 +97,6 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void deleteByAdmin(BookListResponse bookListResponse) throws Exception{
-        bookRepository.deleteByAdmin(bookListResponse);
-    }
-
-    @Override
     public int countQuantityZeroByAdmin() throws Exception{
         return bookRepository.countQuantityZeroByAdmin();
     }
@@ -141,17 +136,17 @@ public class BookServiceImpl implements BookService {
         // 상품 정보 조회
         bookDetailResponse.setBookDto(bookRepository.select(bookId));
         if(bookDetailResponse.getBookDto() == null) {
-            throw new BookNotFoundException(bookId);
+            throw new BookNotFoundException("요청하신 도서를 찾을 수 없습니다. 도서가 삭제되었거나 존재하지 않는 번호일 수 있습니다.", bookId);
         }
         // 지은이 정보 조회
         bookDetailResponse.setWriter(bookRepository.selectWriter(bookId));
         if(bookDetailResponse.getWriter().isEmpty()) {
-            throw new WriterNotFoundException(bookId);
+            throw new WriterNotFoundException("도서의 저자 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.", bookId);
         }
         // 출판사 정보 조회
         bookDetailResponse.setPublisher(bookRepository.selectPublisher(bookId));
         if(bookDetailResponse.getPublisher() == null) {
-            throw new PublisherNotFoundException(bookId);
+            throw new PublisherNotFoundException("출판사 정보를 확인할 수 없습니다. 정보가 누락되었거나 일시적인 오류일 수 있습니다.", bookId);
         }
         // 리뷰 정보 조회
         bookDetailResponse.setReview(reviewService.selectReview(bookId));

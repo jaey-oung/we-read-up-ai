@@ -29,24 +29,24 @@
     <form id="header" action="/admin/bookList" method="GET">
         <button id="register-product-btn">상품 등록</button>
         <div id="search-bar">
-            <input type="text" id="search-input" name="name" placeholder="상품 검색">
+            <input type="text" id="search-input" name="searchWord" placeholder="상품 검색">
             <button id="search-btn">검색</button>
         </div>
     </form>
 
     <!-- 대시보드 통계 -->
-    <div id="dashboard-stats">
-        <a style="text-decoration: none " th:href="@{/admin/bookList?quantity=1}" class="stat-box">
+    <div id="dashboard-stats" th:with="forSale='2',soldOut='0',allProduct='1'">
+        <a style="text-decoration: none " th:href="@{/admin/bookList(quantity=${allProduct})}" class="stat-box">
             <h3>총 상품</h3>
             <p th:text="${countAllByAdmin}+'개'">0개</p>
         </a>
 
-        <a style="text-decoration: none" th:href="@{/admin/bookList?quantity=2}" class="stat-box">
+        <a style="text-decoration: none" th:href="@{/admin/bookList(quantity=${forSale})}" class="stat-box">
             <h3>판매 중인 상품</h3>
             <p th:text="${countAllByAdmin - countQuantityZeroByAdmin}+'개'">0개</p>
         </a>
 
-        <a style="text-decoration: none" th:href="@{/admin/bookList?quantity=0}" class="stat-box">
+        <a style="text-decoration: none" th:href="@{/admin/bookList(quantity=${soldOut})}" class="stat-box">
             <h3>판매 중지 상품</h3>
             <p th:text="${countQuantityZeroByAdmin}+'개'">0개</p>
         </a>
@@ -127,7 +127,7 @@
 <script>
     $(document).ready(function (){
         $('.book-url').on('click', function(){
-            window.location.href = '/bookDetail?bookId=' + $(this).closest($('.book-list')).find('.bookId-box').text();
+            window.location.href = '/book/bookDetail?bookId=' + $(this).closest($('.book-list')).find('.bookId-box').text();
         });
         // 엔터 키로 폼 제출 방지 및 검색 동작
         $('#search-input').keypress(function (event) {
@@ -153,27 +153,27 @@
         $('#product-delete').click(function(){
            let result = confirm('정말 삭제하시겠습니까?');
            if(result){
-               let bookListResponse = [];
+               let bookId = [];
 
                $('.quantity-box').each(function(){
                    if($(this).prop('checked')){
-                       bookListResponse.push({
-                           bookId: $(this).val()
-                       })
+                       bookId.push($(this).val())
                    }
                });
 
-               axios.post('/admin/bookDelete', bookListResponse,{
+               axios.post('/admin/bookDelete', bookId,{
                    headers: {'content-type': 'application/json'}
                }).then(function (response){
-                   if(response.data==='success'){
-                       alert('삭제 완료');
+                   if(response.data === 'success'){
+                        alert("삭제에 성공하였습니다!");
                        location.reload();
-                   } else if(response.data==='fail'){
+                   } else if (response.data.startsWith('ERROR'))
+                   {
+                       alert(response.data.replace('ERROR:', ''));
+                       location.reload();
+                   } else if(response.data === 'fail'){
                        alert('상품을 선택해주세요!');
                    }
-               }).error(function (error){
-
                });
            }
         });
@@ -190,17 +190,17 @@
                 }
             })
 
-            axios.post('/admin/bookMod', bookListResponse, {
+            axios.post('/admin/bookAddQuantity', bookListResponse, {
                 headers: {'content-type': 'application/json'}
             }).then(function (response){
                 if(response.data === 'success'){
                     alert('재고가 0이 되었습니다.');
                     location.reload();
-                } else if(response.data==='fail'){
+                } else if(response.data.startsWith('ERROR')){
+                    alert(response.data.replace('ERROR:', ''));
+                } else if(response.data === 'fail'){
                     alert('상품을 선택해주세요!');
                 }
-            }).error(function (error){
-
             });
         });
         // 판매함 눌럿을때
@@ -211,18 +211,20 @@
                 if($(this).prop('checked')){
                     bookListResponse.push({
                         bookId: $(this).val(),
-                        stockQuantity: 100
+                        stockQuantity: parseInt($(this).closest($('.book-list')).find('.quantity-td').text())+100
                     })
                 }
             })
 
-            axios.post('/admin/bookMod', bookListResponse, {
+            axios.post('/admin/bookAddQuantity', bookListResponse, {
                 headers: {'content-type' : 'application/json'}
             }).then(function (response){
 
                 if(response.data==='success'){
-                    alert("재고가 100개가 되었습니다.");
+                    alert("재고가 추가되었습니다.");
                     location.reload();
+                } else if(response.data.startsWith('ERROR')){
+                    alert(response.data.replace('ERROR:', ''));
                 } else if(response.data==='fail'){
                     alert('상품을 선택해주세요!');
                 }

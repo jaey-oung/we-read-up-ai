@@ -5,6 +5,7 @@ import com.wru.wrubookstore.dto.PublisherDto;
 import com.wru.wrubookstore.dto.WriterBookDto;
 import com.wru.wrubookstore.dto.WriterDto;
 import com.wru.wrubookstore.dto.response.admin.AdminResponse;
+import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -21,10 +22,22 @@ public class AdminRepositoryImpl implements AdminRepository {
 
     private final String namespace = "com.wru.wrubookstore.mapper.AdminMapper.";
 
+    // 재고 100개 추가
+    @Override
+    public int addQuantity(BookListResponse bookListResponse) throws Exception{
+        return session.update(namespace + "addQuantity", bookListResponse);
+    }
+
+    // 책 한권 삭제
+    @Override
+    public int deleteMultipleBook(Integer bookId) throws Exception{
+        return session.delete(namespace + "deleteMultipleBook", bookId);
+    }
+
     // 검색
     @Override
-    public List<BookDto> searchBook(String name) throws Exception{
-        return session.selectList(namespace + "searchBook", name);
+    public List<BookDto> searchBook(String searchWord) throws Exception{
+        return session.selectList(namespace + "searchBook", searchWord);
     }
     // 재고 0이아닌 상품 전부 조회
     @Override
@@ -78,23 +91,35 @@ public class AdminRepositoryImpl implements AdminRepository {
     }
 
     @Override
-    public void insertBook(BookDto bookDto) throws Exception {
-        session.insert(namespace + "insertBook", bookDto);
+    public int insertBook(BookDto bookDto) throws Exception {
+        return session.insert(namespace + "insertBook", bookDto);
     }
 
     @Override
-    public void insertPublisher(PublisherDto publisherDto) throws Exception {
-        session.insert(namespace + "insertPublisher", publisherDto);
+    public int insertPublisher(PublisherDto publisherDto) throws Exception {
+        return session.insert(namespace + "insertPublisher", publisherDto);
     }
 
     @Override
-    public void insertWriter(WriterDto writerDto) throws Exception {
-        session.insert(namespace + "insertWriter", writerDto);
+    public int insertWriter(WriterDto writerDto) throws Exception {
+        return session.insert(namespace + "insertWriter", writerDto);
     }
 
     @Override
-    public void insertWriterBook(WriterBookDto writerBookDto) throws Exception {
-        session.insert(namespace + "insertWriterBook", writerBookDto);
+    public int insertWriterBook(WriterBookDto writerBookDto) throws Exception {
+        return session.insert(namespace + "insertWriterBook", writerBookDto);
+    }
+
+    // 지은이 검색용
+    @Override
+    public List<WriterDto> searchWriter(String keyword) throws Exception{
+        return session.selectList(namespace + "searchWriter", keyword);
+    }
+
+    // 출판사 검색용
+    @Override
+    public List<PublisherDto> searchPublisher(String keyword) throws Exception{
+        return session.selectList(namespace + "searchPublisher", keyword);
     }
 
 

@@ -5,9 +5,14 @@ public class BookNotFoundException extends RuntimeException implements Debuggabl
 
     private final String debugMessage;
 
-    public BookNotFoundException(Integer bookId) {
-        super("요청하신 도서를 찾을 수 없습니다. 도서가 삭제되었거나 존재하지 않는 번호일 수 있습니다.");
+    public BookNotFoundException(String message, Integer bookId) {
+        super(message);
         this.debugMessage = "bookId=" + bookId;
+    }
+
+    public BookNotFoundException(String message) {
+        super(message);
+        this.debugMessage = message;
     }
 
     public String getDebugMessage() {
