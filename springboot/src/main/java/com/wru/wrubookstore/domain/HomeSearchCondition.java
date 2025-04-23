@@ -10,9 +10,9 @@ import lombok.ToString;
 public class MainSearchCondition {
     private Integer page = 1;
     private Integer pageSize = 8;
-    private String category;
     private String keyword = "";
     private String option = "";
+    private Integer sort = 0;
 
     public MainSearchCondition() {}
 
@@ -23,10 +23,9 @@ public class MainSearchCondition {
         this.option = option;
     }
 
-    public MainSearchCondition(Integer page, Integer pageSize, String category) {
+    public MainSearchCondition(Integer page, Integer pageSize) { // 테스트 케이스 수정 필요
         this.page = page;
         this.pageSize = pageSize;
-        this.category = category;
     }
 
     public Integer getOffset() {
