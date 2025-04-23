@@ -1,5 +1,5 @@
 # 공통
-.idea/
+**/.idea/
 *.iml
 *.iws
 *.ipr
@@ -27,14 +27,15 @@ bin/
 **/src/main/resources/application.properties
 
 # Python
-python/__pycache__/
 python/.venv/
 python/venv/
-python/.mypy_cache/
-python/.pytest_cache/
-python/*.pyc
-python/*.pyo
 python/data/
+python/.env
+python/**/__pycache__/
+python/**/.mypy_cache/
+python/**/.pytest_cache/
+python/**/*.pyc
+python/**/*.pyo
 
 # VSCode
 .vscode/

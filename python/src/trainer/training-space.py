@@ -3,7 +3,7 @@ from datetime import datetime
 from sklearn.model_selection import train_test_split
 from transformers import AutoTokenizer
 from torch.utils.data import Dataset, DataLoader
-from python.model.mbtimlp import MBTIModel
+from model.mbtimlp import MBTIModel
 import torch
 import torch.nn as nn
 import json
@@ -39,7 +39,7 @@ class MBTIDataset(Dataset):
 
 # 데이터 불러오기
 print("훈련 데이터 파일 로드 중")
-with open('../data/processed/book_mbti_sample_data.json', 'r', encoding='utf-8') as f:
+with open('../../data/processed/book_mbti_sample_data.json', 'r', encoding='utf-8') as f:
     data = json.load(f)
 texts = [entry['text'] for entry in data]
 labels = [list(entry['label'].values()) for entry in data]
@@ -99,7 +99,7 @@ for epoch in range(30):
 
 print("캐시 저장 파일 생성중")
     # 저장 폴더 생성
-dest = os.path.join('../data/cache')
+dest = os.path.join('../../data/cache')
 if not os.path.exists(dest):
     os.makedirs(dest)
 
