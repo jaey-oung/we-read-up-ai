@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 배송지</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/myPage/add-address.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+
+
+<div class="container">
+    <div class="content">
+        <div class="content-head">
+            <div class="first-category">
+                <span>홈 / 마이쇼핑 / 배송 주소록 관리</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- 사이드바 -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <form action="/myPage/addAddress" method="post" th:object="${address}">
+            <h3>배송 주소록 관리</h3>
+            <div class="form-container">
+                <div class="form-group">
+                    <label for="name">* 배송지명</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="name" name="name">
+                        <div class="err-msg" th:if="${#fields.hasErrors('name')}" th:text="${#fields.errors('name').getFirst()}"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="recipient">* 수령인 이름</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="recipient" name="recipient">
+                        <div class="err-msg" th:if="${#fields.hasErrors('recipient')}" th:text="${#fields.errors('recipient').getFirst()}"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="zipCode">* 주소</label>
+                    <div class="address-group">
+                        <div class="input-wrapper">
+                            <input type="text" id="zipCode" name="zipCode" placeholder="우편번호">
+                            <div class="err-msg" th:if="${#fields.hasErrors('zipCode')}" th:text="${#fields.errors('zipCode').getFirst()}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <div class="input-wrapper">
+                        <input type="text" name="mainAddress" placeholder="기본주소">
+                        <div class="err-msg" th:if="${#fields.hasErrors('mainAddress')}" th:text="${#fields.errors('mainAddress').getFirst()}"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <div class="input-wrapper">
+                        <input type="text" name="detailAddress" placeholder="나머지 주소(선택 입력 가능)">
+                        <div class="err-msg" th:if="${#fields.hasErrors('detailAddress')}" th:text="${#fields.errors('detailAddress').getFirst()}"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="phoneNum">* 휴대전화</label>
+                    <div class="input-wrapper">
+                        <input type="tel" id="phoneNum" name="phoneNum">
+                        <div class="err-msg" th:if="${#fields.hasErrors('phoneNum')}" th:text="${#fields.errors('phoneNum').getFirst()}"></div>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="defaultAddress" name="defaultAddress">
+                    <label for="defaultAddress">기본 배송지로 저장</label>
+                </div>
+            </div>
+            <div class="btn-container">
+                <input type="submit" value="등록" class="btn black">
+                <a href="/myPage/addressList" class="btn">취소</a>
+            </div>
+        </form>
+    </main>
+</div>
+
+
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

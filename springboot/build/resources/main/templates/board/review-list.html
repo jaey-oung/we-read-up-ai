@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 상품후기</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/board/review-list.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+
+
+<div class="container">
+    <div class="content">
+        <div class="content-head">
+            <div class="first-category">
+                <span>홈 / 게시판 / 상품후기</span>
+            </div>
+
+            <div class="titleArea">
+                <h1>상품후기</h1>
+            </div>
+
+            <div class="board-container">
+                <table class="board-table">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>상품이름</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>작성일</th>
+                        <th>조회</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>자바의 정석</td>
+                        <td><a href="/reviewDetail">몰 오픈을 축하합니다.</a></td>
+                        <td>E****</td>
+                        <td>2023-04-13<br>15:49:35</td>
+                        <td>28</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="board-search">
+                    <select>
+                        <option>일주일</option>
+                        <option>한 달</option>
+                        <option>세 달</option>
+                    </select>
+                    <select>
+                        <option>제목</option>
+                        <option>작성자</option>
+                    </select>
+                    <input type="text" placeholder="검색어를 입력하세요">
+                    <button>찾기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <form class="howtopag" action="/board/list" method="get">
+        <button type="submit" name="page">❮❮</button>
+        <button type="submit" name="page">❮</button>
+        <button type="submit" name="page">num</button>
+        <button type="submit" name="page">❯</button>
+        <button type="submit" name="page">❯❯</button>
+    </form>
+</div>
+
+
+
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

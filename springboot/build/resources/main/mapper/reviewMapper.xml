@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wru.wrubookstore.mapper.reviewMapper">
+    <!-- 해당 책의 등록된 리뷰의 별점들 조회 -->
+    <select id="ratingReview" parameterType="int" resultType="double">
+        SELECT COALESCE(SUM(rating),0)/COUNT(*)
+        FROM review
+        WHERE book_id=#{bookId}
+    </select>
+    <!-- 해당 책의 등록된 리뷰의 수 조회 -->
+    <select id="countReview" parameterType="int" resultType="int">
+        SELECT count(*)
+        FROM review
+        WHERE book_id=#{bookId}
+    </select>
+    <!-- 해당 책의 등록된 리뷰를 전부 조회 (오래된 순)-->
+<!--    <select id="selectReview" parameterType="int" resultType="ReviewListResponse">-->
+<!--        SELECT *-->
+<!--        FROM review-->
+<!--        WHERE book_id=#{bookId}-->
+<!--        ORDER BY reg_date-->
+<!--    </select>-->
+    <select id="selectReview" parameterType="int" resultType="ReviewListResponse">
+        SELECT *
+        FROM review,(SELECT nickname, member_id FROM member) AS mem
+        WHERE book_id = #{bookId} AND review.member_id=mem.member_id
+    </select>
+    <!-- 해당 책에 리뷰 추가 -->
+    <insert id="insertReview" parameterType="ReviewDto">
+        INSERT INTO review(book_id, member_id, content, rating)
+        VALUES (#{bookId},#{memberId},#{content},#{rating})
+    </insert>
+    <!-- 해당 책에 리뷰 삭제 -->
+    <delete id="deleteReview" parameterType="ReviewDto">
+        DELETE
+        FROM review
+        WHERE book_id=#{bookId} AND member_id=#{memberId} AND review_id=#{reviewId}
+    </delete>
+    <!-- 해당 책에 리뷰 수정 -->
+    <update id="modifyReview" parameterType="ReviewDto">
+        UPDATE review
+        SET content=#{content}, rating=#{rating}, mod_date=#{modDate}
+        WHERE book_id=#{bookId} AND member_id=#{memberId} AND review_id=#{reviewId}
+    </update>
+</mapper>

@@ -1,41 +1,9 @@
-# 공통
-.idea/
-*.iml
-*.iws
-*.ipr
-out/
-
-# gradle
-springboot/.gradle/
-springboot/build/
-springboot/logs/
-.gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-
-# STS
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-
-# application.properties
-**/src/main/resources/application.properties
-
-# Python
-python/__pycache__/
 python/.venv/
 python/venv/
-python/.mypy_cache/
-python/.pytest_cache/
-python/*.pyc
-python/*.pyo
 python/data/
 python/.env
-
-# VSCode
-.vscode/
+python/**/__pycache__/
+python/**/.mypy_cache/
+python/**/.pytest_cache/
+python/**/*.pyc
+python/**/*.pyo

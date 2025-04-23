@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wru.wrubookstore.mapper.OrderMapper">
+    <sql id="selectCnt">
+        SELECT COUNT(*)
+        FROM orders
+        WHERE user_id = #{userId}
+    </sql>
+
+    <!-- 주문코드를 통해 주문 한 개 조회 -->
+    <select id="select" parameterType="Integer" resultType="OrderDto">
+        SELECT o.*, u.name 'username'
+        FROM orders o, user u
+        WHERE o.user_id = u.user_id AND o.order_id = #{orderId}
+    </select>
+
+    <!-- 날짜와 사용자 코드를 통해 주문 리스트 조회 -->
+    <select id="selectList" parameterType="Map" resultType="OrderDto">
+        SELECT *
+        FROM orders
+        WHERE user_id = #{userId}
+        AND reg_date BETWEEN DATE_FORMAT(#{startDate}, '%Y.%m.%d') AND DATE_FORMAT(CONCAT(#{endDate}, ' 23:59:59'), '%Y.%m.%d %H:%M:%S')
+    </select>
+
+    <!-- 주문상태,날짜,페이징에 따른 주문 내역 조회 -->
+    <select id="selectListByOsc" parameterType="Map" resultType="OrderHistoryRequest">
+        SELECT o.reg_date, o.order_id, u.name 'user_name', min(b.name) 'book_name', count(DISTINCT b.book_id) 'book_type_count', sum(ob.quantity) 'total_book_count', sum(ob.price) 'total_price'
+        FROM orders o, book b, user u, order_book ob
+        WHERE o.order_id = ob.order_id AND b.book_id = ob.book_id AND o.user_id = u.user_id
+        AND u.user_id = #{userId}
+        AND o.reg_date BETWEEN DATE_FORMAT(#{osc.startDate}, '%Y.%m.%d') AND DATE_FORMAT(CONCAT(#{osc.endDate}, ' 23:59:59'), '%Y.%m.%d %H:%M:%S')
+        <if test='osc.statusId != "A"'>
+            AND o.status_id = #{osc.statusId}
+        </if>
+        GROUP BY o.order_id
+        LIMIT #{osc.offset}, #{osc.pageSize}
+    </select>
+
+    <!-- 주문 개수 조회-->
+    <select id="selectCnt" parameterType="Integer" resultType="int">
+        <include refid="selectCnt"/>
+    </select>
+
+    <!-- 주문상태,날짜에 따른 주문 내역 개수 -->
+    <select id="selectCntByOsc" parameterType="Map" resultType="int">
+        <include refid="selectCnt"/>
+        AND reg_date BETWEEN DATE_FORMAT(#{osc.startDate}, '%Y.%m.%d') AND DATE_FORMAT(CONCAT(#{osc.endDate}, ' 23:59:59'), '%Y.%m.%d %H:%M:%S')
+        <if test='osc.statusId != "A"'>
+            AND status_id = #{osc.statusId}
+        </if>
+    </select>
+
+    <!-- 주문상세 정보(주문상품 정보) -->
+    <select id="selectOrderBook" parameterType="Integer" resultType="OrderBookRequest">
+        SELECT b.book_id, b.image, b.name, b.sale_price * quantity 'order_price', ob.quantity
+        FROM order_book ob, book b
+        WHERE ob.book_id = b.book_id AND ob.order_id = #{orderId}
+    </select>
+
+    <!-- 주문 생성 -->
+    <insert id="insertOrder" parameterType="OrderDto" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO orders(user_id)
+        VALUES(#{userId})
+    </insert>
+
+    <!-- 테스트용 주문 생성 -->
+    <insert id="insertOrderTest" parameterType="OrderDto" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO orders(user_id, status_id, reg_date, end_date)
+        VALUES (#{userId}, #{statusId}, #{regDate}, #{endDate})
+    </insert>
+
+    <insert id="insertOrderBook" parameterType="OrderBookDto">
+        INSERT INTO order_book(order_id, book_id, quantity, price)
+        VALUES(#{orderId}, #{bookId}, #{quantity}, #{price})
+    </insert>
+
+    <!-- 판매 순위별 상위 5권 bookId 조회 (판매량이 같을 경우 bookId가 큰 순서대로)-->
+    <select id="selectBookIdInSalesRank" resultType="int">
+        SELECT b.book_id
+        FROM orders a, order_book b
+        WHERE a.order_id = b.order_id
+          AND a.end_date IS NOT NULL
+          AND DATEDIFF(curdate(), end_date) &lt; 7
+        GROUP BY b.book_id
+        ORDER BY SUM(b.quantity) DESC, b.book_id DESC
+        LIMIT 5
+    </select>
+
+    <!-- 테스트용 주문 데이터 전체 삭제 (orders)-->
+    <delete id="deleteAllOrdersTest">
+        DELETE
+        FROM orders
+    </delete>
+
+    <!--  테스트용 주문 데이터 전체 삭제 (order_book) -->
+    <delete id="deleteAllOrderBookTest">
+        DELETE
+        FROM order_book
+    </delete>
+</mapper>

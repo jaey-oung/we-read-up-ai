@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 쿠폰</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/fragments/sidebar.css">
+    <link rel="stylesheet" href="/css/myPage/coupon-list.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+
+
+<div class="container">
+    <div class="content">
+        <div class="content-head">
+            <div class="first-category">
+                <span>홈 / 마이쇼핑 / 마이쿠폰</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="main-container">
+    <!-- 사이드바 -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <h3>쿠폰내역</h3>
+        <hr>
+
+        <table class="board-table">
+            <thead>
+            <tr>
+                <th>번호</th>
+                <th>쿠폰명</th>
+                <th>할인</th>
+                <th>최대 할인 금액</th>
+                <th>최소 주문 금액</th>
+                <th>쿠폰 유효 기간</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="coupon : ${couponList}">
+                <td th:text="${coupon.couponId}">1</td>
+                <td th:text="${coupon.name}">회원가입 축하 쿠폰</td>
+                <td th:text="${coupon.discount <= 1 ? #numbers.formatInteger(coupon.discount * 100, 0) + '%' : coupon.discount + '원'}">2,000</td>
+                <td th:text="|${#numbers.formatDecimal(coupon.maxDiscountAmount, 1, 'COMMA', 0, 'POINT')}원|">0</td>
+                <td th:text="${coupon.minPurchaseAmount == 0 ? '-' : #numbers.formatDecimal(coupon.minPurchaseAmount, 1, 'COMMA', 0, 'POINT') + '원'}">15,000</td>
+                <td>[[${#dates.format(coupon.regDate, 'yyyy-MM-dd')}]] ~ [[${#dates.format(coupon.endDate, 'yyyy-MM-dd')}]]</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div>
+            <form class="howtopag" action="/myPage/couponList" method="get">
+                <button type="submit" name="page" th:value="${ph.page}-10" th:class="'howtopag_item' + (${ph.page >= 1 and ph.page <= 10} ? '_pagdisabled' : '')">❮❮</button>
+                <button type="submit" name="page" th:value="${ph.page}-1" th:class="'howtopag_item' + (${ph.showPrev} ? '' : '_pagdisabled')">❮</button>
+                <th:block th:unless="${ph.endPage == 0}">
+                    <th:block th:each="num : ${#numbers.sequence(ph.beginPage, ph.endPage)}">
+                        <button type="submit" name="page" th:value="${num}" th:text="${num}" th:class="'howtopag_item' + (${ph.page == num} ? '_pagactive' : '')">num</button>
+                    </th:block>
+                </th:block>
+                <button type="submit" name="page" th:value="${ph.page}+1" th:class="'howtopag_item' + (${ph.showNext} ? '' : '_pagdisabled')">❯</button>
+                <button type="submit" name="page" th:value="${ph.page}+10" th:class="'howtopag_item' + (${ph.totalPage - 10 < ph.page} ? '_pagdisabled' : '')">❯❯</button>
+            </form>
+        </div>
+    </main>
+</div>
+
+
+
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

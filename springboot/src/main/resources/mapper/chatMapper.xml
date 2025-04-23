@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wru.wrubookstore.mapper.ChatMapper">
+    <!-- 로그인 사용자 채팅 내역 전체 조회 -->
+    <select id="selectAllByUserId" parameterType="Integer" resultType="ChatDto">
+        SELECT *
+        FROM chat
+        WHERE user_id = #{userId}
+        ORDER BY reg_date
+    </select>
+
+    <!-- 비로그인 사용자 채팅 내역 전체 조회 -->
+    <select id="selectAllByUuid" parameterType="String" resultType="ChatDto">
+        SELECT *
+        FROM chat
+        WHERE user_id IS NULL AND uuid = #{uuid}
+        ORDER BY reg_date
+    </select>
+
+    <!-- 메시지 저장 -->
+    <insert id="insert" parameterType="ChatDto">
+        INSERT INTO chat(user_id, uuid, sender, message)
+        VALUES(#{userId}, #{uuid}, #{sender}, #{message})
+    </insert>
+</mapper>

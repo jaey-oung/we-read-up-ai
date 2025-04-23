@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 장바구니</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/myPage/cart-list.css">
+    <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<main class="cart-container">
+    <h2>장바구니(<span class="cart-cnt" th:text="${list.size()}"></span>)</h2>
+
+    <!-- 장바구니 비었을 때 -->
+    <div class="cart-empty" th:attr="style=${#lists.isEmpty(list)} ? '' : 'display:none;'">
+        <div class="empty-icon">
+            <i class='bx bx-error-circle'></i>
+        </div>
+        <p class="empty-title">장바구니가 비어 있어요.</p>
+        <p class="empty-desc">지금 원하는 상품을 찾아보세요!</p>
+        <a href="/" class="empty-btn">도서 둘러보기</a>
+    </div>
+
+    <!-- 장바구니 목록 -->
+    <div class="cart-list" th:if="${not #lists.isEmpty(list)}">
+        <!-- 전체 선택 -->
+        <div class="cart-header">
+            <div class="left">
+                <label>
+                    <input type="checkbox" class="select-all">전체 선택
+                </label>
+            </div>
+            <button type="button" class="delete-all-btn"><i class='bx bx-trash'></i></button>
+        </div>
+
+        <div class="cart-item" th:each="item : ${list}"
+             th:attr="data-cart-id=${item.cartId}, data-book-id=${item.bookId}, data-sale-price=${item.salePrice},
+                      data-image=${item.image}, data-name=${item.name}, data-quantity=${item.quantity}">
+            <!-- 개별 선택 -->
+            <div class="cart-check">
+                <label>
+                    <input type="checkbox" class="select-item">
+                </label>
+            </div>
+
+            <!-- 도서 이미지 -->
+            <div class="book-image">
+                <a th:href="@{/book/bookDetail(bookId=${item.bookId})}">
+                    <img th:src="${item.image}" alt="도서 이미지">
+                </a>
+            </div>
+
+            <!-- 도서 명 -->
+            <div class="book-name">
+                <a th:href="@{/book/bookDetail(bookId=${item.bookId})}">
+                    <h3 th:text="${item.name}">도서명</h3>
+                </a>
+            </div>
+
+            <!-- 도서 판매가 -->
+            <div class="book-price">
+                <span class="discount-percent"
+                      th:text="${#strings.replace(#numbers.formatDecimal(item.discountPercent * 100, 0, 1), '.0', '') + '%'}"></span>
+
+                <span class="sale-price"
+                      th:text="${#numbers.formatInteger(item.salePrice, 3, 'COMMA')} + '원'"></span>
+
+                <span class="original-price"
+                      th:text="${#numbers.formatInteger(item.originalPrice, 3, 'COMMA')} + '원'"></span>
+            </div>
+
+            <!-- 수량 수정 -->
+            <div class="book-quantity">
+                <div class="quantity-container">
+                    <div class="decrease-btn">−</div>
+                    <span class="quantity-number" th:text="${item.quantity}"></span>
+                    <div class="increase-btn">＋</div>
+                </div>
+            </div>
+
+            <div class="book-price">
+                <span class="price" th:text="${#numbers.formatInteger(item.price, 3, 'COMMA')} + '원'"></span>
+            </div>
+
+            <!-- 장바구니 삭제 버튼 -->
+            <div class="book-delete">
+                <div class="delete-btn"><i class='bx bx-x'></i></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 장바구니 요약 -->
+    <div class="cart-summary" th:if="${not #lists.isEmpty(list)}">
+        <div class="summary-row">
+            <span class="summary-label">총 상품 수:</span>
+            <span class="summary-value total-cnt" th:text="${list.size()} + '개'"></span>
+        </div>
+        <div class="summary-row">
+            <span class="summary-label">총 주문 금액:</span>
+            <span class="summary-value total-price" id="total-price"></span>
+        </div>
+        <button type="submit" class="order-btn">주문하기</button>
+        <input type="hidden" th:value="${list}" name="cartId" id="cartId" class="cartId">
+
+
+    </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/js/cart-list.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE READ UP - 에러</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/error/error.css">
+</head>
+<body>
+
+<div class="page-err">
+    <div class="outer">
+        <div class="middle">
+            <div class="inner">
+                <div class="inner-circle">
+                    <i class="fa fa-cogs"></i>
+                    <span>ERR</span>
+                </div>
+                <span class="inner-status" th:text="${errorMessage} ?: '예상치 못한 오류가 발생했습니다.'">오류가 발생하였습니다.</span>
+                <span class="inner-detail">죄송하지만, 찾고 있는 페이지를 불러오는 데 문제가 발생했습니다.
+                잠시 후 다시 시도해 주세요.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 도서</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/book/book-list.css">
+    <link rel='stylesheet' href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css'>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+<div class="container">
+    <div class="content">
+        <div class="content-head">
+            <div class="first-category">
+                <th:block th:if="${uri == '/book/bookList'}">
+                    <th:block th:if="${category == null}">
+                        <div th:switch="${list.get(0).categoryType}">
+                            <h1 th:case="'cl'" th:text="${list.get(0).categoryLargeName}" />
+                            <h1 th:case="'cm'" th:text="${list.get(0).categoryLargeName} + ' > ' + ${list.get(0).categoryMediumName}" />
+                            <h1 th:case="'cs'" th:text="${list.get(0).categoryLargeName} + ' > ' + ${list.get(0).categoryMediumName} + ' > ' + ${list.get(0).categorySmallName}" />
+                        </div>
+                    </th:block>
+                    <th:block th:unless="${category == null}">
+                        <div th:switch="${category.categoryType}">
+                            <h1 th:case="'cl'" th:text="${category.categoryLargeName}" />
+                            <h1 th:case="'cm'" th:text="${category.categoryLargeName} + ' > ' + ${category.categoryMediumName}" />
+                            <h1 th:case="'cs'" th:text="${category.categoryLargeName} + ' > ' + ${category.categoryMediumName} + ' > ' + ${category.categorySmallName}" />
+                        </div>
+                    </th:block>
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-main">
+        <div class="product-header">
+            <div class="sort">
+                <p class="product-count">
+                    총 <strong class="highlight" th:text="${ph.totalCnt}"></strong>개의 상품이 있습니다.
+                </p>
+
+            </div>
+            <!-- 정렬 방식 추가 -->
+            <div class="sort-select">
+                <label>
+                    <select id="sort-book">
+                        <option value="0" name="sort">- 정렬방식 -</option>
+                        <option value="0" name="sort">최신순</option>
+                        <option value="1" name="sort">낮은 가격순</option>
+                        <option value="2" name="sort">높은 가격순</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+
+        <!-- 상품 결과 없음 -->
+        <div class="product-empty" th:if="${#lists.isEmpty(list)}">
+            <div class="empty-icon">
+                <i class='bx bx-error-circle'></i>
+            </div>
+            <p class="empty-title">상품이 없습니다.</p>
+            <p class="empty-desc">검색어의 철자가 정확한지 다시 한 번 확인해주세요!</p>
+        </div>
+
+        <!-- 상품 목록 -->
+        <div class="product-grid" th:if="${not #lists.isEmpty(list)}">
+            <!-- 쿼리 스트링으로 값 넘겨주기 -->
+            <a style="text-decoration:none;" th:each="item : ${list}" th:href="@{'/book/bookDetail?bookId='+${item.bookId}+'&page='+${ph.page}+'&category='+${category}+'&pageSize='+${ph.pageSize}}" class="product">
+                <img style="height:80%;width:100%" th:src="${item.image}" th:alt="${item.name}">
+                <div class="hover-buttons">
+                    <!-- 장바구니 추가 -->
+                    <button class="add-cart-btn"
+                            th:attr="data-book-id=${item.bookId},
+                        data-price=${item.salePrice}">
+                        장바구니
+                    </button>
+                    <!-- 주문으로 넘어가기 추가 -->
+                    <button onclick="buyNow(this)"
+                            th:attr="data-book-id=${item.bookId}, data-image=${item.image}, data-name=${item.name},
+                                     data-price=${item.salePrice}, data-quantity=1">
+                        구매
+                    </button>
+                </div>
+                <p class="product-name" style="font-size:17px; margin-bottom:-2px; font-weight: bold " th:text="${item.name.length() > 24 ? item.name.substring(0,24).concat('...') : item.name}"></p>
+                <p style="color:#888888; margin-top:10px;margin-bottom:2px;font-size:14px">
+                    <th:block th:each="i : ${writerListResponse}" style="display:inline-block;">
+                        <th:block th:each="writer, stat : ${i}">
+                            <th:block th:if="${item.bookId == writer.bookId}">
+                                <th:block th:if="${stat.count == 1}">
+                                    <span th:text="${writer.name}"></span>
+                                </th:block>
+                                <th:block th:if="${stat.count == stat.size && stat.count > 1}">
+                                    <span th:text="' 외'" style="margin-left:0px;margin-right:0px"></span>
+                                </th:block>
+                                <th:block th:if="${stat.count == stat.size}">
+                                    <span th:text="' 지음 | '" style="margin-left:-3px;margin-right:-2px"></span>
+                                </th:block>
+                            </th:block>
+                        </th:block>
+                    </th:block>
+                    <th:block th:each="i : ${publisherListResponse}">
+                        <th:block th:if="${i.key == item.publisherId}">
+                            <span th:text="${i.value}"></span>
+                        </th:block>
+                    </th:block>
+                </p>
+                <p class="product-price" id="salePrice" style="margin-top:0" >
+                    <strong style="color:black; font-size:17px;" th:text="${#numbers.formatInteger(item.salePrice, 3,'COMMA')+'원 '}"></strong><span style="color:#888888" th:text="${'('+#numbers.formatInteger(item.originalPrice * 0.05,3,'COMMA')+'P)'}"></span>
+                </p>
+            </a>
+        </div>
+        <form class="howtopag" id="form" th:if="${not #lists.isEmpty(list)}" th:action="@{${uri}}" method="get">
+            <!-- 이전 페이지 -10 -->
+            <th:block th:if="${ph.page -10 > 0}">
+                <button type="submit" name="page" th:value="${ph.page -10}">❮❮</button>
+            </th:block>
+            <!-- 이전 페이지 -1 -->
+            <th:block th:if="${ph.page -1 > 0}">
+                <button type="submit" name="page" th:value="${ph.page -1}">❮</button>
+            </th:block>
+            <!-- 페이지 1-10 -->
+            <th:block th:each="i : ${#numbers.sequence(ph.beginPage, ph.endPage)}">
+                <button type="submit" name="page" th:text="${i}" th:value="${i}">num</button>
+            </th:block>
+            <!-- 다음 페이지 +1 -->
+            <th:block th:if="${ph.page+1 <= ph.totalPage}">
+                <button type="submit" name="page" th:value="${ph.page+1}">❯</button>
+            </th:block>
+            <!-- 다음 페이지 +10 -->
+            <th:block th:if="${ph.page +10 <= ph.totalPage}">
+                <button type="submit" name="page" th:value="${ph.page+10}">❯❯</button>
+            </th:block>
+            <!-- 요청 넘겨주기용 input -->
+            <input type="hidden" id="userId" th:value="${session.userId}">
+            <input type="hidden" id="category" name="category" th:value="${sc.category}"/>
+            <input type="hidden" id="pageSize" name="pageSize" th:value="${ph.pageSize}"/>
+            <input type="hidden" id="option" name="option" th:value="${sc.option}"/>
+            <input type="hidden" id="keyword" name="keyword" th:value="${sc.keyword}"/>
+        </form>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/js/cart.js"></script>
+<script src="/js/book-list.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#sort-book').on('change', function(){
+            let option = $('#option').val();
+            let keyword = $('#keyword').val();
+            if(option || keyword){
+                window.location.href = '/book/search?sort=' + $(this).val() + '&category='+$('#category').val()+'&option='+$('#option').val()+'&keyword='+$('#keyword').val();
+            } else{
+                window.location.href = '/book/bookList?sort=' + $(this).val() + '&category='+$('#category').val();
+            }
+
+        });
+    });
+</script>
+</body>
+
+</html>
