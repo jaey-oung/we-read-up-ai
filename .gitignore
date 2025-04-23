@@ -1,32 +1,32 @@
 # 공통
 **/.idea/
- *.iml
- *.iws
- *.ipr
- out/
- 
- # gradle
- springboot/.gradle/
- springboot/build/
- springboot/logs/
- .gradle
- build/
- !gradle/wrapper/gradle-wrapper.jar
- 
- # STS
- .apt_generated
- .classpath
- .factorypath
- .project
- .settings
- .springBeans
- .sts4-cache
- bin/
- 
- # application.properties
- **/src/main/resources/application.properties
- 
- # Python
+*.iml
+*.iws
+*.ipr
+out/
+
+# gradle
+springboot/.gradle/
+springboot/build/
+springboot/logs/
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# application.properties
+**/src/main/resources/application.properties
+
+# Python
 python/.venv/
 python/venv/
 python/data/
@@ -37,5 +37,5 @@ python/**/.pytest_cache/
 python/**/*.pyc
 python/**/*.pyo
 
- # VSCode
- .vscode/
+# VSCode
+.vscode/
