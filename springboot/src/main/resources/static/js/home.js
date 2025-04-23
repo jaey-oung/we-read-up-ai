@@ -7,6 +7,9 @@ const LAST_QUESTION = 4;
 // 각 성향 축(S/I, F/D, N/M, Q/A)에 대한 사용자 응답 점수를 저장하는 객체
 const answers = { S: 0, I: 0, F: 0, D: 0, N: 0, M: 0, Q: 0, A: 0 };
 
+// 팝업 진행 여부 상태
+let popupInProgress = false;
+
 // 추천 도서 리스트
 let recommendedBooks = [];
 
@@ -120,7 +123,10 @@ function handlePopupVisibility() {
 
     if (!hideUntil || new Date() >= new Date(hideUntil)) {
         popup.classList.add("active");
-        banner.classList.add("active");
+
+        // 설문 중이 아니면 배너 표시
+        if (!popupInProgress)
+            banner.classList.add("active");
     } else {
         popup.classList.remove("active");
         banner.classList.remove("active");
@@ -292,6 +298,7 @@ function init() {
     const nextBtns = document.querySelectorAll(".next-btn");
     const prevBtns = document.querySelectorAll(".prev-btn");
     const submitBtn = document.getElementById("submit-btn");
+    const resultCloseBtn = document.getElementById("result-close-btn");
     const typeInfoBtn = document.getElementById("type-info-btn");
     const recommendBooksBtn = document.getElementById("recommend-btn");
     const recommendedBooksCloseBtn = document.getElementById("modal-close-btn");
@@ -337,8 +344,8 @@ function init() {
 
             // 점수 계산 (4척도 기준)
             // 1: 왼쪽 완전 선호 (100 / 0)
-            // 2: 왼쪽 약간 선호 (66.7 / 33.3)
-            // 3: 오른쪽 약간 선호 (33.3 / 66.7)
+            // 2: 왼쪽 약간 선호 (67 / 33)
+            // 3: 오른쪽 약간 선호 (33 / 67)
             // 4: 오른쪽 완전 선호 (0 / 100)
             const value = parseInt(selected.dataset.score);
             const leftCode = container.dataset.leftCode;
@@ -353,6 +360,7 @@ function init() {
         showResult(type);
         alert("당신의 독서 성향 점수:\n" + JSON.stringify(answers, null, 2));
         questions.classList.remove("active")
+        popupInProgress = false;
 
         // TODO: 백엔드로 결과 전송
     }
@@ -370,11 +378,14 @@ function init() {
     /* ===== 이벤트 리스너 등록 ===== */
     // 설문 시작 버튼 클릭 시 팝업 닫고 질문 화면으로 전환
     startBtn.addEventListener("click", () => {
+        popupInProgress = true;
         popup.classList.remove("active");
         questions.classList.add("active");
         showQuestion(currentQuestion);
         updateProgress();
         updateSubmitButton();
+
+        mbtiBanner.classList.remove("active");
     });
 
     // 설문 숨기기 버튼 클릭 시 24시간 동안 보이지 않음
@@ -388,11 +399,18 @@ function init() {
     // 시작 팝업 닫기 버튼 클릭 시 팝업 닫힘
     popupCloseBtn.addEventListener("click", () => popup.classList.remove("active"));
 
-    // 질문 화면 닫기 버튼 클릭 시 질문 창 닫힘
-    quesCloseBtn.addEventListener("click", () => questions.classList.remove("active"));
+    // 질문 화면 닫기 버튼 클릭 시 질문 창 닫히고 배너 다시 표시
+    quesCloseBtn.addEventListener("click", () => {
+        questions.classList.remove("active");
+        popupInProgress = false;
+        mbtiBanner.classList.add("active");
+    });
 
     // 제출 버튼 클릭 시 점수 계산 및 결과 출력
-    submitBtn.addEventListener("click", handleSubmitClick);
+    submitBtn.addEventListener("click", () => {
+        handleSubmitClick();
+        popupInProgress = false;
+    });
 
     // 다음 버튼 클릭 시 다음 질문으로 이동
     nextBtns.forEach((btn) => btn.addEventListener("click", (e) => {
@@ -456,7 +474,9 @@ function init() {
 
     // 배너 클릭 시 설문 팝업 표시
     mbtiBanner.addEventListener("click", () => {
-        // 팝업 숨김, 질문 창 활성화
+        // 중복 방지
+        if (popupInProgress) return;
+
         popup.classList.add("active");
 
         // 답변 초기화
@@ -469,13 +489,16 @@ function init() {
         updateProgress();
         updateSubmitButton();
     });
+
+
+    // 결과 팝업 닫히면 상태 초기화 및 배너 재노출
+    resultCloseBtn.addEventListener("click", () => {
+        document.getElementById("result-container").classList.remove("active");
+        popupInProgress = false;
+        mbtiBanner.classList.add("active");
+    });
 }
 
 /* ===== 초기 실행 ===== */
 document.addEventListener("DOMContentLoaded", handlePopupVisibility);
 document.addEventListener("DOMContentLoaded", init);
-
-// 결과 팝업 닫힘
-document.getElementById("result-close-btn").addEventListener("click", () => {
-    document.getElementById("result-container").classList.remove("active");
-});
