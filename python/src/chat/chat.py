@@ -31,7 +31,11 @@ conn = pymysql.connect(
 # SQL을 실행하는 커서 객체 생성
 cursor = conn.cursor()
 
-persist_dir = "./data/mysql_vector_store"
+# 현재 파일의 위치에서 루트 디렉토리 찾고
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+
+# python/data/mysql_vector_store 경로 설정
+persist_dir = os.path.join(BASE_DIR, "python", "data", "mysql_vector_store")
 
 if not os.path.exists(persist_dir):
     print("🚀 벡터 DB가 없으니 새로 생성합니다.")

@@ -1,6 +1,6 @@
 import json
 
-SAVE_PATH = "../data/processed/book_mbti_sample_data.json"
+SAVE_PATH = "../../data/processed/book_mbti_sample_data.json"
 
 traits_pairs = [('S', 'I'), ('F', 'D'), ('N', 'M'), ('Q', 'A')]
 

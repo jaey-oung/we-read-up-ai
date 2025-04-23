@@ -2,7 +2,7 @@ import json
 from collections import Counter
 
 # 파일 경로
-DATA_PATH = '../data/processed/book_mbti_sample_data.json'
+DATA_PATH = '../../data/processed/book_mbti_sample_data.json'
 
 # 기준값
 EXTREME_THRESHOLD = 90
