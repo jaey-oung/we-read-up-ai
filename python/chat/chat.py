@@ -2,7 +2,7 @@ import os
 import pymysql
 from datetime import datetime
 from dotenv import load_dotenv
-from python.chat.model import Chat
+from python.chat.chat_model import Chat
 from fastapi import APIRouter
 from langchain_upstage import ChatUpstage
 from langchain_core.prompts import PromptTemplate
@@ -19,11 +19,11 @@ router = APIRouter()
 
 # MySQL DB 연결
 conn = pymysql.connect(
-    host='localhost',
-    port=3306,
-    user='root',
-    password='1234',
-    database='book_store',
+    host=os.getenv('DB_HOST'),
+    port=int(os.getenv('DB_PORT')),   # 포트는 int로 변환 필요
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASSWORD'),
+    database=os.getenv('DB_NAME'),
     charset='utf8mb4',                      # 한글 등 특수문자 대응
     cursorclass=pymysql.cursors.DictCursor  # 결과를 dict로 받기
 )
