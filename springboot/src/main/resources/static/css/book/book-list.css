@@ -11,29 +11,10 @@ body {
 }
 
 .container .content {
-    margin: 0 60px;
-}
-
-.content-head {
-    display: flex;
-    flex-direction: column;
-    margin: 0 auto;
-}
-
-.first-category {
-    /*padding-top: 20px;*/
     text-align: center;
-    /*align-self: flex-end;*/
+    margin-top: 30px;
 }
 
-.first-category span {
-    font-size: 13px;
-    color: gray;
-}
-
-.second-category {
-    padding: 45px 0;
-}
 
 .content-main {
     margin-bottom: 120px;
@@ -108,11 +89,15 @@ body {
 /* 상품 카드 스타일 */
 .product {
     background-color: #f8f8f8;
-    padding: 15px;
+    padding: 15px 15px 20px 15px;
     text-align: center;
     position: relative;
     border-radius: 8px;
     overflow: hidden;
+}
+
+.product p {
+    padding-bottom: 3px;
 }
 
 .product img {
