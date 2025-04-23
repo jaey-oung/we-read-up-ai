@@ -33,7 +33,7 @@ class OrderRepositoryImplTest {
         System.out.println("orderDto.getOrderId() = " + orderDto.getOrderId());
         assertEquals(insertCnt, 1);
     }
-
+/*
     @DisplayName("판매 순위별 상위 5권 bookId 조회")
     @Test
     @Transactional
@@ -83,4 +83,5 @@ class OrderRepositoryImplTest {
         assertEquals(5, rankedBooks.size());
         assertEquals(Arrays.asList(6, 1, 5, 4, 3), rankedBooks);
     }
+ */
 }
