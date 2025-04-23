@@ -24,14 +24,14 @@
                     <img src="/img/read-up-logo.png" alt="로고" height="100px">
                 </a>
             </div>
-            <form action="/search" method="get" class="search-container">
+            <form action="/search" method="get" id="search-container">
                 <select th:name="option">
                     <option th:value="'all'" th:selected="${sc?.option} == 'all'">통합검색</option>
                     <option th:value="'title'" th:selected="${sc?.option} == 'title'">도서명</option>
                     <option th:value="'writer'" th:selected="${sc?.option} == 'writer'">저자명</option>
                 </select>
 
-                <input type="text" placeholder="검색어를 입력하세요" th:name="keyword" th:value="${sc?.keyword != null ? sc.keyword : ''}">
+                <input type="text" placeholder="검색어를 입력하세요" th:name="keyword" th:value="${(sc?.keyword != null && sc.keyword.trim() != '') ? sc.keyword.trim() : ''}">
                 <button>
                     <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="검색">
                 </button>
@@ -42,75 +42,35 @@
             </div>
         </div>
     </div>
-    <div id="parent-table">
-        <div id="table">
-            <form action="/bookList" method="get">
-                <table class="categoryAll">
-                    <tr class="categoryHeader">
-                        <th>분류</th>
-                        <th><button type="submit" name="category" value="cl_1">국내도서</button></th>
-                        <th><button type="submit" name="category" value="cl_2">해외도서</button></th>
-                        <th><button type="submit" name="category" value="cl_3">eBook</button></th>
-                    </tr>
-                    <tr class="categoryMedium">
-                        <td></td>
-                        <td><button type="submit" name="category" value="cm_1">건강</button></td>
-                        <td><button type="submit" name="category" value="cm_4">건강</button></td>
-                        <td><button type="submit" name="category" value="cm_7">건강</button></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><button type="submit" name="category" value="cs_1">골프</button></td>
-                        <td><button type="submit" name="category" value="cs_7">골프</button></td>
-                        <td><button type="submit" name="category" value="cs_13">골프</button></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><button type="submit" name="category" value="cs_2">야구</button></td>
-                        <td><button type="submit" name="category" value="cs_8">야구</button></td>
-                        <td><button type="submit" name="category" value="cs_14">야구</button></td>
-                    </tr>
-                    <tr class="categoryMedium">
-                        <td></td>
-                        <td><button type="submit" name="category" value="cm_2">여행</button></td>
-                        <td><button type="submit" name="category" value="cm_5">여행</button></td>
-                        <td><button type="submit" name="category" value="cm_8">여행</button></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><button type="submit" name="category" value="cs_3">아시아</button></td>
-                        <td><button type="submit" name="category" value="cs_9">아시아</button></td>
-                        <td><button type="submit" name="category" value="cs_15">아시아</button></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><button type="submit" name="category" value="cs_4">유럽</button></td>
-                        <td><button type="submit" name="category" value="cs_10">유럽</button></td>
-                        <td><button type="submit" name="category" value="cs_16">유럽</button></td>
-                    </tr>
-                    <tr class="categoryMedium">
-                        <td></td>
-                        <td><button type="submit" name="category" value="cm_3">컴퓨터</button></td>
-                        <td><button type="submit" name="category" value="cm_6">컴퓨터</button></td>
-                        <td><button type="submit" name="category" value="cm_9">컴퓨터</button></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><button type="submit" name="category" value="cs_5">프로그래밍 언어</button></td>
-                        <td><button type="submit" name="category" value="cs_11">프로그래밍 언어</button></td>
-                        <td><button type="submit" name="category" value="cs_17">프로그래밍 언어</button></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><button type="submit" name="category" value="cs_6">컴퓨터 공학</button></td>
-                        <td><button type="submit" name="category" value="cs_12">컴퓨터 공학</button></td>
-                        <td><button type="submit" name="category" value="cs_18">컴퓨터 공학</button></td>
-                    </tr>
-                </table>
-            </form>
+    <div id="category-wrapper"> <!-- 전체 카테고리 감싸는 영역 -->
+        <div id="category-container"> <!-- 카테고리 묶음 -->
+            <div id="category_large">
+                <th:block th:each="ctg: ${largeCategories}">
+                    <span class="category-large" th:id="${ctg.categoryLargeId}">
+                        <a href="#" th:text="${ctg.categoryLargeName}">대분류_이름</a>
+                    </span>
+                </th:block>
+            </div>
+            <span class="category-step">></span>
+            <div id="category_medium">
+            </div>
+            <span class="category-step">></span>
+            <div id="category_small">
+            </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/js/nav.js"></script>
+    <script>
+        const form = document.getElementById('search-container')
+        const input = form.querySelector('input');
+        form.addEventListener('submit', function(event) {
+            if (input.value.trim().length === 0) {
+                event.preventDefault();
+                alert('검색 창에 공백만 입력할 수 없습니다. 다른 값을 입력해 주세요.')
+            }
+        });
+    </script>
 </header>
 </body>
 </html>
