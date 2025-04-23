@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Footer</title>
+</head>
+<body>
+<footer th:fragment="footer">
+    <div class="footer">
+        <div class="footer-section">
+            <a href="/" id="footer-logo"><img src="/img/read-up-logo.png" alt="website-logo"></a>
+            <div class="footer-text">
+                <h3>WE-READ-UP(주)</h3><br>
+                <p class="footer-sub-text">
+                    인터넷 서점<br>
+                    대표자: 이승원 김나현 장신규 유창호 양재영 최회진<br>
+                    주소: 서울 강남구 강남대로 364 미왕빌딩 10층, 11층 (패스트캠퍼스)
+                </p>
+            </div>
+        </div>
+        <div class="footer-section">
+            <a href="/board/notice-list" id="cs"><h3>고객센터</h3></a>
+            <p class="footer-text">
+                전화번호 02-501-9396 &nbsp;
+                이메일 help@fastcampus.co.kr &nbsp;
+                주중 10시~18시 &nbsp;(점심시간 12~13시 / 주말 및 공휴일 제외)
+            </p>
+        </div>
+        <div class="footer-section sns-links">
+            <h3>SNS</h3>
+            <a href="#">instagram</a>
+            <a href="#">youtube</a>
+            <a href="#">facebook</a>
+            <a href="#">kakao</a>
+            <a href="#">twitter</a>
+            <a href="#">blog</a>
+        </div>
+        <div class="copyright">
+            Copyright © we-read-up Corp. All Rights Reserved.
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.sns-links a').on('click', function(event) {
+                event.preventDefault();
+            });
+        });
+    </script>
+</footer>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE READ UP - 관리자 페이지</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>대시보드</title>
+    <link rel="stylesheet" href="/css/admin/admin-book-list.css">
+</head>
+<body>
+<!-- 사이드바 -->
+<div id="sidebar">
+    <div id="logo">
+        <a th:href="@{'/admin/bookList'}"><h2>We Read Up</h2></a>
+    </div>
+    <ul id="menu">
+        <li><a href="/admin/bookList">상품 대시보드</a></li>
+        <li><a href="/admin/bookCreate">상품 등록</a></li>
+        <li><a href="#">주문 관리</a></li>
+        <li><a href="#">재고 관리</a></li>
+    </ul>
+</div>
+
+<!-- 대시보드 콘텐츠 -->
+<div id="main-content">
+    <form id="header" action="/admin/bookList" method="GET">
+        <button id="register-product-btn">상품 등록</button>
+        <div id="search-bar">
+            <input type="text" id="search-input" name="name" placeholder="상품 검색">
+            <button id="search-btn">검색</button>
+        </div>
+    </form>
+
+    <!-- 대시보드 통계 -->
+    <div id="dashboard-stats">
+        <a style="text-decoration: none " th:href="@{/admin/bookList?quantity=1}" class="stat-box">
+            <h3>총 상품</h3>
+            <p th:text="${countAllByAdmin}+'개'">0개</p>
+        </a>
+
+        <a style="text-decoration: none" th:href="@{/admin/bookList?quantity=2}" class="stat-box">
+            <h3>판매 중인 상품</h3>
+            <p th:text="${countAllByAdmin - countQuantityZeroByAdmin}+'개'">0개</p>
+        </a>
+
+        <a style="text-decoration: none" th:href="@{/admin/bookList?quantity=0}" class="stat-box">
+            <h3>판매 중지 상품</h3>
+            <p th:text="${countQuantityZeroByAdmin}+'개'">0개</p>
+        </a>
+
+    </div>
+
+    <!-- 상품 목록 -->
+    <div id="product-list-section">
+        <button class="select-all" id="select-all">모두선택</button>
+        <button class="product-no-sale" id="product-no-sale">판매중지</button>
+        <button class="product-sale" id="product-sale">재고추가</button>
+        <button class="product-delete" id="product-delete">삭제</button>
+
+        <table id="product-table">
+            <thead>
+            <tr>
+                <th>선택</th>
+                <th>상품 코드</th>
+                <th>이름</th>
+                <th>정가</th>
+                <th>판매가</th>
+                <th>할인가격</th>
+                <th>할인율</th>
+                <th>등록일</th>
+                <th>ISBN</th>
+                <th>재고</th>
+                <th>상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:if="${bookDto != null}">
+                <tr th:each="i : ${bookDto}" class="book-list">
+                    <td><input type="checkbox" class="quantity-box" th:value="${i.bookId}" id="quantity-box"></td>
+                    <td th:text="${i.bookId}" id="bookId-box" class="bookId-box">0</td>
+                    <td th:text="${i.name}" class="book-url">No name</td>
+                    <td th:text="${#numbers.formatInteger(i.originalPrice, 3, 'COMMA')+'원'}">999,999,999원</td>
+                    <td th:text="${#numbers.formatInteger(i.salePrice, 3, 'COMMA')+'원'}">999,999,999원</td>
+                    <td th:text="${#numbers.formatInteger(i.discountPrice, 3, 'COMMA')+'원'}">0원</td>
+                    <td th:text="${#numbers.formatInteger(i.discountPercent*100, 0)+'%'}">0%</td>
+                    <td th:text="${#dates.format(i.regDate,'yyyy-MM-dd')}">9999-01-01</td>
+                    <td th:text="${i.isbn}">9791130648385</td>
+                    <td th:text="${i.stockQuantity}" id="quantity-td" class="quantity-td">0</td>
+                    <td th:text="${i.stockQuantity > 0 ? '판매중' : '판매중지'}">판매중지</td>
+                </tr>
+            </th:block>
+            <th:block th:if="${bookDto == null}">
+                <strong>상품이 없습니다!</strong>
+            </th:block>
+            </tbody>
+        </table>
+        <form class="form-box" id="form-box" action="/admin/bookList" method="get">
+            <!-- 이전 페이지 -10 -->
+            <th:block th:if="${ph.page -10 > 0}">
+                <button type="submit" name="page" th:value="${ph.page -10}">❮❮</button>
+            </th:block>
+            <!-- 이전 페이지 -1 -->
+            <th:block th:if="${ph.page -1 > 0}">
+                <button type="submit" name="page" th:value="${ph.page -1}">❮</button>
+            </th:block>
+            <!-- 페이지 1-10 -->
+            <th:block th:each="i : ${#numbers.sequence(ph.beginPage, ph.endPage)}">
+                <button type="submit" name="page" th:text="${i}" th:value="${i}">num</button>
+            </th:block>
+            <!-- 다음 페이지 +1 -->
+            <th:block th:if="${ph.page+1 <= ph.totalPage}">
+                <button type="submit" name="page" th:value="${ph.page+1}">❯</button>
+            </th:block>
+            <!-- 다음 페이지 +10 -->
+            <th:block th:if="${ph.page +10 <= ph.totalPage}">
+                <button type="submit" name="page" th:value="${ph.page+10}">❯❯</button>
+            </th:block>
+            <input type="hidden" th:value="${quantity}" name="quantity"/>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function (){
+        $('.book-url').on('click', function(){
+            window.location.href = '/bookDetail?bookId=' + $(this).closest($('.book-list')).find('.bookId-box').text();
+        });
+        // 엔터 키로 폼 제출 방지 및 검색 동작
+        $('#search-input').keypress(function (event) {
+            if (event.which === 13) { // Enter key (엔터키)
+                event.preventDefault(); // 엔터키 기본 동작(폼 제출) 방지
+                $('#header').attr('action', '/admin/bookList'); // 검색의 경우 bookList로 설정
+                $('#header').submit(); // 폼 제출
+            }
+        });
+        // 상품 등록 누를시
+        $('#register-product-btn').click(function (){
+            $('#header').attr('action', '/admin/bookCreate');
+        })
+        // 모두 선택 눌렀을때
+        $('#select-all').click(function (){
+           $('.quantity-box').each(function(){
+               if(!$(this).prop('checked')){
+                   $(this).prop('checked', true);
+               }
+           })
+        });
+        // 삭제 눌렀을때
+        $('#product-delete').click(function(){
+           let result = confirm('정말 삭제하시겠습니까?');
+           if(result){
+               let bookListResponse = [];
+
+               $('.quantity-box').each(function(){
+                   if($(this).prop('checked')){
+                       bookListResponse.push({
+                           bookId: $(this).val()
+                       })
+                   }
+               });
+
+               axios.post('/admin/bookDelete', bookListResponse,{
+                   headers: {'content-type': 'application/json'}
+               }).then(function (response){
+                   if(response.data==='success'){
+                       alert('삭제 완료');
+                       location.reload();
+                   } else if(response.data==='fail'){
+                       alert('상품을 선택해주세요!');
+                   }
+               }).error(function (error){
+
+               });
+           }
+        });
+        // 판매안함 눌럿을때
+        $('#product-no-sale').click(function (){
+            let bookListResponse = [];
+
+            $('.quantity-box').each(function(){
+                if($(this).prop('checked')){
+                    bookListResponse.push({
+                        bookId:$(this).val(),
+                        stockQuantity:0
+                    })
+                }
+            })
+
+            axios.post('/admin/bookMod', bookListResponse, {
+                headers: {'content-type': 'application/json'}
+            }).then(function (response){
+                if(response.data === 'success'){
+                    alert('재고가 0이 되었습니다.');
+                    location.reload();
+                } else if(response.data==='fail'){
+                    alert('상품을 선택해주세요!');
+                }
+            }).error(function (error){
+
+            });
+        });
+        // 판매함 눌럿을때
+        $('#product-sale').click(function (){
+            let bookListResponse = [];
+
+            $('.quantity-box').each(function(){
+                if($(this).prop('checked')){
+                    bookListResponse.push({
+                        bookId: $(this).val(),
+                        stockQuantity: 100
+                    })
+                }
+            })
+
+            axios.post('/admin/bookMod', bookListResponse, {
+                headers: {'content-type' : 'application/json'}
+            }).then(function (response){
+
+                if(response.data==='success'){
+                    alert("재고가 100개가 되었습니다.");
+                    location.reload();
+                } else if(response.data==='fail'){
+                    alert('상품을 선택해주세요!');
+                }
+            }).error(function (error){
+
+            })
+        });
+    });
+</script>
+
+
+</body>
+</html>

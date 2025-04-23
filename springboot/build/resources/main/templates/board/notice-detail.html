@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 공지사항</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/board/notice-detail.css">
+    <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<script>
+    let msg = [[${msg}]];
+    if(msg == "WRT_ERR") {
+        alert("게시물 등록에 실패하였습니다. 다시 시도해 주세요.");
+    }
+    if(msg == "MOD_ERR") {
+        alert("게시물 수정에 실패하였습니다. 다시 시도해 주세요.");
+    }
+</script>
+
+<div class="container">
+    <div class="content">
+        <div class="content-head">
+            <div class="first-category">
+                <span>홈 / 게시판 / 공지사항</span>
+            </div>
+
+            <div class="titleArea">
+                <h1>공지사항</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    let noticeId = [[${noticeDto != null ? noticeDto.noticeId : ''}]];
+    console.log("noticeId =", noticeId);
+</script>
+
+<div class="container">
+    <div class="main-container">
+        <h2 class="writing-header">게시판 [[${mode == 'new' ? '글쓰기' : '읽기'}]]</h2>
+        <form id="form" class="frm" action="" method="post">
+            <input type="hidden" name="noticeId" th:value="${noticeDto != null ? noticeDto.noticeId : '0'}">
+
+            <input name="title" type="text" th:value="${noticeDto != null ? noticeDto.title : ''}"
+                   placeholder="제목을 입력해 주세요." class="title"
+                   th:readonly="${mode != 'new'}"><br>
+
+            <textarea name="content" class="content" placeholder="내용을 입력해 주세요."
+                      th:readonly="${mode != 'new'}"
+                      th:text="${noticeDto != null ? noticeDto.content : ''}">
+
+            </textarea><br>
+
+            <div class="button-group">
+                <!-- 글쓰기 모드일 때만 등록 버튼 보이기 -->
+                <div th:if="${mode == 'new'}">
+                    <button type="button" id="writeBtn" class="btn btn-write">
+                        <i class="fa fa-pencil"></i> 등록
+                    </button>
+                </div>
+
+                <div th:if="${mode != 'new' and noticeDto.employeeId != null}">
+                    <button type="button" id="modifyBtn" class="btn btn-modify">
+                        <i class="fa fa-edit"></i> 수정
+                    </button>
+                    <button type="button" id="removeBtn" class="btn btn-remove">
+                        <i class="fa fa-trash"></i> 삭제
+                    </button>
+                </div>
+                <input type="hidden" th:value="${member != null ? member.memberId : ''}" id="memberId"/>
+
+                <!-- 목록 버튼은 항상 보이게 -->
+                <button type="button" id="listBtn" class="btn btn-list">
+                    <i class="fa fa-bars"></i> 목록
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    $(document).ready(function(){
+        let formCheck = function() {
+            let form = document.getElementById("form");
+            if(form.title.value === "") {
+                alert("제목을 입력해 주세요.");
+                form.title.focus();
+                return false;
+            }
+
+            if(form.content.value === "") {
+                alert("내용을 입력해 주세요.");
+                form.content.focus();
+                return false;
+            }
+            return true;
+        }
+
+        // searchCondition에서 queryString 추출 (Thymeleaf 인라인 사용)
+        let queryString = [[${searchCondition != null ? searchCondition.queryString : ''}]];
+
+        $("#writeNewBtn").on("click", function(){
+            location.href = '/board/write';
+        });
+
+        $("#writeBtn").on("click", function(){
+            let form = $("#form");
+            form.attr("action", '/board/write');
+            form.attr("method", "post");
+
+            if(formCheck())
+                form.submit();
+        });
+
+        $("#modifyBtn").on("click", function(){
+            let form = $("#form");
+            let isReadonly = $("input[name=title]").attr('readonly');
+
+            // 1. 읽기 상태이면, 수정 상태로 변경
+            if(isReadonly === 'readonly') {
+                $(".writing-header").html("게시판 수정");
+                $("input[name=title]").attr('readonly', false);
+                $("textarea").attr('readonly', false);
+                $("#modifyBtn").html("<i class='fa fa-pencil'></i> 등록");
+                return;
+            }
+
+            // 2. 수정 상태이면, 수정된 내용을 서버로 전송
+            form.attr("action", '/board/modify' + queryString);
+            form.attr("method", "post");
+            if(formCheck())
+                form.submit();
+        });
+
+        $("#removeBtn").on("click", function(){
+            console.log("removeBtn clicked");
+            if(!confirm("정말로 삭제하시겠습니까?")) return;
+
+            let form = $("#form");
+            form.attr("action", '/board/remove' + queryString);
+            form.attr("method", "post");
+            form.submit();
+        });
+
+        $("#listBtn").on("click", function(){
+            console.log("listBtn clicked");
+            location.href = '/board/notice-list' + queryString;
+        });
+    });
+</script>
+
+<!-- 댓글 입력 폼 -->
+<div class="comment-container">
+    <h2 class="writing-header">댓글</h2>
+
+    <div class="comment-form" th:if="${member != null}">
+        <h3>댓글달기</h3>
+        <textarea name="commentContent" placeholder="댓글을 입력하세요"></textarea>
+        <!--        <div class="form-inputs">-->
+        <!--            <button id="sendBtn" type="button" class="btn-submit">등록</button>-->
+        <!--        </div>-->
+        <div class="form-inputs">
+            <button id="sendBtn" type="button" class="btn-submit">등록</button>
+        </div>
+
+    </div>
+    <div id="commentList"><ul></ul></div>
+</div>
+
+<script th:inline="javascript">
+    // noticeId 초기화: undefined, null, 빈 문자열, 0 방지
+    let noticeId = [[${noticeDto != null ? noticeDto.noticeId : '0'}]];
+    noticeId = (noticeId && noticeId !== '0') ? noticeId : null;
+    console.log("noticeId =", noticeId);
+</script>
+
+<script>
+    $(document).ready(function () {
+        // noticeId가 존재하면 댓글 목록 불러오기
+        if (noticeId) {
+            showList(noticeId);
+        } else {
+            console.log("새 게시물 작성 모드 - 댓글 목록 호출 안 함");
+        }
+    });
+
+    // 댓글 목록을 불러오는 함수
+    let showList = function(noticeId) {
+        if (!noticeId) return;  // noticeId가 없으면 호출하지 않음
+
+        $.ajax({
+            type: 'GET',
+            url: '/comments?noticeId=' + noticeId,
+            success: function(result) {
+                $("#commentList ul").html(toHtml(result));
+            },
+            error: function() {
+                alert("댓글 목록을 불러오는 데 실패했습니다.");
+            }
+        });
+    }
+
+    // 댓글 등록/수정 버튼 클릭
+    $("#sendBtn").click(function() {
+        let content = $("textarea[name=commentContent]").val();
+        if (content.trim() === '') {
+            alert("댓글을 입력해주세요.");
+            $("textarea[name=commentContent]").focus();
+            return;
+        }
+
+        let commentId = $(this).attr("data-commentId");  // 수정할 댓글 ID
+        // 1. 댓글 등록
+        if (!commentId) {
+            $.ajax({
+                type: 'POST',
+                url: '/comments?noticeId=' + noticeId,
+                headers: { "content-type": "application/json" },
+                data: JSON.stringify({ noticeId: noticeId, content: content }),
+                success: function(result) {
+                    alert("댓글이 등록되었습니다.");
+                    $("textarea[name=commentContent]").val("");  // 입력칸 초기화
+                    showList(noticeId);  // 댓글 목록 갱신
+                },
+                error: function() {
+                    alert("댓글 등록에 실패했습니다.");
+                }
+            });
+        } else {
+            // 2. 댓글 수정
+            $.ajax({
+                type: 'PATCH',
+                url: '/comments/' + commentId,
+                headers: { "content-type": "application/json" },
+                data: JSON.stringify({ commentId: commentId, content: content }),
+                success: function(result) {
+                    alert("댓글이 수정되었습니다.");
+                    $("textarea[name=commentContent]").val("");  // 입력칸 초기화
+                    $("#sendBtn").removeAttr("data-commentId").text("등록");
+                    showList(noticeId);  // 댓글 목록 갱신
+                },
+                error: function() {
+                    alert("댓글 수정에 실패했습니다.");
+                }
+            });
+        }
+    });
+
+    // 수정 버튼 클릭
+    $(document).on('click', '.modBtn', function() {
+        let $li = $(this).closest('li');
+        let commentId = $(this).closest('li').data('commentid'); // 댓글의 ID 추출
+        let content = $(this).closest('li').find('.content').text(); // 댓글 내용 추출
+
+        $("textarea[name=commentContent]").val(content); // 댓글 내용 textarea에 설정
+        $("#sendBtn").text("수정").attr("data-commentId", commentId); // 수정버튼 변경
+
+        // 선택된 댓글의 수정/삭제 버튼 숨기기
+        $li.find('.delBtn').hide();
+        $li.find('.modBtn').hide();
+    });
+
+
+    // 댓글 삭제
+    $("#commentList").on("click", ".delBtn", function() {
+        let commentId = $(this).parent().attr("data-commentId");
+        $.ajax({
+            type: 'DELETE',
+            url: '/comments/' + commentId + '?noticeId=' + noticeId,  // noticeId 전달
+            success: function(result) {
+                alert("댓글이 삭제되었습니다.");
+                showList(noticeId);  // 댓글 목록 갱신
+            },
+            error: function() {
+                alert("댓글 삭제에 실패했습니다.");
+            }
+        });
+    });
+
+    // 댓글을 HTML로 변환 (안전하게 특수문자 escape 추가)
+    let toHtml = function(comments) {
+        let member = parseInt($('#memberId').val());
+        let html = "<ul>";
+        comments.forEach(function(comment) {
+            html += '<li data-commentId="' + comment.commentId + '" data-noticeId="' + comment.noticeId + '">';
+            html += '작성자:<span class="memberId">' + escapeHtml(comment.nickname) + '</span> | ';
+            html += '내용: <span class="content">' + escapeHtml(comment.content) + '</span> | ';
+            html += '수정일: <span class="modDate">' + comment.modDate + '</span> | ';
+            console.log('멤버아이디!'+member);
+            console.log('코맨트아이디!'+comment.memberId);
+            if(member === comment.memberId){
+                html += '<button class="delBtn">삭제</button>';
+                html += '<button class="modBtn">수정</button>';
+            }
+
+
+            html += '</li>';
+        });
+        html += "</ul>";
+        return html;
+    }
+    // 특수문자 escape 함수
+    let escapeHtml = function (string) {
+        return String(string)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+    $(document).ready(function () {
+        // noticeId가 존재하고, 0이 아니면 showList() 호출 (새 글쓰기 모드에서는 호출하지 않음)
+        if (noticeId && noticeId !== '0') {
+            showList(noticeId);
+        } else {
+            console.log("새 게시물 작성 모드 - 댓글 목록 호출 안 함");
+        }
+    });
+
+</script>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

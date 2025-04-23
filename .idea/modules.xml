@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/springboot.main.iml" filepath="$PROJECT_DIR$/.idea/modules/springboot.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/we-read-up-ai.iml" filepath="$PROJECT_DIR$/.idea/we-read-up-ai.iml" />
+    </modules>
+  </component>
+</project>

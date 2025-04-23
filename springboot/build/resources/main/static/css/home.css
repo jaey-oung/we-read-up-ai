@@ -1,0 +1,762 @@
+/* 기본 스타일 */
+body {
+    margin: 0;
+    padding-top: 50px;
+}
+
+/* ===== 독서 성향 테스트 스타일 ===== */
+/* 팝업 컨테이너 기본 설정 */
+#popup-container, #questions-container, #book-recommendation-modal, #result-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#popup-container.active, #questions-container.active, #book-recommendation-modal.active, #result-container.active {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+#questions-container.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 팝업 박스 공통 스타일 */
+.popup-box {
+    background: #fffdf6;
+    padding: 4rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 40px rgba(139, 69, 19, 0.2);
+    position: relative;
+    text-align: center;
+    width: 95%;
+    max-width: 1000px;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* 닫기 버튼 */
+#popup-close-btn, #ques-close-btn, #result-close-btn, #modal-close-btn {
+    font-size: 2rem;
+    color: #d4a76a;
+    background: none;
+    border: none;
+    position: absolute;
+    top: 1.2rem;
+    right: 1.5rem;
+    cursor: pointer;
+}
+
+#popup-close-btn:hover, #ques-close-btn:hover, #result-close-btn:hover, #modal-close-btn:hover {
+    color: #8b4513;
+}
+
+/* 시작 화면 스타일 */
+h2 {
+    font-size: 2.5rem;
+    color: #8b4513;
+    margin-bottom: 2rem;
+}
+
+.popup-intro-text {
+    color: #d97a35;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.popup-description {
+    font-size: 1.2rem;
+    color: #8b4513;
+    margin-bottom: 2.5rem;
+}
+
+#popup-start-btn {
+    display: inline-block;
+    padding: 0.9rem 2.5rem;
+    background: #d97a35;
+    border: none;
+    border-radius: 9999px;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+    white-space: nowrap;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+#popup-start-btn:hover {
+    background: #7a583e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(139, 69, 19, 0.3);
+}
+
+#popup-hide-btn {
+    position: absolute;
+    top: 1.2rem;
+    left: 1.5rem;
+    background: none;
+    border: none;
+    color: #d97a35;
+    font-size: 1rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* 진행 상태 표시 */
+.progress-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(240, 230, 214, 0.5);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #d97a35;
+    width: 25%;
+    border-radius: 10px;
+    transition: 0.3s ease;
+}
+
+.progress-text {
+    color: #8b4513;
+    font-size: 1rem;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* 질문 컨테이너 */
+.question-text {
+    font-size: 1.3rem;
+    color: #8b4513;
+    line-height: 1.8;
+    margin: 1rem 0 2.5rem;
+    text-align: center;
+    position: relative;
+    padding: 0 60px;
+}
+
+/* 퀴즈 본문 */
+.ques-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    margin: 2rem auto;
+    width: 100%;
+    max-width: 800px;
+}
+
+/* 선택 스케일 컨테이너 */
+.choice-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.scale-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 249, 230, 0.5);
+    border-radius: 40px;
+    padding: 1.2rem 2rem;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.scale-option {
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    background: white;
+    border: 2px solid #d4a76a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    color: #8b4513;
+    font-weight: 500;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    text-align: center;
+    white-space: pre-line;
+    box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1);
+}
+
+.scale-option:hover {
+    background: #fff3da;
+    border-color: #d97a35;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(217, 122, 53, 0.2);
+}
+
+.scale-option.selected {
+    background: #d97a35;
+    color: white;
+    border-color: #d97a35;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(217, 122, 53, 0.4);
+}
+
+/* 네비게이션 버튼 */
+.nav-btn {
+    font-size: 2.2rem;
+    color: #d97a35;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    opacity: 0.8;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.nav-btn.prev-btn {
+    left: 0;
+}
+
+.nav-btn.next-btn {
+    right: 0;
+}
+
+/* 제출 버튼 */
+#submit-btn {
+    width: fit-content;
+    margin: 2.5rem auto 0;
+    padding: 0.9rem 2.5rem;
+    background: #d97a35;
+    border: none;
+    border-radius: 9999px;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+    white-space: nowrap;
+}
+
+#submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+#submit-btn.active {
+    background: #d97a35;
+    cursor: pointer;
+}
+
+#submit-btn.active:hover {
+    background: #7a583e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(139, 69, 19, 0.3);
+}
+
+/* 각 질문별 프로그레스 바 상태 */
+#q1:not(.active) ~ .progress-fill { width: 25%; }
+#q2:not(.active) ~ .progress-fill { width: 50%; }
+#q3:not(.active) ~ .progress-fill { width: 75%; }
+#q4:not(.active) ~ .progress-fill { width: 100%; }
+
+.question-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    min-height: 300px; /* 필요 시 추가 */
+    position: relative;
+}
+
+.question-container {
+    display: none;
+    width: 100%;
+    max-width: 800px;
+}
+
+.question-container.active {
+    display: block;
+}
+
+/* 설문 조사 결과 */
+#result-container .popup-box {
+    background-color: white;
+    padding: 2.5rem 2rem;
+    border-radius: 15px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.result-content {
+    margin-top: 0.5rem;
+}
+
+.result-type {
+    text-align: center;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.8rem;
+}
+
+.result-type {
+    text-align: center;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.8rem;
+}
+
+#result-type-name {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0;
+    background-color: white;
+    padding: 0.8rem;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-width: 140px;
+}
+
+.result-icon {
+    width: 32px;
+    height: 32px;
+    color: #d97a35;
+    stroke-width: 1.5;
+    transition: color 0.3s ease;
+    margin-bottom: 0.2rem;
+}
+
+.result-code {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #666;
+}
+
+.result-name {
+    font-size: 0.9rem;
+    color: #333;
+    margin-top: 0.2rem;
+}
+
+#result-type-description {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.6rem;
+    line-height: 1.4;
+    max-width: 500px;
+    text-align: center;
+    word-break: keep-all;
+}
+
+#result-container h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+}
+
+/* 모든 독서 성향 보여주기 */
+#type-info-btn {
+    position: absolute;
+    right: 5rem;
+    top: 1.6rem;
+    font-size: 1rem;
+    color: #d97a35;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#type-info-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fffdf6;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid #d4a76a;
+    box-shadow: 0 6px 15px rgba(139, 69, 19, 0.2);
+    width: 800px;
+    z-index: 9999;
+    display: none;
+}
+
+#type-info-box.active {
+    display: block;
+}
+
+.type-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.8rem;
+}
+
+.type-item {
+    padding: 0.6rem;
+    border-radius: 10px;
+    background: #fff8f1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 0.75rem;
+    transition: 0.2s;
+    min-height: 130px;
+}
+
+.type-item:hover {
+    transform: scale(1.03);
+    box-shadow: 0 2px 6px rgba(139, 69, 19, 0.2);
+}
+
+.type-item .code {
+    font-weight: bold;
+    color: #d97a35;
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+.type-item .name {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: #333;
+}
+
+.type-item .description {
+    font-size: 0.65rem;
+    color: #777;
+    margin-top: 0.3rem;
+    line-height: 1.2;
+    word-break: keep-all;
+}
+
+/* 도서 추천 서비스 */
+.recommend-btn-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+}
+
+#recommend-btn {
+    background-color: #d97a35;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(139, 69, 19, 0.2);
+}
+
+#recommend-btn:hover {
+    background-color: #7a583e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(139, 69, 19, 0.3);
+}
+
+.modal-content-wrapper {
+    background: #fffdf6;
+    padding: 2rem;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content-wrapper h3 {
+    text-align: center;
+    color: #8b4513;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+}
+
+.recommendation-list {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.recommendation-card-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.recommended-book-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.recommended-book-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.recommended-book-cover {
+    width: 120px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.recommended-book-title {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    height: 2.6em;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.recommended-book-author {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.recommended-book-description {
+    font-size: 0.75rem;
+    color: #777;
+    line-height: 1.4;
+    height: 4.2em;
+    overflow: hidden;
+    text-align: center;
+}
+
+/* 상단 배너 */
+#mbti-banner {
+    width: 100%;
+    background-color: #fff3da;
+    color: #8b4513;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.7rem 1rem;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 3000;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+#mbti-banner.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 슬라이더 css */
+
+.h-slider {
+    padding-top: 10px;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.h-slide-container {
+    width: 900px;
+    max-width: 100%;
+    display: inline-block;
+    position: relative;
+    box-shadow: 10px 10px 5px #aaaaaa;
+    border-radius: 20px;
+}
+.h-slider-body {
+    border-radius: inherit;
+    overflow: hidden;
+}
+.slide-control-button {
+    width: 30px;
+    height: 28px;
+    position: absolute;
+    bottom: 30px;
+    right: 155px;
+    padding: 6px 9px;
+    color: white;
+    font-size: 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    border: none;
+}
+.slide-control-button:hover {
+    cursor: pointer;
+}
+#play-button {
+    line-height: 0.2em;
+}
+#slider-bottom-text {
+    color: white;
+    font-size: 12px;
+    padding: 4px 13px;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    display: flex;
+    bottom: 30px;
+    right: 60px;
+    border-radius: 15px;
+    background-color: rgba(0, 0, 0, 0.5);
+    gap: 5px;
+}
+#h-slide-prev, #h-slide-next {
+    color: white;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: lighter;
+    transition: 0.6s ease;
+    text-decoration: none;
+}
+.h-slides img {
+    width: 100%;
+    height: 100%;
+}
+
+/* 주간 랭킹 css */
+
+.book-ranking {
+    padding: 40px;
+}
+
+.ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.ranking-title {
+    font-size: 24px;
+    font-weight: bold;
+    padding: 0 5px 0 20px;
+}
+
+.ranking-subtitle {
+    font-size: 14px;
+    color: #777;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 판매순위별 상위 5권만 조회 */
+    padding: 10px;
+}
+
+.product-grid a {
+    text-decoration: none;
+    display: block;
+    position: relative;
+    align-items: center;
+}
+
+.ranking-book-name:hover {
+    text-decoration: underline;
+}
+
+.ranking_books {
+    background-color: #f8f8f8;
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
+}
+
+.ranking_books p {
+    margin: 8px;
+    font-size: 15px;
+}
+
+.ranking_books img {
+    width: 100%;
+    height: 350px;
+    border: 1px solid #eaeaea;
+}
+
+#book-text {
+    margin: 10px 0;
+}
+
+.ranking-book-category, .ranking-book-writers {
+    color: #444444;
+    font-size: 11px;
+}
+
+.ranking-book-name {
+    font-size: 11px;
+    color: black;
+    font-weight: bold;
+}
+
+#ranking-book-writers {
+    margin-bottom: 1px;
+}

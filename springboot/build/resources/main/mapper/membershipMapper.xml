@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wru.wrubookstore.mapper.MembershipMapper">
+    <select id="select" parameterType="Integer" resultType="MembershipDto">
+        SELECT ms.*
+        FROM member m, membership ms
+        WHERE m.membership_id = ms.membership_id AND m.user_id = #{userId}
+    </select>
+</mapper>

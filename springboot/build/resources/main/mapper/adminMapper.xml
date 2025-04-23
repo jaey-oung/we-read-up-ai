@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wru.wrubookstore.mapper.AdminMapper">
+    <!-- 검색 -->
+    <select id="searchBook" parameterType="String" resultType="BookDto">
+        SELECT *
+        FROM book
+        WHERE name LIKE CONCAT('%',#{name} ,'%')
+    </select>
+    <!-- 재고가 0인 책 모두 조회 -->
+    <select id="selectZeroQuantityBook" parameterType="map" resultType="BookDto">
+        SELECT *
+        FROM book
+        WHERE stock_quantity=0
+        ORDER BY book_id desc
+        LIMIT #{offset}, #{limit}
+    </select>
+    <!-- 재고가 0이 아닌 책 모두 조회 -->
+    <select id="selectZeroNotQuantityBook" parameterType="map" resultType="BookDto">
+        SELECT *
+        FROM book
+        WHERE stock_quantity!=0
+        ORDER BY book_id desc
+        LIMIT #{offset}, #{limit}
+    </select>
+    <!-- 책한 권에 등록된 출판사 -->
+    <select id="selectPublisherName" parameterType="int" resultType="String">
+        SELECT p.name
+        FROM book b, (SELECT publisher_id, name FROM publisher) AS p
+        WHERE b.book_id=#{bookId} AND b.publisher_id=p.publisher_id;
+    </select>
+    <!-- 책 한권에 등록된 지은이 모두 담기 -->
+    <select id="selectWriterName" parameterType="int" resultType="String">
+        SELECT w.name
+        FROM writer w, (SELECT writer_id FROM writer_book WHERE book_id=#{bookId}) AS wb
+        WHERE w.writer_id=wb.writer_id;
+    </select>
+    <!-- 마지막으로 등록한 writer_book 코드 조회 -->
+    <select id="selectWriterBookId" resultType="String">
+        SELECT writer_book_id
+        FROM writer_book
+        ORDER BY CAST(SUBSTRING(writer_book_id, 4) AS UNSIGNED) DESC
+        LIMIT 0, 1
+    </select>
+    <!-- 마지막으로 등록한 책 코드 조회 -->
+    <select id="selectBookId" resultType="int">
+        SELECT book_id
+        FROM book
+        ORDER BY book_id DESC
+        LIMIT 0, 1
+    </select>
+    <!-- 책 한권 조회용 -->
+    <select id="selectBook" parameterType="BookDto" resultType="BookDto">
+        SELECT *
+        FROM book
+        WHERE isbn=#{isbn}
+    </select>
+    <!-- 출판사 하나 조회용 -->
+    <select id="selectPublisherOne" parameterType="PublisherDto" resultType="PublisherDto">
+        SELECT *
+        FROM publisher
+        WHERE name=#{name} AND president=#{president} AND biz_reg_no=#{bizRegNo} AND main_address=#{mainAddress} AND detail_address=#{detailAddress} AND zip_code=#{zipCode} AND phone_num=#{phoneNum} AND biz_area=#{bizArea}
+    </select>
+    <!-- 모든 출판사 조회용 -->
+    <select id="selectAllPublisher" resultType="PublisherDto">
+        SELECT *
+        FROM publisher
+        ORDER BY name
+    </select>
+    <!-- 출판사 마지막(코드) 조회용 -->
+    <select id="selectPublisherId" resultType="String">
+        SELECT publisher_id
+        FROM publisher
+        ORDER BY CAST(SUBSTRING(publisher_id, 5) AS UNSIGNED) DESC
+        LIMIT 0, 1
+    </select>
+    <!-- 모든 지은이 조회용 -->
+    <select id="selectAllWriter" resultType="WriterDto">
+        SELECT *
+        FROM writer
+        ORDER BY name
+    </select>
+    <!-- 지은이 한명 조회용(해봐야됨) -->
+    <select id="selectWriterOne" parameterType="WriterDto" resultType="WriterDto">
+        SELECT *
+        FROM writer
+        WHERE name=#{name} AND gender=#{gender} AND nationality=#{nationality}
+        <if test="nickname != null">
+              AND nickname=#{nickname}
+        </if>
+        <if test="nickname == null">
+            AND nickname IS NULL
+        </if>
+        <if test="description != null">
+            AND description=#{description}
+        </if>
+        <if test="description == null">
+            AND description IS NULL
+        </if>
+    </select>
+    <!-- 지은이 (마지막)코드 조회용 -->
+    <select id="selectWriterId" resultType="String">
+        SELECT writer_id
+        FROM writer
+        ORDER BY CAST(SUBSTRING(writer_id, 5) AS UNSIGNED ) DESC
+        LIMIT 0,1
+    </select>
+    <!-- 책 등록용 -->
+    <insert id="insertBook" parameterType="BookDto">
+        INSERT INTO book (publisher_id, category_large_id, category_medium_id, category_small_id, name, translator, original_price, discount_percent,
+                          discount_price, sale_price, release_date, table_of_content, description, isbn,
+                          stock_quantity, size, weight, page, image)
+        VALUES (#{publisherId},#{categoryLargeId}, #{categoryMediumId}, #{categorySmallId},#{name},#{translator},#{originalPrice},#{discountPercent},
+                #{discountPrice},#{salePrice},#{releaseDate},#{tableOfContent},#{description},#{isbn},
+                #{stockQuantity},#{size},#{weight},#{page},#{image})
+    </insert>
+    <!-- 출판사 등록용 -->
+    <insert id="insertPublisher" parameterType="PublisherDto">
+        INSERT INTO publisher (publisher_id, name, president, biz_reg_no, main_address, detail_address, zip_code, phone_num, biz_area)
+        VALUES (#{publisherId},#{name},#{president},#{bizRegNo},#{mainAddress},#{detailAddress},#{zipCode},#{phoneNum},#{bizArea})
+    </insert>
+    <!-- 지은이 등록용 -->
+    <insert id="insertWriter" parameterType="WriterDto">
+        INSERT INTO writer (writer_id, name, description, gender, nationality, nickname)
+        VALUES (#{writerId},#{name},#{description},#{gender},#{nationality},#{nickname})
+    </insert>
+    <!-- writer_book 등록용 -->
+    <insert id="insertWriterBook" parameterType="WriterBookDto">
+        INSERT INTO writer_book(writer_book_id, writer_id, book_id)
+        VALUES (#{writerBookId},#{writerId},#{bookId})
+    </insert>
+</mapper>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wru.wrubookstore.mapper.RefundMapper">
+    <select id="selectCnt" parameterType="Integer" resultType="int">
+        SELECT COUNT(*)
+        FROM refund r, orders o
+        WHERE r.order_id = o.order_id AND o.user_id = #{userId}
+    </select>
+</mapper>

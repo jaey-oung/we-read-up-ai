@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 사용자 정보</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/myPage/convert-member.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+
+
+<div class="container">
+    <div class="content">
+        <div class="content-head">
+            <div class="first-category">
+                <span>홈 / 회원 정보 수정</span>
+            </div>
+
+            <form action="/myPage/convertMember" method="post" th:object="${user}" class="second-category">
+                <h1>회원 전환</h1>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="email">* 이메일</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" name="email" th:value="${user.email}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">* 비밀번호</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" name="password" placeholder="영문 대소문자/숫자/특수문자 중 2가지 이상 조합, 8자~20자">
+                            <div class="err-msg" th:if="${#fields.hasErrors('password')}" th:text="${#fields.errors('password').getFirst()}"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="pwConfirm">* 비밀번호 확인</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="pwConfirm" name="pwConfirm">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="name">* 이름</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="name" name="name" th:value="${user.name}" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="nickname">* 닉네임</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="nickname" name="nickname">
+                            <div class="err-msg" th:if="${user.isMember && #fields.hasErrors('nickname')}" th:text="${#fields.errors('nickname').getFirst()}"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">* 휴대전화</label>
+                        <div class="input-wrapper">
+                            <input type="tel" id="phone" name="phoneNum" placeholder="'-'를 입력해주세요.">
+                            <div class="err-msg" th:if="${user.isMember && #fields.hasErrors('phoneNum')}" th:text="${#fields.errors('phoneNum').getFirst()}"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="birth">* 생년월일</label>
+                        <div class="input-wrapper">
+                            <input type="date" id="birth" name="birthdate">
+                            <div class="err-msg" th:if="${user.isMember && #fields.hasErrors('birthdate')}" th:text="${#fields.errors('birthdate').getFirst()}"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>* 성별</label>
+                        <div class="radio-group">
+                            <input type="radio" id="male" name="gender" value="M" checked>
+                            <label for="male">남</label>
+
+                            <input type="radio" id="female" name="gender" value="F">
+                            <label for="female">여</label>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="userId" th:value="${user.userId}">
+                    <input type="hidden" name="isMember" th:value="true">
+                </div>
+
+                <div class="buttons">
+                    <input type="submit" value="회원 전환" class="btn submit">
+                    <input type="reset" value="취소" class="btn cancel">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+</body>
+</html>

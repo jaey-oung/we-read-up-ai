@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WE READ UP - 아이디 찾기</title>
+    <link rel="icon" href="/img/read-up-logo.png" type="text/png">
+    <link rel="stylesheet" href="/css/fragments/header.css">
+    <link rel="stylesheet" href="/css/fragments/footer.css">
+    <link rel="stylesheet" href="/css/fragments/nav.css">
+    <link rel="stylesheet" href="/css/login/find-id.css">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+
+
+
+
+<div class="container">
+    <div class="content">
+        <div class="content-head">
+            <div class="first-category">
+                <span>홈 / 아이디 찾기</span>
+            </div>
+
+            <form action="/login/findId" method="post" class="second-category" th:object="${member}">
+                <h1>아이디 찾기</h1>
+
+                <div class="form-container">
+
+                    <div class="form-group">
+                        <label for="name">이름</label>
+                        <input type="text" id="name" name="name" placeholder="이름">
+                        <div class="err-msg" th:if="${#fields.hasErrors('name')}" th:text="${#fields.errors('name').getFirst()}"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phoneNum">휴대폰 번호</label>
+                        <input type="tel" id="phoneNum" name="phoneNum" placeholder="'-'를 입력해주세요.">
+                        <div class="err-msg" th:if="${#fields.hasErrors('phoneNum')}" th:text="${#fields.errors('phoneNum').getFirst()}"></div>
+                    </div>
+
+                </div>
+                <div class="btn-container">
+                    <div class="global-error" th:if="${#fields.hasGlobalErrors()}">
+                        <p class="err-msg" th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                    </div>
+                    <button class="btn">찾기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

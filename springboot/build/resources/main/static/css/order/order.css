@@ -1,0 +1,382 @@
+body, h2 {
+    margin: 0;
+}
+
+.top-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.top-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    padding: 0 16px;
+    background-color: white;
+    position: relative;
+}
+
+.top-inner .icon {
+    font-size: 20px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.top-inner .center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.top-inner .right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.tab-bar {
+    background-color: #111;
+    color: white;
+    text-align: center;
+    padding: 12px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    background: #eee;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.section-title {
+    padding: 16px;
+    font-size: 18px;
+    margin: 0;
+}
+
+.form-container {
+    margin-bottom: 10px;
+    background-color: white;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+}
+
+.form-group label {
+    width: 150px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.product-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px;
+    position: relative;
+}
+
+.product-box img {
+    width: 100px;
+    height: auto;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+}
+
+.product-info {
+    flex-grow: 1;
+}
+
+.product-name {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.product-qty {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.product-price {
+    font-weight: bold;
+    color: #222;
+}
+
+.shipping-fee {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    padding: 16px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.row {
+    padding: 16px 16px 0;
+    display: flex;
+    align-items: center;
+}
+
+.label {
+    margin-right: 40px;
+    font-size: 14px;
+    color: #222;
+}
+
+.btn-small {
+    padding: 4px 10px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.point-input {
+    flex: 1;
+    padding: 6px;
+    text-align: right;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.sub-info {
+    padding: 0 16px 16px;
+    font-size: 12px;
+    color: #666;
+    margin-top: 6px;
+    text-align: right;
+}
+
+.total-apply {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    border-top: 1px solid #eee;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.summary-header {
+    padding: 16px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+}
+
+.summary-item .price {
+    font-weight: normal;
+}
+
+.summary-item .discount {
+    color: red;
+}
+
+.final-payment {
+    background-color: #f5f8ff;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.final-price {
+    color: #111;
+}
+
+.method-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.method-subtitle {
+    padding: 16px;
+    margin: 0;
+    color: #444;
+}
+
+.method-option {
+    display: block;
+    padding: 15px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: 0.2s;
+    border-radius: 5px;
+    user-select: none;
+}
+
+.method-option.selected {
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    font-weight: bold;
+}
+
+.method-option input[type="radio"] {
+    display: none; /* 라디오 버튼 숨기기 */
+}
+
+.agreement-box {
+    background-color: #f9fafd;
+    padding: 20px;
+    font-size: 14px;
+    color: #333;
+}
+
+.agreement-text {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.submit-btn {
+    width: 100%;
+    background-color: #111;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+
+
+
+
+/* ✅ 전체 팝업 배경 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* ✅ 팝업 콘텐츠 박스 */
+.modal-content {
+    background-color: #fff;
+    margin: 80px auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* ✅ 상단 헤더 */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-btn {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-body {
+    margin-top: 15px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.select {
+    padding: 12px;
+    width: 100%;
+}
+
+.discount-box {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    background-color: #f5f8ff;
+    padding: 10px;
+    text-align: right;
+    font-weight: bold;
+}
+
+.coupon-button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* 공통 버튼 스타일 */
+.btn {
+    flex: 1;
+    padding: 12px 0;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+/* 적용 (검정 배경, 흰 글씨) */
+.btn.apply {
+    background-color: #000;
+    color: white;
+}
+
+/* 초기화 (흰 배경, 검정 글씨) */
+.btn.reset {
+    background-color: #fff;
+    color: black;
+}
