@@ -11,29 +11,10 @@ body {
 }
 
 .container .content {
-    margin: 0 60px;
-}
-
-.content-head {
-    display: flex;
-    flex-direction: column;
-    margin: 0 auto;
-}
-
-.first-category {
-    /*padding-top: 20px;*/
     text-align: center;
-    /*align-self: flex-end;*/
+    margin-top: 30px;
 }
 
-.first-category span {
-    font-size: 13px;
-    color: gray;
-}
-
-.second-category {
-    padding: 45px 0;
-}
 
 .content-main {
     margin-bottom: 120px;
@@ -115,6 +96,10 @@ body {
     overflow: hidden;
 }
 
+.product p {
+    padding-bottom: 3px;
+}
+
 .product img {
     width: 100%;
     height: 75%;
@@ -129,15 +114,19 @@ body {
 
 /* 제품명 및 가격 스타일 */
 .product-name {
-    font-size: 18px;
+    font-size: 19px;
     margin-top: 20px;
     font-weight: bold;
     color: #333;
     text-decoration: none !important;
 }
 
+.product span {
+    font-size: 17px;
+}
+
 .product-price {
-    font-size: 16px;
+    font-size: 19px;
 
     color: darkred;
     text-decoration: none !important;

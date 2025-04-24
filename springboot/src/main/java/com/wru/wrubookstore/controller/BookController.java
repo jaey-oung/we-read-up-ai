@@ -1,23 +1,17 @@
 package com.wru.wrubookstore.controller;
 
 import com.wru.wrubookstore.domain.PageHandler;
-import com.wru.wrubookstore.domain.MainSearchCondition;
-import com.wru.wrubookstore.domain.SearchCondition;
+import com.wru.wrubookstore.domain.HomeSearchCondition;
 import com.wru.wrubookstore.dto.*;
+import com.wru.wrubookstore.dto.BookFilterDto;
+import com.wru.wrubookstore.dto.request.category.CategoryRequest;
 import com.wru.wrubookstore.dto.response.book.BookDetailResponse;
-import com.wru.wrubookstore.dto.response.category.CategoryResponse;
-import com.wru.wrubookstore.dto.response.publisher.PublisherListResponse;
-import com.wru.wrubookstore.dto.response.review.ReviewListResponse;
-import com.wru.wrubookstore.dto.response.writer.WriterListResponse;
 import com.wru.wrubookstore.service.*;
-import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.Writer;
 import java.util.*;
 
 @Controller
@@ -31,39 +25,32 @@ public class BookController {
 
     /* 메인 홈페이지 메뉴의 카테고리 클릭 시 도서 리스트 출력 */
     @GetMapping("/bookList")
-    public String bookList(MainSearchCondition sc, Model model, HttpServletRequest request, Integer sort) {
+    public String bookList(HomeSearchCondition sc,
+                           @RequestParam("cl_id") String categoryLargeId,
+                           @RequestParam("cm_id") String categoryMediumId,
+                           @RequestParam("cs_id") String categorySmallId,
+                           @RequestParam("path") String path,
+                           Model model, HttpServletRequest request) {
+
+        // 대/중/소분류 카테고리 id를 하나의 객체로 관리
+        CategoryRequest categoryIds = new CategoryRequest(categoryLargeId, categoryMediumId, categorySmallId);
 
         try{
-            if(sort == null){
-                sort = 0;
-            }
-            // 도서 테이블에서 특정 카테고리에 속한 도서 개수 파악
-            int count = bookService.selectByCategoryCnt(sc.getCategory());
-            List<CategoryDto> list = new ArrayList<>();
+            // 해당 카테고리에 속한 도서 개수 구하기
+            int count = bookService.getCntByCategoryIds(categoryIds);
 
-            // 개수가 0이면 카테고리만 조인한 테이블에서 카테고리 정보만 반환
-            if (count == 0) {
-                CategoryDto categoryInfo = bookService.selectCategoryInfo(sc.getCategory());
-                model.addAttribute("category", categoryInfo);
-            } else if (count > 0) {
-                // 개수가 1 이상이면 도서 테이블에서 특정 카테고리에 속한 도서 개수 및 도서 리스트, 카테고리 정보 반환
-                if(sort == 0){
-                    list = bookService.selectByCategory(sc);
-                }
-                else if(sort == 1){
-                    list = bookService.selectByCategory2(sc);
-                }
-                else if(sort == 2){
-                    list = bookService.selectByCategory3(sc);
-                }
-            } else {
-                throw new Exception("잘못된 도서 개수입니다.");
+            List<CompleteBookDto> list = new ArrayList<>();
+            if (count != 0) {
+                // 페이징, 정렬과 관련된 sc와 카테고리 id를 조합해 조건에 맞는 도서 리스트 반환
+                BookFilterDto bookFilterDto = new BookFilterDto(sc, categoryIds);
+                list = bookService.getAllCompleteBooks(bookFilterDto); // 책, 출판사, 저자 정보 포함
             }
 
             model.addAttribute("sc", sc);
             model.addAttribute("list", list);
             model.addAttribute("ph", new PageHandler(count, sc.getPage(), sc.getPageSize()));
-            model.addAttribute("uri", request.getRequestURI()); // 페이징 시 해당 uri 정보 전달
+            model.addAttribute("path", path);
+            model.addAttribute("url", request.getRequestURI()); // 페이징 시 해당 url 정보 전달
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -71,74 +58,23 @@ public class BookController {
         return "book/book-list";
     }
 
-
-    /* 검색 창에 통합검색, 저자명, 도서명 옵션으로 키워드 검색 */
+    /* 검색 창에서 통합검색, 저자명, 도서명 옵션으로 키워드 검색 */
     @GetMapping("/search")
-    public String search(MainSearchCondition sc, Model model, HttpServletRequest request, Integer sort) {
+    public String search(HomeSearchCondition sc, Model model, HttpServletRequest request) {
 
         try {
-            if(sort == null){
-                sort = 0;
-            }
-            // scDto에서 어떤 옵션을 통한 검색인지 가져오기
-            String option = sc.getOption();
             // 검색 결과 개수 반환
-            int count = bookService.selectSearchCnt(sc);
-            // 옵션과 키워드를 통한 도서 리스트 반환
-            List<BookDto> list = new ArrayList<>();
+            int count = bookService.getCntBySearchCondition(sc);
 
-            System.out.println("sort = " + sort);
-
-            // 리스트에 담겨있는 BookDto 정보를
-            // 1. 최신순
-            if(sort == 0){
-                list = switch (option) {
-                    case "all" -> bookService.searchByAll(sc);
-                    case "title" ->  bookService.searchByTitle(sc);
-                    case "writer" -> bookService.searchByWriter(sc);
-                    default -> throw new Exception("잘못된 옵션입니다.");
-                };
-            }
-            // 2. 낮은 가격순
-            else if(sort == 1){
-                list = switch (option) {
-                    case "all" -> bookService.searchByAll2(sc);
-                    case "title" ->  bookService.searchByTitle2(sc);
-                    case "writer" -> bookService.searchByWriter2(sc);
-                    default -> throw new Exception("잘못된 옵션입니다.");
-                };
-            }
-            // 3. 높은 가격순
-            else if(sort == 2){
-                list = switch (option) {
-                    case "all" -> bookService.searchByAll3(sc);
-                    case "title" ->  bookService.searchByTitle3(sc);
-                    case "writer" -> bookService.searchByWriter3(sc);
-                    default -> throw new Exception("잘못된 옵션입니다.");
-                };
+            List<CompleteBookDto> list = new ArrayList<>();
+            if (count != 0) {
+                // 검색 옵션과 키워드에 맞는 도서 리스트 반환
+                list = bookService.getAllCompleteBooks(sc);
             }
 
-
-
-            List<List<WriterListResponse>> writerListResponse = new ArrayList<>();
-            Map<String,String> publisherListResponse = new HashMap<>();
-
-            for(BookDto dto : list){
-                writerListResponse.add(bookService.selectWriterName(dto.getBookId()));
-                publisherListResponse.put(bookService.selectPublisherName(dto.getPublisherId()).getPublisherId(),bookService.selectPublisherName(dto.getPublisherId()).getName());
-            }
-
-//            List<PublisherListResponse> publisher = new ArrayList<>(publisherListResponse);
-
-            System.out.println("출판사 여기//publisherListResponse = " + publisherListResponse);
-            System.out.println("지은이여기//writerListResponse = " + writerListResponse);
-
-            PageHandler pageHandler = new PageHandler(count, sc.getPage(), sc.getPageSize());
-            model.addAttribute("publisherListResponse", publisherListResponse);
-            model.addAttribute("writerListResponse", writerListResponse);
             model.addAttribute("sc", sc);
             model.addAttribute("list", list);
-            model.addAttribute("ph", pageHandler);
+            model.addAttribute("ph", new PageHandler(count, sc.getPage(), sc.getPageSize()));
             model.addAttribute("uri", request.getRequestURI()); // 페이징 시 해당 uri 정보 전달
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,7 +82,6 @@ public class BookController {
 
         return "book/book-list";
     }
-
 
     // 상품 상세 페이지
     @GetMapping("/bookDetail")
