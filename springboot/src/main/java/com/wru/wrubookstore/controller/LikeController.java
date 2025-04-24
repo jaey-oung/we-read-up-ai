@@ -4,26 +4,21 @@ import com.wru.wrubookstore.domain.PageHandler;
 import com.wru.wrubookstore.dto.BookDto;
 import com.wru.wrubookstore.dto.LikeDto;
 import com.wru.wrubookstore.dto.MemberDto;
-import com.wru.wrubookstore.repository.LikeRepository;
-import com.wru.wrubookstore.service.BookService;
 import com.wru.wrubookstore.service.LikeService;
 import com.wru.wrubookstore.service.MemberService;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
-public class likeController {
+public class LikeController {
     private final LikeService likeService;
     private final MemberService memberService;
 
-    public likeController(LikeService likeService, MemberService memberService) {
+    public LikeController(LikeService likeService, MemberService memberService) {
         this.likeService = likeService;
         this.memberService = memberService;
     }
@@ -76,37 +71,23 @@ public class likeController {
         return "redirect:/myPage/like/list";
     }
 
-    @PostMapping("/book/like")
+    // 현재 세션에 로그인 중인 유저의 해당 책에 대한 좋아요를 추가
+    @PostMapping("/like/insert")
     @ResponseBody
-    public String likeList(@RequestBody LikeDto likeDto, HttpSession session, Model m){
-        // book-detail.html에서 like를 눌러서 bookId와 session에 등록된 id를 넘겨주면
-        // [세션에 등록된 id에서 member_id를 조인해와서]
-        // 검증... like에 member_id중 book_id가 이미 있다면 like 삭제
-        // like에 member_id중 book_id가 없다면 like추가
+    public String insertLike(@RequestBody LikeDto likeDto,
+                             @SessionAttribute(value = "userId", required = false) Integer userId) throws Exception{
+        if(userId == null) return "userNotLogin";
 
-        try{
-            System.out.println("likeDto = " + likeDto);
+        return likeService.insertLike(likeDto, userId);
+    }
 
-            int isLikeUser = likeService.selectLikeMember(likeDto);
-            m.addAttribute("isLikeUser", isLikeUser);
+    // 현재 세션에 로그인 중인 유저의 해당 책에 대한 좋아요를 삭제
+    @PostMapping("/like/delete")
+    @ResponseBody
+    public String deleteLike(@RequestBody LikeDto likeDto,
+                             @SessionAttribute(value = "userId", required = false) Integer userId) throws Exception {
+        if(userId == null) return "userNotLogin";
 
-            // member_id가 book_id를 like하지 않음 - like 추가
-            if (isLikeUser == 0) {
-                System.out.println(session.getAttribute("name")+"좋아요 누름" + isLikeUser);
-                likeService.insertLike(likeDto);
-            } else {
-                System.out.println(session.getAttribute("name")+"좋아요 삭제함" + isLikeUser);
-                likeService.deleteLike(likeDto);
-            }
-
-            System.out.println("isLikeUser = " + isLikeUser);
-
-            return "success";
-
-        } catch(Exception e){
-            e.printStackTrace();
-            return "error";
-        }
-
+        return likeService.deleteLike(likeDto, userId);
     }
 }

@@ -44,13 +44,15 @@ public interface BookRepository {
     // 저자 이름으로 검색 시 도서 정보 조회
     List<CompleteBookDto> searchByWriter(HomeSearchCondition sc) throws Exception;
 
+    // 해당 책의 카테고리 정보 모두 조회
+    CategoryResponse selectCategoryAll(Integer bookId) throws Exception;
+
     // 관리자용
     int countAllByAdmin() throws Exception;
     List<BookDto> selectAllByAdmin() throws Exception;
     void deleteAllByAdmin() throws Exception;
     void updateByAdmin(BookListResponse bookListResponse) throws Exception;
     int countQuantityZeroByAdmin() throws Exception;
-    void deleteByAdmin(BookListResponse bookListResponse) throws Exception;
     List<BookDto> selectBook(Map map) throws Exception;
 
     // 카테고리 조회용
@@ -69,8 +71,4 @@ public interface BookRepository {
 
     // 각 책의 출판사를 조회
     String selectPublisher(Integer bookId) throws Exception;
-
-    CategoryResponse selectCategorySM(Integer bookId) throws Exception;
-
-    CategoryResponse selectCategoryL(CategoryResponse categoryResponse) throws Exception;
 }

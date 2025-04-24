@@ -53,8 +53,8 @@
         <!-- 상품 목록 -->
         <div class="product-grid" th:if="${not #lists.isEmpty(list)}">
             <!-- 쿼리 스트링으로 값 넘겨주기 -->
-            <a style="text-decoration:none;" th:each="item : ${list}" th:href="@{'/bookDetail?bookId='+${item.book.bookId}}" class="product">
-                <img style="height:80%;width:100%" th:src="${item.book.image}" th:alt="${item.book.name}">
+            <a style="text-decoration:none;" th:each="item : ${list}" th:href="@{'/book/bookDetail?bookId='+${item.book.bookId}}" class="product">
+                <img th:src="${item.book.image}" th:alt="${item.book.name}">
                 <div class="hover-buttons">
                     <!-- 장바구니 추가 -->
                     <button class="add-cart-btn"
@@ -84,7 +84,7 @@
             <th:block th:if="${ph.page -10 > 0}">
                 <button type="submit" name="page" th:value="${ph.page -10}">❮❮</button>
             </th:block>
-             <!-- 이전 페이지 -1 -->
+            <!-- 이전 페이지 -1 -->
             <th:block th:if="${ph.page -1 > 0}">
                 <button type="submit" name="page" th:value="${ph.page -1}">❮</button>
             </th:block>
@@ -165,11 +165,11 @@
         clickedButton = btn;
     }
 
-    // '/bookList' 경우 페이지 전환 시 URL 직접 지정
+    // '/book/bookList' 경우 페이지 전환 시 URL 직접 지정
     function doPaging(form) {
         const link = /*[[${url}]]*/ {};
         console.log("link=", link);
-        if (!(link === "/bookList")) {
+        if (!(link === "/book/bookList")) {
             return true; // 폼 제출 허용
         }
 

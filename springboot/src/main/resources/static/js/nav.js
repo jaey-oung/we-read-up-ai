@@ -133,6 +133,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!span || !container.contains(span)) return; // span이 아니거나 범위 밖이면 무시
 
-        window.location.href = `/bookList?cl_id=${cl_id}&cm_id=${cm_id}&cs_id=${cs_id}&path=${encodeURIComponent(path)}`;
+        window.location.href = `/book/bookList?cl_id=${cl_id}&cm_id=${cm_id}&cs_id=${cs_id}&path=${encodeURIComponent(path)}`;
     });
 });

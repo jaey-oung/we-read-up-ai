@@ -12,7 +12,7 @@ public interface LikeService {
     Integer likeCount(Integer bookId) throws Exception;
 
     // 해당 책을 세션 유저가 좋아요 했는지 조회
-    Integer selectLikeMember(LikeDto likeDto) throws Exception;
+    Integer selectLikeMember(Integer bookId, Integer userId) throws Exception;
 
     // 해당 회원의 좋아요 수 조회
     int selectCntByMember(Integer memberId) throws Exception;
@@ -21,10 +21,10 @@ public interface LikeService {
     List<BookDto> selectListByPh(Integer memberId, PageHandler ph) throws Exception;
 
     // 해당 책을 좋아요에 추가
-    void insertLike(LikeDto likeDto) throws Exception;
+    String insertLike(LikeDto likeDto, Integer userId) throws Exception;
 
     // 해당 책에 누른 좋아요 삭제
-    void deleteLike(LikeDto likeDto) throws Exception;
+    String deleteLike(LikeDto likeDto, Integer userId) throws Exception;
 
     // 해당 회원의 좋아요 모두 삭제
     void deleteAll(Integer memberId) throws Exception;

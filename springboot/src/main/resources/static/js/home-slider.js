@@ -23,7 +23,7 @@
         {
             "url": "/img/slides/event-spring.png",
             "name": "봄_이벤트_쿠폰",
-            "link": "/search?option=all&keyword=" /* 국내 도서 전체 리스트 출력 */
+            "link": "/book/search?option=all&keyword=" /* 국내 도서 전체 리스트 출력 */
         },
         {
             "url": "/img/slides/rec-travel.png",

@@ -81,6 +81,12 @@ public class BookRepositoryImpl implements BookRepository {
         return session.selectList(namespace + "searchByWriter", sc);
     }
 
+    // 해당 책의 카테고리 정보 모두 조회
+    @Override
+    public CategoryResponse selectCategoryAll(Integer bookId) throws Exception{
+        return session.selectOne(namespace + "selectCategoryAll", bookId);
+    }
+
     // 관리자용
     @Override
     public int countAllByAdmin() throws Exception {
@@ -112,11 +118,6 @@ public class BookRepositoryImpl implements BookRepository {
         return session.selectList(namespace + "selectBook", map);
     }
 
-    @Override
-    public void deleteByAdmin(BookListResponse bookListResponse) throws Exception{
-        session.delete(namespace + "deleteByAdmin", bookListResponse);
-    }
-
     // 카테고리 조회용
     @Override
     public List<CategoryResponse> selectCategoryLarge() throws Exception{
@@ -130,7 +131,6 @@ public class BookRepositoryImpl implements BookRepository {
     public List<CategoryResponse> selectCategorySmall(CategoryResponse categoryResponse) throws Exception{
         return session.selectList(namespace + "selectCategorySmall", categoryResponse);
     }
-    // 카테고리 조회용
 
     // 책 번호로 한개 조회
     @Override
@@ -154,17 +154,5 @@ public class BookRepositoryImpl implements BookRepository {
     @Override
     public String selectPublisher(Integer bookId) throws Exception{
         return session.selectOne(namespace + "selectPublisher", bookId);
-    }
-
-    // 카테고리 소, 중 검색 이름
-    @Override
-    public CategoryResponse selectCategorySM(Integer bookId) throws Exception{
-        return session.selectOne(namespace + "selectCategorySM", bookId);
-    }
-
-    // 카테고리 대 검색 이름
-    @Override
-    public CategoryResponse selectCategoryL(CategoryResponse categoryResponse) throws Exception{
-        return session.selectOne(namespace + "selectCategoryL", categoryResponse);
     }
 }

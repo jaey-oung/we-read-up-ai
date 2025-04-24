@@ -38,4 +38,6 @@ public interface NoticeRepository {
 
     List<NoticeDto> searchSelectPage(SearchCondition sc) throws Exception // List<E> selectList(String statement, Object parameter)
     ;
+
+    int deleteCommentsByNoticeId(Integer noticeId) throws Exception;
 }

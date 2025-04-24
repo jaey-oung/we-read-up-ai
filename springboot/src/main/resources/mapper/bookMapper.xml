@@ -235,54 +235,26 @@
         <result property="categorySmallName" column="category_small_name"/>
     </resultMap>
 
-    <!-- 카테고리 대 조회 -->
-    <select id="selectCategoryL" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT name AS category_large_name
-        FROM category_large
-        WHERE category_large_id=#{categoryLargeId}
-    </select>
-    <!-- 카테고리 소,중 조회 -->
-    <select id="selectCategorySM" parameterType="int" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT m.name AS category_medium_name, cs.name AS category_small_name, category_large_id FROM category_medium m,
-               (SELECT name, category_medium_id FROM category_small,
-                       (SELECT category_small_id FROM book WHERE book_id = #{bookId}) AS bs
-                WHERE bs.category_small_id = category_small.category_small_id) AS cs
-        WHERE cs.category_medium_id=m.category_medium_id
-    </select>
+    <!-- 카테고리 전부 조회 -->
+    <select id="selectCategoryAll" parameterType="int" resultType="CategoryResponse" resultMap="categoryResultMap">
+        SELECT
+            b.category_large_id,
+            b.category_medium_id,
+            b.category_small_id,
 
-    <!-- 카테고리 대 조회 -->
-    <select id="selectCategoryLarge" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT category_large_id, name AS category_large_name
-        FROM category_large
-        ORDER BY category_large_id
-    </select>
-    <!-- 카테고리 중 조회 -->
-    <select id="selectCategoryMedium" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT cl.category_large_id, cm.category_medium_id, cl.name AS category_large_name, cm.name AS category_medium_name
-        FROM category_large cl, category_medium cm
-        WHERE cl.category_large_id = #{categoryLargeId} AND cm.category_large_id = #{categoryLargeId}
-        ORDER BY cm.category_medium_id
-    </select>
-    <!-- 카테고리 소 조회 -->
-    <select id="selectCategorySmall" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT cm.category_medium_id, cm.name AS category_medium_name, cs.category_small_id, cs.name AS category_small_name
-        FROM category_small cs, category_medium cm
-        WHERE cm.category_medium_id = #{categoryMediumId} AND cs.category_medium_id = #{categoryMediumId}
-        ORDER BY category_small_id
-    </select>
+            (SELECT cl.name
+             FROM category_large cl
+             WHERE cl.category_large_id = b.category_large_id) AS category_large_name,
 
-    <!-- 관리자용: 전체 책 잘라서 가져오기 -->
-    <select id="selectBook" parameterType="map" resultType="BookDto">
-        SELECT *
-        FROM book
-        ORDER BY book_id desc
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 관리자용: 판매중인 책 개수(0인거) 조회 -->
-    <select id="countQuantityZeroByAdmin" resultType="int">
-        SELECT count(*)
-        FROM book
-        WHERE stock_quantity = 0
+            (SELECT cm.name
+             FROM category_medium cm
+             WHERE cm.category_medium_id = b.category_medium_id) AS category_medium_name,
+
+            (SELECT cs.name
+             FROM category_small cs
+             WHERE cs.category_small_id = b.category_small_id) AS category_small_name
+        FROM book b
+        WHERE b.book_id=#{bookId}
     </select>
 
     <!-- 관리자용: 전체 책 개수 조회 -->
@@ -295,7 +267,7 @@
     <select id="selectAllByAdmin" resultType="BookDto">
         SELECT book_id, publisher_id, category_small_id, name, translator, original_price, discount_percent,
                discount_price, sale_price, release_date, reg_date, table_of_content, description, isbn, stock_quantity,
-            size, weight, page, image
+               size, weight, page, image
         FROM book
     </select>
 
@@ -305,13 +277,6 @@
         FROM book
     </delete>
 
-    <!-- 관리자용: 책 한권 삭제 -->
-    <delete id="deleteByAdmin" parameterType="BookListResponse">
-        DELETE
-        FROM book
-        WHERE book_id=#{bookId}
-    </delete>
-
     <!-- 관리자용: 재고 관리 -->
     <update id="updateByAdmin" parameterType="BookListResponse">
         UPDATE book
@@ -319,25 +284,51 @@
         WHERE book_id=#{bookId}
     </update>
 
+    <!-- 관리자용: 판매중인 책 개수(0인거) 조회 -->
+    <select id="countQuantityZeroByAdmin" resultType="int">
+        SELECT count(*)
+        FROM book
+        WHERE stock_quantity = 0
+    </select>
+
+    <!-- 관리자용: 전체 책 잘라서 가져오기 -->
+    <select id="selectBook" parameterType="map" resultType="BookDto">
+        SELECT *
+        FROM book
+        ORDER BY book_id desc
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 카테고리 대 조회 -->
+    <select id="selectCategoryLarge" resultType="CategoryResponse" resultMap="categoryResultMap">
+        SELECT category_large_id, name AS category_large_name
+        FROM category_large
+        ORDER BY category_large_id
+    </select>
+
+    <!-- 카테고리 중 조회 -->
+    <select id="selectCategoryMedium" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
+        SELECT cl.category_large_id, cm.category_medium_id, cl.name AS category_large_name, cm.name AS category_medium_name
+        FROM category_large cl, category_medium cm
+        WHERE cl.category_large_id = #{categoryLargeId} AND cm.category_large_id = #{categoryLargeId}
+        ORDER BY cm.category_medium_id
+    </select>
+
+    <!-- 카테고리 소 조회 -->
+    <select id="selectCategorySmall" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
+        SELECT cm.category_medium_id, cm.name AS category_medium_name, cs.category_small_id, cs.name AS category_small_name
+        FROM category_small cs, category_medium cm
+        WHERE cm.category_medium_id = #{categoryMediumId} AND cs.category_medium_id = #{categoryMediumId}
+        ORDER BY category_small_id
+    </select>
+
      <!--  책 한 권의 정보 조회  -->
     <select id="select" parameterType="int" resultType="BookDto">
         SELECT *
         FROM book
         WHERE book_id=#{bookId}
     </select>
-    <!--  책 하나의 지은이들 조회 (bookId별 지은이) -->
-    <select id="selectWriter" parameterType="int" resultType="String">
-        SELECT w.name
-        FROM writer AS w, (SELECT writer_id FROM writer_book WHERE book_id=#{bookId} ORDER BY book_id desc) AS wb
-        WHERE wb.writer_id = w.writer_id
-        ORDER BY name;
-    </select>
-    <!--  책 하나의 출판사 이름 -->
-    <select id="selectPublisher" parameterType="int" resultType="String">
-        SELECT p.name
-        FROM publisher AS p, (SELECT publisher_id FROM book WHERE book_id=#{bookId}) AS bp
-        WHERE p.publisher_id = bp.publisher_id;
-    </select>
+
     <!-- 테스트용 -->
     <insert id="insert" parameterType="BookDto">
         INSERT INTO book (publisher_id, category_small_id, name, translator, original_price, discount_percent,
@@ -347,4 +338,19 @@
                 #{discountPrice},#{salePrice},#{releaseDate},#{regDate},#{tableOfContent},#{description},#{isbn},
                 #{stockQuantity},#{size},#{weight},#{page},#{image});
     </insert>
+
+    <!--  책 하나의 지은이들 조회 (bookId별 지은이) -->
+    <select id="selectWriter" parameterType="int" resultType="String">
+        SELECT w.name
+        FROM writer AS w, (SELECT writer_id FROM writer_book WHERE book_id=#{bookId} ORDER BY book_id desc) AS wb
+        WHERE wb.writer_id = w.writer_id
+        ORDER BY name;
+    </select>
+
+    <!--  책 하나의 출판사 이름 -->
+    <select id="selectPublisher" parameterType="int" resultType="String">
+        SELECT p.name
+        FROM publisher AS p, (SELECT publisher_id FROM book WHERE book_id=#{bookId}) AS bp
+        WHERE p.publisher_id = bp.publisher_id;
+    </select>
 </mapper>

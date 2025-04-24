@@ -32,20 +32,20 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
     // 해당 책에 리뷰 추가
     @Override
-    public void insertReview(ReviewDto reviewDto) throws Exception{
-        session.insert(namespace + "insertReview", reviewDto);
+    public int insertReview(ReviewDto reviewDto) throws Exception{
+        return session.insert(namespace + "insertReview", reviewDto);
     }
 
     // 해당 책에 리뷰 삭제
     @Override
-    public void deleteReview(ReviewDto reviewDto) throws Exception{
-        session.delete(namespace + "deleteReview", reviewDto);
+    public int deleteReview(ReviewDto reviewDto) throws Exception{
+        return session.delete(namespace + "deleteReview", reviewDto);
     }
 
     // 해당 책에 리뷰 수정
     @Override
-    public void modifyReview(ReviewDto reviewDto) throws Exception{
-        session.update(namespace + "modifyReview", reviewDto);
+    public int modifyReview(ReviewDto reviewDto) throws Exception{
+        return session.update(namespace + "modifyReview", reviewDto);
     }
 
     // 해당 책의 등록된 리뷰 점수 조회

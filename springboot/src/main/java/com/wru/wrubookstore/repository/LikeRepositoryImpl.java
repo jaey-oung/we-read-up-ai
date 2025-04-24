@@ -42,13 +42,13 @@ public class LikeRepositoryImpl implements LikeRepository {
 
     // 해당 책을 좋아요에 추가
     @Override
-    public void insertLike(LikeDto likeDto) throws Exception{
-        session.insert(namespace + "insertLike", likeDto);
+    public int insertLike(LikeDto likeDto) throws Exception{
+        return session.insert(namespace + "insertLike", likeDto);
     }
     // 해당 책에 누른 좋아요 삭제
     @Override
-    public void deleteLike(LikeDto likeDto) throws Exception{
-        session.delete(namespace + "deleteLike", likeDto);
+    public int deleteLike(LikeDto likeDto) throws Exception{
+        return session.delete(namespace + "deleteLike", likeDto);
     }
 
     @Override

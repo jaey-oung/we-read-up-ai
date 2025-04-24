@@ -51,10 +51,10 @@
                 <option value="DS2" th:selected="${osc.statusId == 'DS2'}">배송 중</option>
                 <option value="DS3" th:selected="${osc.statusId == 'DS3'}">배송 완료</option>
             </select>
-            <button onclick="setDateRange(event, 0)">오늘</button>
-            <button onclick="setDateRange(event, 7)">1주일</button>
-            <button onclick="setDateRange(event, 30)">1개월</button>
-            <button onclick="setDateRange(event, 180)">6개월</button>
+            <button type="button" onclick="setDate()">오늘</button>
+            <button type="button" onclick="setDate('oneWeek')">1주일</button>
+            <button type="button" onclick="setDate('oneMonth')">1개월</button>
+            <button type="button" onclick="setDate('sixMonth')">6개월</button>
             <input type="date" id="startDate" name="startDate" th:value="${osc.startDate}">
             <span>~</span>
             <input type="date" id="endDate" name="endDate" th:value="${osc.endDate}">

@@ -5,14 +5,23 @@ import com.wru.wrubookstore.dto.PublisherDto;
 import com.wru.wrubookstore.dto.WriterBookDto;
 import com.wru.wrubookstore.dto.WriterDto;
 import com.wru.wrubookstore.dto.response.admin.AdminResponse;
+import com.wru.wrubookstore.dto.response.book.BookListResponse;
 
+import java.awt.print.Book;
 import java.util.List;
 import java.util.Map;
 
 public interface AdminRepository {
 
+    // 재고 100개 추가
+    int addQuantity(BookListResponse bookListResponse) throws Exception;
+
+    // 책 한권 삭제
+    int deleteMultipleBook(Integer bookId) throws Exception;
+
     // 검색
-    List<BookDto> searchBook(String name) throws Exception;
+    List<BookDto> searchBook(String searchWord) throws Exception;
+
     // 재고 0이아닌 상품 전부 조회
     List<BookDto> selectZeroNotQuantityBook(Map map) throws Exception;
 
@@ -41,13 +50,17 @@ public interface AdminRepository {
 
     WriterDto selectWriterOne(WriterDto writerDto) throws Exception;
 
-    void insertBook(BookDto bookDto) throws Exception;
+    int insertBook(BookDto bookDto) throws Exception;
 
-    void insertPublisher(PublisherDto publisherDto) throws Exception;
+    int insertPublisher(PublisherDto publisherDto) throws Exception;
 
-    void insertWriter(WriterDto writerDto) throws Exception;
+    int insertWriter(WriterDto writerDto) throws Exception;
 
-    void insertWriterBook(WriterBookDto writerBookDto) throws Exception;
+    int insertWriterBook(WriterBookDto writerBookDto) throws Exception;
 
+    // 지은이 검색용
+    List<WriterDto> searchWriter(String keyword) throws Exception;
+    // 출판사 검색용
+    List<PublisherDto> searchPublisher(String keyword) throws Exception;
 
 }

@@ -24,7 +24,7 @@
                     <img src="/img/read-up-logo.png" alt="로고" height="100px">
                 </a>
             </div>
-            <form action="/search" method="get" id="search-container">
+            <form action="/book/search" method="get" id="search-container">
                 <select th:name="option">
                     <option th:value="'all'" th:selected="${sc?.option} == 'all'">통합검색</option>
                     <option th:value="'title'" th:selected="${sc?.option} == 'title'">도서명</option>
@@ -57,8 +57,6 @@
             <span class="category-step">></span>
             <div id="category_small">
             </div>
-        </div>
-    </div>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/js/nav.js"></script>
     <script>

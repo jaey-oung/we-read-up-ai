@@ -16,9 +16,9 @@ public interface LikeRepository {
     // 회원의 좋아요 목록 페이징에 맞게 출력
     List<BookDto> selectListByPh(Map<String, Object> map) throws Exception;
     // 해당 책을 좋아요에 추가
-    void insertLike(LikeDto likeDto) throws Exception;
+    int insertLike(LikeDto likeDto) throws Exception;
     // 해당 책에 누른 좋아요 삭제
-    void deleteLike(LikeDto likeDto) throws Exception;
+    int deleteLike(LikeDto likeDto) throws Exception;
     // 해당 회원의 좋아요 모두 삭제
     void deleteAll(Integer memberId) throws Exception;
     // 마이페이지에서 선택한 항목 좋아요 삭제

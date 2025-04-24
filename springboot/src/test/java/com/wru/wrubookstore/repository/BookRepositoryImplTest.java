@@ -1,12 +1,20 @@
 package com.wru.wrubookstore.repository;
+/*
 
-
+import com.wru.wrubookstore.domain.MainSearchCondition;
+import com.wru.wrubookstore.dto.BookDto;
+import com.wru.wrubookstore.dto.CategoryDto;
+import com.wru.wrubookstore.dto.request.order.OrderBookRequest;
+import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
@@ -19,8 +27,8 @@ public class BookRepositoryImplTest {
     @Transactional
     public void select() throws Exception {
         for (int i = 1; i < 250; i++) {
-//            BookDto bookDto = new BookDto("pub_1","cs_1", ""+i, "김", 1000, new BigDecimal(0.01),170,1200, new Date(), new Date(), "목차", "내용", 1111111111, 100, "133*200", 420, 300,"https://image.aladin.co.kr/product/32875/63/cover500/k562936112_2.jpg");
-//            bookRepository.insert(bookDto);
+            BookDto bookDto = new BookDto("pub_1","cs_1", ""+i, "김", 1000, new BigDecimal(0.01),170,1200, new Date(), new Date(), "목차", "내용", 1111111111, 100, "133*200", 420, 300,"https://image.aladin.co.kr/product/32875/63/cover500/k562936112_2.jpg");
+            bookRepository.insert(bookDto);
         }
     }
 
@@ -31,7 +39,6 @@ public class BookRepositoryImplTest {
         System.out.println("writer = " + writer);
     }
 
-/*
     @DisplayName("카테고리만 조인한 테이블에서 카테고리 정보 조회")
     @Test
     @Transactional
@@ -107,7 +114,7 @@ public class BookRepositoryImplTest {
     @Transactional
     public void searchByAllTest() throws Exception {
         // 통합 검색 시 해당 키워드 정보를 포함하는 도서 조회
-        HomeSearchCondition sc = new HomeSearchCondition(1, 8, "남궁성", "all");
+        MainSearchCondition sc = new MainSearchCondition(1, 8, "남궁성", "all");
         List<BookDto> books = bookRepository.searchByAll(sc);
         assertTrue(books.size() <= (bookRepository.searchByTitle(sc).size() + bookRepository.searchByWriter(sc).size()));
     }
@@ -117,7 +124,7 @@ public class BookRepositoryImplTest {
     @Transactional
     public void searchByTitleTest() throws Exception {
         // 도서 제목에 '정석' 키워드가 포함된 도서 조회 (2권)
-        HomeSearchCondition sc = new HomeSearchCondition(1, 8, "정석", "title");
+        MainSearchCondition sc = new MainSearchCondition(1, 8, "정석", "title");
         List<BookDto> books = bookRepository.searchByTitle(sc);
         assertEquals(2, books.size());
         for (BookDto book : books) {
@@ -130,7 +137,7 @@ public class BookRepositoryImplTest {
     @Transactional
     public void searchByWriterTest() throws Exception {
         // 저자 이름에 '남궁' 키워드가 포함된 도서 조회 (2권)
-        HomeSearchCondition sc = new HomeSearchCondition(1, 8, "남궁", "writer");
+        MainSearchCondition sc = new MainSearchCondition(1, 8, "남궁", "writer");
         List<BookDto> books = bookRepository.searchByWriter(sc);
         assertEquals(2, books.size());
         for (BookDto book : books) {
@@ -142,27 +149,26 @@ public class BookRepositoryImplTest {
     @DisplayName("검색 결과로 반환된 도서 개수 조회")
     @Test
     @Transactional
-    public void selectCntBySearchConditionTest() throws Exception {
+    public void selectSearchCntTest() throws Exception {
         // 해당 검색어를 포함하는 도서 조회 - 통합 검색
-        HomeSearchCondition sc = new HomeSearchCondition(1, 8, "정석", "all");
-        int count = bookRepository.selectCntBySearchCondition(sc);
+        MainSearchCondition sc = new MainSearchCondition(1, 8, "정석", "all");
+        int count = bookRepository.selectSearchCnt(sc);
         assertEquals(2, count);
 
         // 해당 검색어를 포함하는 도서 조회 - 도서 제목
-        sc = new HomeSearchCondition(1, 8, "정석", "title");
-        count = bookRepository.selectCntBySearchCondition(sc);
+        sc = new MainSearchCondition(1, 8, "정석", "title");
+        count = bookRepository.selectSearchCnt(sc);
         assertEquals(2, count);
 
         // 해당 검색어를 포함하는 도서 조회 - 저자 이름
-        sc = new HomeSearchCondition(1, 8, "정석", "writer");
-        count = bookRepository.selectCntBySearchCondition(sc);
+        sc = new MainSearchCondition(1, 8, "정석", "writer");
+        count = bookRepository.selectSearchCnt(sc);
         assertEquals(0, count);
 
         // 유효하지 않은 키워드로 조회
-        sc = new HomeSearchCondition(1, 8, "invalid%k@eyw1ord", "all");
-        count = bookRepository.selectCntBySearchCondition(sc);
+        sc = new MainSearchCondition(1, 8, "invalid%k@eyw1ord", "all");
+        count = bookRepository.selectSearchCnt(sc);
         assertEquals(0, count);
     }
-
- */
 }
+*/

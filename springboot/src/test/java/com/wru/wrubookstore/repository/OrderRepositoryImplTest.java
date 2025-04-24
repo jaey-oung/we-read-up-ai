@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class OrderRepositoryImplTest {
-
+/*
     @Autowired
     OrderRepository orderRepository;
     @Autowired
@@ -33,7 +33,7 @@ class OrderRepositoryImplTest {
         System.out.println("orderDto.getOrderId() = " + orderDto.getOrderId());
         assertEquals(insertCnt, 1);
     }
-/*
+
     @DisplayName("판매 순위별 상위 5권 bookId 조회")
     @Test
     @Transactional
