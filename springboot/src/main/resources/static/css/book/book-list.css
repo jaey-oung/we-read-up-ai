@@ -89,7 +89,7 @@ body {
 /* 상품 카드 스타일 */
 .product {
     background-color: #f8f8f8;
-    padding: 15px 15px 20px 15px;
+    padding: 15px;
     text-align: center;
     position: relative;
     border-radius: 8px;
@@ -114,15 +114,19 @@ body {
 
 /* 제품명 및 가격 스타일 */
 .product-name {
-    font-size: 18px;
+    font-size: 19px;
     margin-top: 20px;
     font-weight: bold;
     color: #333;
     text-decoration: none !important;
 }
 
+.product span {
+    font-size: 17px;
+}
+
 .product-price {
-    font-size: 16px;
+    font-size: 19px;
 
     color: darkred;
     text-decoration: none !important;
