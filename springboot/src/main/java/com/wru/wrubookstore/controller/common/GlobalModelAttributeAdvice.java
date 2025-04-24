@@ -1,4 +1,4 @@
-package com.wru.wrubookstore;
+package com.wru.wrubookstore.controller.common;
 
 
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
