@@ -73,7 +73,7 @@
         <div class="product-grid" th:if="${not #lists.isEmpty(list)}">
             <!-- 쿼리 스트링으로 값 넘겨주기 -->
             <a style="text-decoration:none;" th:each="item : ${list}" th:href="@{'/book/bookDetail?bookId='+${item.bookId}+'&page='+${ph.page}+'&category='+${category}+'&pageSize='+${ph.pageSize}}" class="product">
-                <img style="height:80%;width:100%" th:src="${item.image}" th:alt="${item.name}">
+                <img th:src="${item.image}" th:alt="${item.name}">
                 <div class="hover-buttons">
                     <!-- 장바구니 추가 -->
                     <button class="add-cart-btn"
