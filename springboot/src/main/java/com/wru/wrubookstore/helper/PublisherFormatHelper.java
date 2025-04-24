@@ -1,9 +1,9 @@
-package com.wru.wrubookstore.validator;
+package com.wru.wrubookstore.helper;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class PublisherValidator {
+public class PublisherFormatHelper {
 
     // 사업자 번호 포맷팅 메서드
     public String getFormatBizRegNo(String bizRegNo){

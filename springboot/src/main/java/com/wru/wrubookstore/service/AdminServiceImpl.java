@@ -10,7 +10,7 @@ import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
 import com.wru.wrubookstore.error.exception.*;
 import com.wru.wrubookstore.repository.AdminRepository;
-import com.wru.wrubookstore.validator.PublisherValidator;
+import com.wru.wrubookstore.helper.PublisherFormatHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +24,7 @@ import java.util.Map;
 public class AdminServiceImpl implements AdminService {
     private final AdminRepository adminRepository;
     private final BookService bookService;
-    private final PublisherValidator publisherValidator;
+    private final PublisherFormatHelper publisherFormatHelper;
     private final int FAIL = 0;
     private final int ONE = 1;
     // 보여줄 상품 리스트
@@ -35,10 +35,10 @@ public class AdminServiceImpl implements AdminService {
     private final String PUB = "pub_";
     private final String WB = "wb_";
 
-    AdminServiceImpl(AdminRepository adminRepository, BookService bookService, PublisherValidator publisherValidator) {
+    AdminServiceImpl(AdminRepository adminRepository, BookService bookService, PublisherFormatHelper publisherFormatHelper) {
         this.adminRepository = adminRepository;
         this.bookService = bookService;
-        this.publisherValidator = publisherValidator;
+        this.publisherFormatHelper = publisherFormatHelper;
     }
 
     // 책 등록
@@ -267,8 +267,8 @@ public class AdminServiceImpl implements AdminService {
 
             // 사업자 번호 000-00-00000 포멧팅
             // 핸드폰번호 010-0000-0000 포멧팅
-            p.setBizRegNo(publisherValidator.getFormatBizRegNo(p.getBizRegNo()));
-            p.setPhoneNum(publisherValidator.getFormatPhoneNumber(p.getPhoneNum()));
+            p.setBizRegNo(publisherFormatHelper.getFormatBizRegNo(p.getBizRegNo()));
+            p.setPhoneNum(publisherFormatHelper.getFormatPhoneNumber(p.getPhoneNum()));
 
             PublisherDto found = selectPublisherOne(p);
 

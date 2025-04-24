@@ -6,6 +6,16 @@ const LAST_QUESTION = 4;
 /* ===== 전역 상태 정의 ===== */
 // 각 성향 축(S/I, F/D, N/M, Q/A)에 대한 사용자 응답 점수를 저장하는 객체
 const answers = { S: 0, I: 0, F: 0, D: 0, N: 0, M: 0, Q: 0, A: 0 };
+// 척도별 점수 비율
+const SCALE_MAP = [
+    { left: 100, right: 0 },    // 1번 선택 (왼쪽 극단)
+    { left: 66.7, right: 33.3 },// 2번 선택 (왼쪽 약간)
+    { left: 33.3, right: 66.7 },// 3번 선택 (오른쪽 약간)
+    { left: 0, right: 100 }     // 4번 선택 (오른쪽 극단)
+];
+
+// 팝업 진행 여부 상태
+let popupInProgress = false;
 
 // 추천 도서 리스트
 let recommendedBooks = [];
@@ -120,7 +130,10 @@ function handlePopupVisibility() {
 
     if (!hideUntil || new Date() >= new Date(hideUntil)) {
         popup.classList.add("active");
-        banner.classList.add("active");
+
+        // 설문 중이 아니면 배너 표시
+        if (!popupInProgress)
+            banner.classList.add("active");
     } else {
         popup.classList.remove("active");
         banner.classList.remove("active");
@@ -153,59 +166,29 @@ function displayResult(code, info) {
     `;
     resultTypeDescription.textContent = info.description;
 
-    // 성향 유형에 맞는 추천 책 데이터 로드
-    loadRecommendedBooks(code);
+    // 성향 유형에 맞는 추천 책 데이터 가져오기
+    loadRecommendedBooks();
 }
 
-// 성향 유형에 맞는 추천 책 데이터 로드
-function loadRecommendedBooks(typeCode) {
-    // 여기서는 예시 데이터를 사용
-    // 추후에 서버에서 데이터 가져옴
-    recommendedBooks = [
-        {
-            id: 1,
-            title: "책 제목 1",
-            author: "저자 1",
-            cover: "/img/book-cover-1.jpg",
-            description:
-                "책 설명 1",
-        },
-        {
-            id: 2,
-            title: "책 제목 2",
-            author: "저자 2",
-            cover: "/img/book-cover-2.jpg",
-            description:
-                "책 설명 2",
-        },
-        {
-            id: 3,
-            title: "책 제목 3",
-            author: "저자 3",
-            cover: "/img/book-cover-3.jpg",
-            description:
-                "책 설명 3",
-        },
-        {
-            id: 4,
-            title: "책 제목 4",
-            author: "저자 4",
-            cover: "/img/book-cover-4.jpg",
-            description:
-                "책 설명 4",
-        },
-        {
-            id: 5,
-            title: "책 제목 5",
-            author: "저자 5",
-            cover: "/img/book-cover-5.jpg",
-            description:
-                "책 설명 5",
-        },
-    ];
+// 성향 유형에 맞는 추천 책 데이터 가져오기
+function loadRecommendedBooks() {
+    axios.post("http://localhost:8000/book/recommend", {
+        scores: answers
+    })
+        .then((res) => {
+            // 추천 결과 저장 및 UI 갱신
+            recommendedBooks = res.data;
+            // 추천 도서 그리드 렌더링
+            initBooksGrid();
+        })
+        .catch((err) => {
+            console.error("추천 도서 요청 실패", err);
+        });
+}
 
-    // 추천 책 그리드 초기화
-    initBooksGrid();
+// 글자수 자르고 말줄임표 붙이기
+function truncate(text, maxLength) {
+    return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
 }
 
 // 추천 책 그리드 초기화
@@ -220,10 +203,12 @@ function initBooksGrid() {
         const bookItem = document.createElement("div");
         bookItem.className = "recommended-book-item";
         bookItem.innerHTML = `
-          <img src="${book.cover}" alt="${book.title}" class="recommended-book-cover">
-          <h4 class="recommended-book-title">${book.title}</h4>
-          <p class="recommended-book-author">${book.author}</p>
-          <p class="recommended-book-description">${book.description}</p>
+            <a href="/book/bookDetail?bookId=${book.book_id}">
+                <img src="${book.image}" alt="${book.title}" class="recommended-book-image">
+            </a>
+            <h4 class="recommended-book-title">${truncate(book.title, 10)}</h4>
+            <p class="recommended-book-author">${book.author}</p>
+            <p class="recommended-book-description">${truncate(book.description, 50)}</p>
         `;
         gridContainer.appendChild(bookItem);
     });
@@ -292,6 +277,7 @@ function init() {
     const nextBtns = document.querySelectorAll(".next-btn");
     const prevBtns = document.querySelectorAll(".prev-btn");
     const submitBtn = document.getElementById("submit-btn");
+    const resultCloseBtn = document.getElementById("result-close-btn");
     const typeInfoBtn = document.getElementById("type-info-btn");
     const recommendBooksBtn = document.getElementById("recommend-btn");
     const recommendedBooksCloseBtn = document.getElementById("modal-close-btn");
@@ -343,18 +329,17 @@ function init() {
             const value = parseInt(selected.dataset.score);
             const leftCode = container.dataset.leftCode;
             const rightCode = container.dataset.rightCode;
-            const rightRatio = Math.round((value - 1) * 33.3);
+            const ratio = SCALE_MAP[value - 1];
 
-            answers[leftCode] = 100 - rightRatio;
-            answers[rightCode] = rightRatio;
+            answers[leftCode] = ratio.left;
+            answers[rightCode] = ratio.right;
         }
 
         const type = calculateType();
         showResult(type);
         alert("당신의 독서 성향 점수:\n" + JSON.stringify(answers, null, 2));
         questions.classList.remove("active")
-
-        // TODO: 백엔드로 결과 전송
+        popupInProgress = false;
     }
 
     // 스케일(1~4) 선택 시 선택 상태 갱신 및 제출 버튼 상태 업데이트
@@ -370,11 +355,14 @@ function init() {
     /* ===== 이벤트 리스너 등록 ===== */
     // 설문 시작 버튼 클릭 시 팝업 닫고 질문 화면으로 전환
     startBtn.addEventListener("click", () => {
+        popupInProgress = true;
         popup.classList.remove("active");
         questions.classList.add("active");
         showQuestion(currentQuestion);
         updateProgress();
         updateSubmitButton();
+
+        mbtiBanner.classList.remove("active");
     });
 
     // 설문 숨기기 버튼 클릭 시 24시간 동안 보이지 않음
@@ -388,11 +376,18 @@ function init() {
     // 시작 팝업 닫기 버튼 클릭 시 팝업 닫힘
     popupCloseBtn.addEventListener("click", () => popup.classList.remove("active"));
 
-    // 질문 화면 닫기 버튼 클릭 시 질문 창 닫힘
-    quesCloseBtn.addEventListener("click", () => questions.classList.remove("active"));
+    // 질문 화면 닫기 버튼 클릭 시 질문 창 닫히고 배너 다시 표시
+    quesCloseBtn.addEventListener("click", () => {
+        questions.classList.remove("active");
+        popupInProgress = false;
+        mbtiBanner.classList.add("active");
+    });
 
     // 제출 버튼 클릭 시 점수 계산 및 결과 출력
-    submitBtn.addEventListener("click", handleSubmitClick);
+    submitBtn.addEventListener("click", () => {
+        handleSubmitClick();
+        popupInProgress = false;
+    });
 
     // 다음 버튼 클릭 시 다음 질문으로 이동
     nextBtns.forEach((btn) => btn.addEventListener("click", (e) => {
@@ -456,7 +451,9 @@ function init() {
 
     // 배너 클릭 시 설문 팝업 표시
     mbtiBanner.addEventListener("click", () => {
-        // 팝업 숨김, 질문 창 활성화
+        // 중복 방지
+        if (popupInProgress) return;
+
         popup.classList.add("active");
 
         // 답변 초기화
@@ -469,13 +466,16 @@ function init() {
         updateProgress();
         updateSubmitButton();
     });
+
+
+    // 결과 팝업 닫히면 상태 초기화 및 배너 재노출
+    resultCloseBtn.addEventListener("click", () => {
+        document.getElementById("result-container").classList.remove("active");
+        popupInProgress = false;
+        mbtiBanner.classList.add("active");
+    });
 }
 
 /* ===== 초기 실행 ===== */
 document.addEventListener("DOMContentLoaded", handlePopupVisibility);
 document.addEventListener("DOMContentLoaded", init);
-
-// 결과 팝업 닫힘
-document.getElementById("result-close-btn").addEventListener("click", () => {
-    document.getElementById("result-container").classList.remove("active");
-});
