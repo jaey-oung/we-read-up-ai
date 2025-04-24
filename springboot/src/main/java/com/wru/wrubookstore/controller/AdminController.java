@@ -50,7 +50,7 @@ public class AdminController {
     }
 
     // 업로드 경로
-    private final String UPLOAD_DIR = "src/main/resources/static/img/book/";
+    private final String UPLOAD_DIR = "springboot/src/main/resources/static/img/book/";
     // 보여줄 상품 리스트
     private final int ALL_PRODUCT = 1;
     private final int SOLD_OUT = 0;
