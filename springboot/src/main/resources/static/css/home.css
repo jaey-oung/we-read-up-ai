@@ -742,7 +742,7 @@ h2 {
     border: 1px solid #eaeaea;
 }
 
-#book-text {
+.book-text {
     margin: 10px 0;
 }
 
@@ -757,6 +757,6 @@ h2 {
     font-weight: bold;
 }
 
-#ranking-book-writers {
+.ranking-book-writers {
     margin-bottom: 1px;
 }

@@ -191,7 +191,7 @@
             <a th:href="@{'/book/bookDetail?bookId='+${book.bookId}}">
                 <img th:src="${book.image}" th:alt="${book.name}">
             </a>
-            <div id="book-text">
+            <div class="book-text">
                 <th:block th:if="${book.categoryMediumName != null}">
                     <p class="ranking-book-category"
                        th:text="${#strings.length(book.categoryLargeName + ' / ' + book.categoryMediumName) > 23 ?
@@ -203,7 +203,10 @@
                 <th:block th:if="${book.categoryMediumName == null}">
                     <p class="ranking-book-category" th:text="${book.categoryLargeName}">대분류_카테고리</p>
                 </th:block>
-                <p class="ranking-book-writers" id="ranking-book-writers">
+                <a th:href="@{'/book/bookDetail?bookId='+${book.bookId}}">
+                    <p class="ranking-book-name" th:text="${book.name}">도서명</p>
+                </a>
+                <p class="ranking-book-writers">
                     <span th:text="${book.writerNames?.length() > 15 ? book.writerNames?.substring(0, 15).concat('...') : book.writerNames}">저자명</span>
                 </p>
             </div>
