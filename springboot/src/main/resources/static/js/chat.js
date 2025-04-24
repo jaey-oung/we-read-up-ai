@@ -69,13 +69,36 @@ chatInput.addEventListener('keypress', function(event) {
 
 
 
-// 
+// 로딩 스피너 보여주는 함수
+function showSpinner() {
+    const spinner = document.createElement('div');
+    spinner.className = 'message bot';
+    spinner.innerHTML = `
+    <div class="spinner-container">
+        <div class="spinner"></div>
+    </div>
+`;
+    chatBody.appendChild(spinner);
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// 로딩 스피너 숨기는 함수
+function removeSpinner() {
+    const spinner = document.querySelector('.message.bot:last-child');
+    spinner.remove();
+}
 
 // 화면에 메시지 보여주는 함수
 function appendMessage(message, sender, regDate) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
-    const formattedMessage = message.replace(/(?<!\d)\. (?=[A-Z가-힣])/g, '.<br>');
+    const formattedMessage = message
+        // 하이픈(-) 앞뒤만 줄바꿈 추가, "도서명", "원가", "할인율", "판매가", "내용"은 제외
+        .replace(/-\s*(?!도서명|원가|할인율|판매가|내용)([^\n]+)/g, '<br>-$1')
+        // 문장 끝 마침표 후 줄바꿈 추가, 단 번호(1. 2. 등) 뒤는 제외
+        .replace(/(?<=[^.0-9])\. (?=[A-Z가-힣])/g, '.<br>')
+        // 앞뒤 공백 정리
+        .trim();
     const formattedDate = regDate.slice(0, 19).replace('T', ' ');
 
     if (sender === 'bot') {
@@ -134,6 +157,7 @@ async function sendMessage() {
     if (message) {
         // 사용자 메시지 채팅에 추가
         appendMessage(message, 'user', now);
+        showSpinner();
 
         try {
             const response = await fetch('/chat/send', {
@@ -152,6 +176,7 @@ async function sendMessage() {
             }
             // 응답 값 JSON 객체로 변환
             const data = await response.json();
+            removeSpinner();
             // 응답 메시지 채팅에 표시
             appendMessage(data.message, data.sender, data.regDate);
         } catch (error) {
