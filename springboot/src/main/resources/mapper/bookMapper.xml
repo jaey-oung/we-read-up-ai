@@ -138,7 +138,7 @@
     </resultMap>
 
     <!-- 특정 카테고리에 속한 도서 리스트 조회 -->
-    <select id="selectByCategory" parameterType="BookSearchRequestDto" resultMap="completeBookMap">
+    <select id="selectByCategory" parameterType="BookFilterDto" resultMap="completeBookMap">
         SELECT b.*, p.name AS publisher_name, GROUP_CONCAT(w.name SEPARATOR ', ') AS writer_names
         FROM (SELECT * FROM book WHERE <include refid="sql-option-category-nested" />) b, publisher p, writer w, writer_book wb
         WHERE b.publisher_id = p.publisher_id AND b.book_id = wb.book_id AND w.writer_id = wb.writer_id
