@@ -4,7 +4,7 @@ import com.wru.wrubookstore.domain.HomeSearchCondition;
 import com.wru.wrubookstore.dto.BookDto;
 import com.wru.wrubookstore.dto.CompleteBookDto;
 import com.wru.wrubookstore.dto.RankedBookDto;
-import com.wru.wrubookstore.dto.request.BookSearchRequestDto;
+import com.wru.wrubookstore.dto.BookFilterDto;
 import com.wru.wrubookstore.dto.request.category.CategoryRequest;
 import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
@@ -30,7 +30,7 @@ public interface BookRepository {
     int selectCntByCategoryIds(CategoryRequest category) throws Exception;
 
     // 특정 카테고리에 속한 도서 리스트 조회
-    List<CompleteBookDto> selectByCategory(BookSearchRequestDto request) throws Exception;
+    List<CompleteBookDto> selectByCategory(BookFilterDto request) throws Exception;
 
     // 검색 결과 개수 조회
     int selectCntBySearchCondition(HomeSearchCondition sc) throws Exception;

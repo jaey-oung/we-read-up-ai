@@ -3,7 +3,7 @@ package com.wru.wrubookstore.controller;
 import com.wru.wrubookstore.domain.PageHandler;
 import com.wru.wrubookstore.domain.HomeSearchCondition;
 import com.wru.wrubookstore.dto.*;
-import com.wru.wrubookstore.dto.request.BookSearchRequestDto;
+import com.wru.wrubookstore.dto.BookFilterDto;
 import com.wru.wrubookstore.dto.request.category.CategoryRequest;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
 import com.wru.wrubookstore.dto.response.review.ReviewListResponse;
@@ -53,8 +53,8 @@ public class BookController {
             List<CompleteBookDto> list = new ArrayList<>();
             if (count != 0) {
                 // 페이징, 정렬과 관련된 sc와 카테고리 id를 조합해 조건에 맞는 도서 리스트 반환
-                BookSearchRequestDto bookSearchRequestDto = new BookSearchRequestDto(sc, categoryIds);
-                list = bookService.getAllCompleteBooks(bookSearchRequestDto); // 책, 출판사, 저자 정보 포함
+                BookFilterDto bookFilterDto = new BookFilterDto(sc, categoryIds);
+                list = bookService.getAllCompleteBooks(bookFilterDto); // 책, 출판사, 저자 정보 포함
             }
 
             model.addAttribute("sc", sc);

@@ -4,7 +4,7 @@ import com.wru.wrubookstore.domain.HomeSearchCondition;
 import com.wru.wrubookstore.dto.BookDto;
 import com.wru.wrubookstore.dto.CompleteBookDto;
 import com.wru.wrubookstore.dto.RankedBookDto;
-import com.wru.wrubookstore.dto.request.BookSearchRequestDto;
+import com.wru.wrubookstore.dto.BookFilterDto;
 import com.wru.wrubookstore.dto.request.category.CategoryRequest;
 import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
@@ -66,7 +66,7 @@ public class BookServiceImpl implements BookService {
 
     // 특정 카테고리에 속한 도서 리스트 조회
     @Override
-    public List<CompleteBookDto> getAllCompleteBooks(BookSearchRequestDto request) throws Exception {
+    public List<CompleteBookDto> getAllCompleteBooks(BookFilterDto request) throws Exception {
         return bookRepository.selectByCategory(request);
     }
 
