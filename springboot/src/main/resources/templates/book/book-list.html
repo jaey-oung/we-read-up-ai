@@ -17,26 +17,7 @@
 
 <div class="container">
     <div class="content">
-        <div class="content-head">
-            <div class="first-category">
-                <th:block th:if="${uri == '/book/bookList'}">
-                    <th:block th:if="${category == null}">
-                        <div th:switch="${list.get(0).categoryType}">
-                            <h1 th:case="'cl'" th:text="${list.get(0).categoryLargeName}" />
-                            <h1 th:case="'cm'" th:text="${list.get(0).categoryLargeName} + ' > ' + ${list.get(0).categoryMediumName}" />
-                            <h1 th:case="'cs'" th:text="${list.get(0).categoryLargeName} + ' > ' + ${list.get(0).categoryMediumName} + ' > ' + ${list.get(0).categorySmallName}" />
-                        </div>
-                    </th:block>
-                    <th:block th:unless="${category == null}">
-                        <div th:switch="${category.categoryType}">
-                            <h1 th:case="'cl'" th:text="${category.categoryLargeName}" />
-                            <h1 th:case="'cm'" th:text="${category.categoryLargeName} + ' > ' + ${category.categoryMediumName}" />
-                            <h1 th:case="'cs'" th:text="${category.categoryLargeName} + ' > ' + ${category.categoryMediumName} + ' > ' + ${category.categorySmallName}" />
-                        </div>
-                    </th:block>
-                </th:block>
-            </div>
-        </div>
+        <h1 th:text="${path}">카테고리_경로</h1>
     </div>
 
     <div class="content-main">
@@ -51,8 +32,8 @@
             <div class="sort-select">
                 <label>
                     <select id="sort-book">
-                        <option value="0" name="sort">- 정렬방식 -</option>
-                        <option value="0" name="sort">최신순</option>
+                        <option value="0" name="sort" id="sort-option-str">- 정렬방식 -</option>
+                        <option value="0" name="sort" id="latest-sort">최신순</option>
                         <option value="1" name="sort">낮은 가격순</option>
                         <option value="2" name="sort">높은 가격순</option>
                     </select>
@@ -72,51 +53,33 @@
         <!-- 상품 목록 -->
         <div class="product-grid" th:if="${not #lists.isEmpty(list)}">
             <!-- 쿼리 스트링으로 값 넘겨주기 -->
-            <a style="text-decoration:none;" th:each="item : ${list}" th:href="@{'/book/bookDetail?bookId='+${item.bookId}+'&page='+${ph.page}+'&category='+${category}+'&pageSize='+${ph.pageSize}}" class="product">
-                <img style="height:80%;width:100%" th:src="${item.image}" th:alt="${item.name}">
+            <a style="text-decoration:none;" th:each="item : ${list}" th:href="@{'/book/bookDetail?bookId='+${item.book.bookId}}" class="product">
+                <img th:src="${item.book.image}" th:alt="${item.book.name}">
                 <div class="hover-buttons">
                     <!-- 장바구니 추가 -->
                     <button class="add-cart-btn"
-                            th:attr="data-book-id=${item.bookId},
-                        data-price=${item.salePrice}">
+                            th:attr="data-book-id=${item.book.bookId},
+                        data-price=${item.book.salePrice}">
                         장바구니
                     </button>
                     <!-- 주문으로 넘어가기 추가 -->
                     <button onclick="buyNow(this)"
-                            th:attr="data-book-id=${item.bookId}, data-image=${item.image}, data-name=${item.name},
-                                     data-price=${item.salePrice}, data-quantity=1">
+                            th:attr="data-book-id=${item.book.bookId}, data-image=${item.book.image}, data-name=${item.book.name},
+                                     data-price=${item.book.salePrice}, data-quantity=1">
                         구매
                     </button>
                 </div>
-                <p class="product-name" style="font-size:17px; margin-bottom:-2px; font-weight: bold " th:text="${item.name.length() > 24 ? item.name.substring(0,24).concat('...') : item.name}"></p>
+                <p class="product-name" style="font-size:17px; margin-bottom:-2px; font-weight: bold " th:text="${item.book.name.length() > 24 ? item.book.name.substring(0,24).concat('...') : item.book.name}">도서명</p>
                 <p style="color:#888888; margin-top:10px;margin-bottom:2px;font-size:14px">
-                    <th:block th:each="i : ${writerListResponse}" style="display:inline-block;">
-                        <th:block th:each="writer, stat : ${i}">
-                            <th:block th:if="${item.bookId == writer.bookId}">
-                                <th:block th:if="${stat.count == 1}">
-                                    <span th:text="${writer.name}"></span>
-                                </th:block>
-                                <th:block th:if="${stat.count == stat.size && stat.count > 1}">
-                                    <span th:text="' 외'" style="margin-left:0px;margin-right:0px"></span>
-                                </th:block>
-                                <th:block th:if="${stat.count == stat.size}">
-                                    <span th:text="' 지음 | '" style="margin-left:-3px;margin-right:-2px"></span>
-                                </th:block>
-                            </th:block>
-                        </th:block>
-                    </th:block>
-                    <th:block th:each="i : ${publisherListResponse}">
-                        <th:block th:if="${i.key == item.publisherId}">
-                            <span th:text="${i.value}"></span>
-                        </th:block>
-                    </th:block>
+                    <span th:text="${item.writerNames?.length() > 15 ? item.writerNames?.substring(0, 15).concat('...') : item.writerNames} + ' 지음 |'">저자명</span>
+                    <span th:text="${item.publisherName?.length() > 10 ? item.publisherName?.substring(0, 10).concat('...') : item.publisherName}">출판사명</span>
                 </p>
                 <p class="product-price" id="salePrice" style="margin-top:0" >
-                    <strong style="color:black; font-size:17px;" th:text="${#numbers.formatInteger(item.salePrice, 3,'COMMA')+'원 '}"></strong><span style="color:#888888" th:text="${'('+#numbers.formatInteger(item.originalPrice * 0.05,3,'COMMA')+'P)'}"></span>
+                    <strong style="color:black; font-size:17px;" th:text="${#numbers.formatInteger(item.book.salePrice, 3,'COMMA')+'원 '}"></strong><span style="color:#888888" th:text="${'('+#numbers.formatInteger(item.book.originalPrice * 0.05,3,'COMMA')+'P)'}">가격</span>
                 </p>
             </a>
         </div>
-        <form class="howtopag" id="form" th:if="${not #lists.isEmpty(list)}" th:action="@{${uri}}" method="get">
+        <form class="howtopag" id="form" th:if="${not #lists.isEmpty(list)}" th:action="${url}" onsubmit="return doPaging(this)" method="get">
             <!-- 이전 페이지 -10 -->
             <th:block th:if="${ph.page -10 > 0}">
                 <button type="submit" name="page" th:value="${ph.page -10}">❮❮</button>
@@ -138,8 +101,6 @@
                 <button type="submit" name="page" th:value="${ph.page+10}">❯❯</button>
             </th:block>
             <!-- 요청 넘겨주기용 input -->
-            <input type="hidden" id="userId" th:value="${session.userId}">
-            <input type="hidden" id="category" name="category" th:value="${sc.category}"/>
             <input type="hidden" id="pageSize" name="pageSize" th:value="${ph.pageSize}"/>
             <input type="hidden" id="option" name="option" th:value="${sc.option}"/>
             <input type="hidden" id="keyword" name="keyword" th:value="${sc.keyword}"/>
@@ -153,20 +114,79 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="/js/cart.js"></script>
 <script src="/js/book-list.js"></script>
-<script>
+<script th:inline="javascript">
     $(document).ready(function(){
-        $('#sort-book').on('change', function(){
-            let option = $('#option').val();
-            let keyword = $('#keyword').val();
-            if(option || keyword){
-                window.location.href = '/book/search?sort=' + $(this).val() + '&category='+$('#category').val()+'&option='+$('#option').val()+'&keyword='+$('#keyword').val();
-            } else{
-                window.location.href = '/book/bookList?sort=' + $(this).val() + '&category='+$('#category').val();
-            }
+        let currentUrl = window.location.href;
+        let url = new URL(currentUrl);
+        let params = new URLSearchParams(url.search);
 
+        const form = document.getElementById('form');
+        // form 내 페이지 버튼들 이벤트 일괄 적용
+        form.querySelectorAll('button[name="page"]').forEach(btn => {
+            btn.onclick = function () {
+                setClickedBtn(this);
+            };
+        })
+
+        // 현재 페이지 style 지정
+        let pageNum = params.get('page');
+        if(!pageNum){
+            pageNum = "1";
+        }
+        const clickedBtn = form.querySelector(`button[value="${pageNum}"]`);
+        clickedBtn.style.textDecoration = 'underline';
+        clickedBtn.style.fontWeight = 'bold';
+
+        // 정렬 기준 selected, 속성 지정
+        const sort = $('#sort-book');
+        let sortValue = params.get('sort');
+        if (!sortValue) {
+            $("#sort-option-str").prop('selected', true);
+        } else if (sortValue === "0") {
+            $("#latest-sort").prop('selected', true);
+        } else {
+            sort.val(sortValue);  // URL의 'sort' 값으로 select의 값 설정
+        }
+
+        // 정렬 기준 바뀔 때 queryString 변경하여 페이지 이동
+        sort.on('change', function(){
+            params.set('sort', $(this).val()); // 'sort' 값을 새로운 값으로 설정
+            params.set('page', 1); // 정렬 방식 바꾸면 기본 페이지 1로 설정
+
+            url.search = params.toString();
+            window.location.href = url.toString()
         });
     });
+
+    // 실제 클릭된 버튼 확인
+    let clickedButton = null;
+
+    function setClickedBtn(btn) {
+        clickedButton = btn;
+    }
+
+    // '/book/bookList' 경우 페이지 전환 시 URL 직접 지정
+    function doPaging(form) {
+        const link = /*[[${url}]]*/ {};
+        console.log("link=", link);
+        if (!(link === "/book/bookList")) {
+            return true; // 폼 제출 허용
+        }
+
+        // 현재 URL에 필요한 속성 추가 및 대체
+        const currentUrl = new URL(window.location.href);
+        const formData = new FormData(form);
+
+        const not_used = ["option", "keyword"];
+        for (const [key, value] of formData.entries()) {
+            if (not_used.includes(key)) continue;
+            currentUrl.searchParams.set(key, value);  // 이미 URL에 있으면 대체, 없으면 추가
+        }
+        currentUrl.searchParams.set("page", clickedButton.value); // 페이지 속성 수동 추가
+
+        window.location.href = currentUrl.toString();  // 페이지 이동
+        return false; // 폼 제출 차단
+    }
 </script>
 </body>
-
 </html>

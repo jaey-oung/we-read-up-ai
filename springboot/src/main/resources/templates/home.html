@@ -48,8 +48,8 @@
                     <div class="choice-container">
                         <div class="scale-container" data-left-code="S" data-right-code="I">
                             <div class="scale-option" data-score="1">현실 중심 책에<br>가장 끌림</div>
-                            <div class="scale-option" data-score="2">현실 중심 책에<br>조금 더 끌림</div>
-                            <div class="scale-option" data-score="3">상상 중심 책에<br>조금 더 끌림</div>
+                            <div class="scale-option" data-score="2">현실 중심 책에<br>약간 끌림</div>
+                            <div class="scale-option" data-score="3">상상 중심 책에<br>약간 끌림</div>
                             <div class="scale-option" data-score="4">상상 중심 책에<br>가장 끌림</div>
                         </div>
                     </div>
@@ -66,10 +66,10 @@
                 <div class="ques-body">
                     <div class="choice-container">
                         <div class="scale-container" data-left-code="F" data-right-code="D">
-                            <div class="scale-option" data-score="1">감성 중심 책에<br>강하게 끌림</div>
+                            <div class="scale-option" data-score="1">감성 중심 책에<br>가장 끌림</div>
                             <div class="scale-option" data-score="2">감성 중심 책에<br>약간 끌림</div>
                             <div class="scale-option" data-score="3">정보 중심 책에<br>약간 끌림</div>
-                            <div class="scale-option" data-score="4">정보 중심 책에<br>강하게 끌림</div>
+                            <div class="scale-option" data-score="4">정보 중심 책에<br>가장 끌림</div>
                         </div>
                     </div>
                 </div>
@@ -183,24 +183,31 @@
     <div class="ranking-header">
         <div>
             <span class="ranking-title">주간 랭킹</span>
-            <span class="ranking-subtitle">최근 1주일 동안 집계</span>
+            <span class="ranking-subtitle">최근 주문일 기준 7일간 집계</span>
         </div>
     </div>
     <div class="product-grid">
         <div class="ranking_books" th:each="book : ${rankedBooks}" >
-            <a th:href="@{'/book/bookDetail?bookId='+${book.bookAndCategory.bookId}}">
-                <img th:src="${book.bookAndCategory.image}" th:alt="${book.bookAndCategory.name}">
+            <a th:href="@{'/book/bookDetail?bookId='+${book.bookId}}">
+                <img th:src="${book.image}" th:alt="${book.name}">
             </a>
-            <div id="book-text">
-                <p class="ranking-book-category" th:text="${book.bookAndCategory.categoryMediumName} + '/' + ${book.bookAndCategory.categorySmallName}">카테고리</p>
-                <a id="ranking-book-name" th:href="@{'/book/bookDetail?bookId='+${book.bookAndCategory.bookId}}">
-                    <p class="ranking-book-name" th:text="${book.bookAndCategory.name}">도서명</p>
+            <div class="book-text">
+                <th:block th:if="${book.categoryMediumName != null}">
+                    <p class="ranking-book-category"
+                       th:text="${#strings.length(book.categoryLargeName + ' / ' + book.categoryMediumName) > 23 ?
+                           (book.categoryLargeName + ' / ' + book.categoryMediumName).substring(0, 23).concat('...') :
+                           book.categoryLargeName + ' / ' + book.categoryMediumName}">
+                        대_중분류_카테고리
+                    </p>
+                </th:block>
+                <th:block th:if="${book.categoryMediumName == null}">
+                    <p class="ranking-book-category" th:text="${book.categoryLargeName}">대분류_카테고리</p>
+                </th:block>
+                <a th:href="@{'/book/bookDetail?bookId='+${book.bookId}}">
+                    <p class="ranking-book-name" th:text="${book.name}">도서명</p>
                 </a>
-                <p class="ranking-book-writers" id="ranking-book-writers">
-                    <th:block th:each="writer, iterStat : ${book.writers}">
-                        <span th:text="${writer}">저자명</span>
-                        <span th:if="!${iterStat.last}">,</span>
-                    </th:block>
+                <p class="ranking-book-writers">
+                    <span th:text="${book.writerNames?.length() > 15 ? book.writerNames?.substring(0, 15).concat('...') : book.writerNames}">저자명</span>
                 </p>
             </div>
         </div>
@@ -210,6 +217,8 @@
 <div th:replace="~{fragments/footer :: footer}"></div>
 <!-- Lucide 아이콘 라이브러리 -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<!-- Axios HTTP 클라이언트 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="/js/home.js"></script>
 <script src="/js/home-slider.js"></script>
 <script src="/js/display-msg.js"></script>
