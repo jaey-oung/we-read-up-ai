@@ -42,7 +42,7 @@
                     <div class="category-container">
                         <div class="category-item" id="categoryLarge">
                             <div class="category-title">대분류</div>
-                            <ul class="category-list" th:each="i : ${cl}">
+                            <ul class="category-list" th:each="i : ${adminBookCreateData.categoryResponse}">
                                 <li th:text="${i.categoryLargeName}" class="category-large"></li>
                                 <input type="hidden" class="category-large-id" th:value="${i.categoryLargeId}"/>
                             </ul>
@@ -142,18 +142,38 @@
         </table>
     </div>
 
+
     <!-- 저자 정보 섹션 -->
 <div class="section" id="writer-section">
     <span class="writer-list">
+        <div class="author-popup" id="author-popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; border:1px solid #ccc; padding:20px; z-index:1000; width:500px; max-height:400px; overflow-y:auto; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+            <div style="text-align:right;">
+                <button class="popup-close" id="popup-close" style="font-size:16px; border:none; background:none; cursor:pointer;color:black">✖</button>
+            </div>
+            <h3>작가 검색</h3>
+            <input class="popup-author-search" type="text" id="popup-author-search" placeholder="작가 이름 또는 필명" style="width:400px; padding:8px; margin-bottom:10px; border:1px solid #ccc;">
+            <button class="search-btn" id="search-btn">검색</button>
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                <tr>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">이름</th>
+                    <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">필명</th>
+                    <th style="padding:8px; border-bottom:1px solid #ccc;"></th>
+                </tr>
+                </thead>
+                <tbody class="popup-author-result" id="popup-author-result">
+                <!-- 검색 결과 출력 위치 -->
+                </tbody>
+            </table>
+        </div>
         <h3>저자 정보</h3>
         <table class="form-table">
             <tr>
                 <th>지은이 선택</th>
                 <td class="author-list">
-                    <select id="author-id" class="writer-medium-id" style="width:200px">
-                        <option>직접 입력</option>
-                        <option th:each="i : ${authors}" th:value="${i.writerId}" th:text="${i.nickname==null ? i.name : i.name+' >> [필명:'+i.nickname+']'}"></option>
-                    </select>
+                    <button id="author-id" class="writer-medium-id" style="width:200px;">
+                        작가 검색
+                    </button>
                 </td>
             </tr>
             <tr>
@@ -284,15 +304,33 @@
     <!-- 출판사 정보 섹션 -->
     <div class="section">
         <span class="publisher-list">
+            <div class="publisher-popup" id="publisher-popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; border:1px solid #ccc; padding:20px; z-index:1000; width:500px; max-height:400px; overflow-y:auto; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+        <div style="text-align:right;">
+            <button class="publisher-popup-close" id="publisher-popup-close" style="font-size:16px; border:none; background:none; cursor:pointer;color:black">✖</button>
+        </div>
+        <h3>출판사 검색</h3>
+        <input class="popup-publisher-search" type="text" id="popup-publisher-search" placeholder="출판사 이름" style="width:400px; padding:8px; margin-bottom:10px; border:1px solid #ccc;">
+        <button class="publisher-search-btn" id="publisher-search-btn">검색</button>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+            <tr>
+                <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">출판사명</th>
+                <th style="padding:8px; border-bottom:1px solid #ccc;"></th>
+            </tr>
+            </thead>
+            <tbody class="popup-publisher-result" id="popup-publisher-result">
+            <!-- 검색 결과 출력 위치 -->
+            </tbody>
+        </table>
+    </div>
         <h3>출판사 정보</h3>
         <table class="form-table">
             <tr>
                 <th>출판사 선택</th>
                 <td>
-                    <select id="publisher-id" class="publisher-id" style="width:200px">
-                        <option>직접 입력</option>
-                        <option th:each="i : ${publishers}" th:value="${i.publisherId}" th:text="${i.name+'('+i.bizRegNo+')'}"></option>
-                    </select>
+                    <button id="publisher-id" style="width:200px;">
+                        출판사 검색
+                    </button>
                 </td>
             </tr>
             <tr>
@@ -436,10 +474,10 @@
     <script th:inline="javascript">
         /*<![CDATA[*/
         // 서버에서 받은 authors 리스트를 JavaScript의 authors 배열로 변환
-        const authors = /*[[${authors}]]*/ [];  // 서버에서 전달된 authors 데이터를 배열로 변환
+        const authors = /*[[${adminBookCreateData.writerDto}]]*/ [];  // 서버에서 전달된 authors 데이터를 배열로 변환
 
         // 서버에서 받은 publishers 리스트를 JavaScript의 publishers 배열로 변환
-        const publishers = /*[[${publishers}]]*/ [];  // 서버에서 전달된 publishers 데이터를 배열로 변환
+        const publishers = /*[[${adminBookCreateData.publisherDto}]]*/ [];  // 서버에서 전달된 publishers 데이터를 배열로 변환
         /*]]>*/
     </script>
 
@@ -510,7 +548,7 @@
             // 배열 초기화
             books = [];
             if(name && isbn && originalPrice && discountPercent && discountPrice && salePrice && releaseDate
-                && description && stockQuantity && size && weight && page){
+                && description && stockQuantity && size && weight && page  && selectedCategory.largeId){
                 books.push({
                     name: name,
                     isbn: isbn,
@@ -536,8 +574,6 @@
                 $('#product-name').focus();
                 return;
             }
-
-
 
             // 출판사 이름
             let publisherName = $('#publisher-name').val();
@@ -705,15 +741,34 @@
         $('#author-button').on('click', function(event){
             event.preventDefault();
 
-            let nameBox = $('<span class="writer-list">\n' +
+            let nameBox = $(
+                '<span class="writer-list">\n' +
+                '<div class="author-popup" id="author-popup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; border:1px solid #ccc; padding:20px; z-index:1000; width:500px; max-height:400px; overflow-y:auto; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">\n' +
+                '        <div style="text-align:right;">\n' +
+                '            <button class="popup-close" id="popup-close" style="font-size:16px; border:none; background:none; cursor:pointer;color:black">✖</button>\n' +
+                '        </div>\n' +
+                '        <h3>작가 검색</h3>\n' +
+                '        <input class="popup-author-search" type="text" id="popup-author-search" placeholder="작가 이름 또는 필명" style="width:400px; padding:8px; margin-bottom:10px; border:1px solid #ccc;">\n' +
+                '        <button class="search-btn" id="search-btn">검색</button>\n' +
+                '        <table style="width:100%; border-collapse:collapse;">\n' +
+                '            <thead>\n' +
+                '            <tr>\n' +
+                '                <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">이름</th>\n' +
+                '                <th style="text-align:left; padding:8px; border-bottom:1px solid #ccc;">필명</th>\n' +
+                '                <th style="padding:8px; border-bottom:1px solid #ccc;"></th>\n' +
+                '            </tr>\n' +
+                '            </thead>\n' +
+                '            <tbody class="popup-author-result" id="popup-author-result">\n' +
+                '            <!-- 검색 결과 출력 위치 -->\n' +
+                '            </tbody>\n' +
+                '        </table>\n' +
+                '    </div>' +
                 '        <h3 style="margin-top:30px">저자 정보</h3>\n' +
                 '        <table class="form-table">\n' +
                 '            <tr>\n' +
                 '                <th>지은이 선택</th>\n' +
                 '                <td class="author-list">\n' +
-                '                    <select id="author-id" class="writer-medium-id" style="width:200px">\n' +
-                '                        <option>직접 입력</option>\n' +
-                '                    </select>\n' +
+                '                    <button type="button" class="writer-medium-id" style="width:200px;">작가 검색</button>\n' +
                 '                </td>\n' +
                 '            </tr>\n' +
                 '            <tr>\n' +
@@ -841,98 +896,44 @@
                 '        </table>\n' +
                 '    </span>')
             $('#writer-section').append(nameBox);
-
-            authors.forEach(function(author) {
-                var optionText = author.nickname ? author.name + ' >> [필명: ' + author.nickname + ']' : author.name;
-                $(nameBox).find($('.writer-medium-id')).append('<option value="' + author.writerId + '">' + optionText + '</option>');
-            });
-
-            $('.author-del').on('click', function(event){
-                event.preventDefault();
-                $(this).closest('.writer-list').remove();
-            });
-
-            $('.writer-medium-id').on('change', function(){
-                var id = $(this).val();
-                var selectedAuthor = authors.find(function(author) {
-                    return author.writerId === id;
-                });
-                if(selectedAuthor){
-                    console.log('2번 자동입력');
-                    $(this).closest($('.writer-list')).find($('.writer-medium-name')).val(selectedAuthor.name).prop('readonly', true);
-                    $(this).closest($('.writer-list')).find($('.writer-long')).val(selectedAuthor.description).prop('readonly', true);
-                    $(this).closest($('.writer-list')).find($('.writer-medium-gender')).val(selectedAuthor.gender).css('pointer-events', 'none');
-                    $(this).closest($('.writer-list')).find($('.writer-medium')).val(selectedAuthor.nationality).css('pointer-events', 'none');
-                    $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).val(selectedAuthor.nickname).prop('readonly', true);
-                }
-
-                if($(this).val() === '직접 입력'){
-                    console.log('2번 직접입력');
-                    $(this).closest($('.writer-list')).find($('.writer-medium-name')).prop('readonly', false);
-                    $(this).closest($('.writer-list')).find($('.writer-long')).prop('readonly', false);
-                    $(this).closest($('.writer-list')).find($('.writer-medium-gender')).css('pointer-events', 'auto');
-                    $(this).closest($('.writer-list')).find($('.writer-medium')).css('pointer-events', 'auto');
-                    $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).prop('readonly', false);
-                }
-            });
         });
 
-        $('#author-id').on('change', function(){
-            var id = $(this).val();
-            var selectedAuthor = authors.find(function(author) {
-                return author.writerId === id;
-            });
-            if(selectedAuthor){
-                console.log('1번 자동입력');
-                $(this).closest($('.writer-list')).find($('.writer-medium-name')).val(selectedAuthor.name).prop('readonly', true);
-                $(this).closest($('.writer-list')).find($('.writer-long')).val(selectedAuthor.description).prop('readonly', true);
-                $(this).closest($('.writer-list')).find($('.writer-medium-gender')).val(selectedAuthor.gender).css('pointer-events', 'none');
-                $(this).closest($('.writer-list')).find($('.writer-medium')).val(selectedAuthor.nationality).css('pointer-events', 'none');
-                $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).val(selectedAuthor.nickname).prop('readonly', true);
-            }
-
-            if($('.writer-medium-id').val() === '직접 입력'){
-                console.log('1번 직접입력');
-                $(this).closest($('.writer-list')).find($('.writer-medium-name')).prop('readonly', false);
-                $(this).closest($('.writer-list')).find($('.writer-long')).prop('readonly', false);
-                $(this).closest($('.writer-list')).find($('.writer-medium-gender')).css('pointer-events', 'auto');
-                $(this).closest($('.writer-list')).find($('.writer-medium')).css('pointer-events', 'auto');
-                $(this).closest($('.writer-list')).find($('.writer-medium-nickname')).prop('readonly', false);
-            }
-        });
-
-        $('#publisher-id').on('change', function(){
-            var id = $(this).val();
-            var publisherId = publishers.find(function(publisher) {
-                return publisher.publisherId === id;
-            })
-
-            if(publisherId){
-                $('#publisher-name').val(publisherId.name).prop('readonly', true);
-                $('#publisher-ceo').val(publisherId.president).prop('readonly', true);
-                $('#business-number1').val(publisherId.bizRegNo.substring(0,3)).prop('readonly', true);
-                $('#business-number2').val(publisherId.bizRegNo.substring(4,6)).prop('readonly', true);
-                $('#business-number3').val(publisherId.bizRegNo.substring(7)).prop('readonly', true);
-                $('#address1').val(publisherId.mainAddress).prop('readonly', true);
-                $('#address2').val(publisherId.detailAddress).prop('readonly', true);
-                $('#zipcode').val(publisherId.zipCode).prop('readonly', true);
-                $('#phone1').val(publisherId.phoneNum.substring(0,3)).prop('readonly', true);
-                $('#phone2').val(publisherId.phoneNum.substring(4,8)).prop('readonly', true);
-                $('#phone3').val(publisherId.phoneNum.substring(9)).prop('readonly', true);
-                $('#publisher-nationality').val(publisherId.bizArea).css('pointer-events', 'none');
-            }
-
-            if($('#publisher-id').val() === '직접 입력'){
-                $('#publisher-name').prop('readonly', false);
-                $('#publisher-ceo').prop('readonly', false);
-                $('#business-number').prop('readonly', false);
-                $('#address1').prop('readonly', false);
-                $('#address2').prop('readonly', false);
-                $('#zipcode').prop('readonly', false);
-                $('#phone').prop('readonly', false);
-                $('#publisher-nationality').css('pointer-events', 'auto');
-            }
-        })
+        // $('#publisher-id').on('change', function(){
+        //     var id = $(this).val();
+        //     var publisherId = publishers.find(function(publisher) {
+        //         return publisher.publisherId === id;
+        //     })
+        //
+        //     if(publisherId){
+        //         $('#publisher-name').val(publisherId.name).prop('readonly', true);
+        //         $('#publisher-ceo').val(publisherId.president).prop('readonly', true);
+        //         $('#business-number1').val(publisherId.bizRegNo.substring(0,3)).prop('readonly', true);
+        //         $('#business-number2').val(publisherId.bizRegNo.substring(4,6)).prop('readonly', true);
+        //         $('#business-number3').val(publisherId.bizRegNo.substring(7)).prop('readonly', true);
+        //         $('#address1').val(publisherId.mainAddress).prop('readonly', true);
+        //         $('#address2').val(publisherId.detailAddress).prop('readonly', true);
+        //         $('#zipcode').val(publisherId.zipCode).prop('readonly', true);
+        //         $('#phone1').val(publisherId.phoneNum.substring(0,3)).prop('readonly', true);
+        //         $('#phone2').val(publisherId.phoneNum.substring(4,8)).prop('readonly', true);
+        //         $('#phone3').val(publisherId.phoneNum.substring(9)).prop('readonly', true);
+        //         $('#publisher-nationality').val(publisherId.bizArea).css('pointer-events', 'none');
+        //     }
+        //
+        //     if($('#publisher-id').val() === '직접 입력'){
+        //         $('#publisher-name').prop('readonly', false);
+        //         $('#publisher-ceo').prop('readonly', false);
+        //         $('#business-number1').prop('readonly', false);
+        //         $('#business-number2').prop('readonly', false);
+        //         $('#business-number3').prop('readonly', false);
+        //         $('#address1').prop('readonly', false);
+        //         $('#address2').prop('readonly', false);
+        //         $('#zipcode').prop('readonly', false);
+        //         $('#phone1').prop('readonly', false);
+        //         $('#phone2').prop('readonly', false);
+        //         $('#phone3').prop('readonly', false);
+        //         $('#publisher-nationality').css('pointer-events', 'auto');
+        //     }
+        // })
 
 
         tinymce.init({
@@ -969,6 +970,11 @@
                 image = response.data;
                 console.log(response.data);
                 console.log('image:'+image);
+
+                if(response.data.startsWith('ERROR')){
+                    alert(response.data.replace('ERROR:',''));
+                    return false;
+                }
 
                 var reader = new FileReader();
                 reader.onload=function(event){
@@ -1034,15 +1040,20 @@
             let categoryLargeName = $(this).closest('.category-list').find('.category-large').text();
             let categoryLargeId = $(this).closest('.category-list').find('.category-large-id').val();
 
+            $('.category-large').css('color', 'black')
+            $(this).css('color','#2563eb')
+
             // 대분류 선택 시 저장
             selectedCategory.largeId = categoryLargeId;
             selectedCategory.mediumId = null;
             selectedCategory.smallId = null;
 
-            axios.post('/admin/bookCategory', [{
-                categoryLargeName: categoryLargeName,
-                categoryLargeId: categoryLargeId
-            }], {
+            axios.get('/admin/bookCategory', {
+                params: {
+                    categoryLargeName: categoryLargeName,
+                    categoryLargeId: categoryLargeId
+                }
+            }, {
                 headers: {'content-type':'application/json'}
             }).then(function(response){
                 $('#category-name').text('(대분류) '+ categoryLargeName+' > ').css('margin-top', '10px');
@@ -1058,7 +1069,7 @@
                         .find('li')
                         .text('해당 없음')
                         .data('id', null)
-                        .css({'margin-bottom': '12px', 'font-style': 'italic', 'color': '#999'})
+                        .css({'margin-bottom': '12px', 'font-style': 'italic', 'color': 'black'})
                         .end()
                 );
 
@@ -1082,6 +1093,9 @@
                     let categoryMediumName = $(this).text();
                     let categoryMediumId = $(this).data('id');
 
+                    $('.category-medium').css('color', 'black')
+                    $(this).css('color','#2563eb')
+
                     selectedCategory.mediumId = categoryMediumId;
                     selectedCategory.smallId = null;
 
@@ -1091,10 +1105,12 @@
                         return;
                     }
 
-                    axios.post('/admin/bookCategory', [{
-                        categoryMediumName: categoryMediumName,
-                        categoryMediumId: categoryMediumId
-                    }], {
+                    axios.get('/admin/bookCategory', {
+                        params:{
+                            categoryMediumName: categoryMediumName,
+                            categoryMediumId: categoryMediumId
+                        }
+                    }, {
                         headers: {'content-type' : 'application/json'}
                     }).then(function(response){
                         $('#category-name').text('(대분류) '+ categoryLargeName+' > (중분류) '+categoryMediumName+' > ').css('margin-top', '10px');
@@ -1108,7 +1124,7 @@
                                 .find('li')
                                 .text('해당 없음')
                                 .data('id', null)
-                                .css({'margin-bottom': '12px', 'font-style': 'italic', 'color': '#999'})
+                                .css({'margin-bottom': '12px', 'font-style': 'italic', 'color': 'black'})
                                 .end()
                         );
 
@@ -1134,6 +1150,9 @@
 
                             selectedCategory.smallId = categorySmallId;
 
+                            $('.category-small').css('color', 'black')
+                            $(this).css('color','#2563eb')
+
                             if (categorySmallId === null) {
                                 $('#category-name').text('(대분류) ' + categoryLargeName + ' > (중분류) ' + categoryMediumName + ' > (소분류 없음)').css('margin-top', '10px');
                             } else {
@@ -1144,6 +1163,159 @@
                 });
             });
         });
+    });
+
+    // 팝업 연동
+    $(document).on('click', '.writer-medium-id', function(event) {
+        event.preventDefault();
+        $(this).closest('.writer-list').find('.author-popup').show();
+    });
+
+    $(document).on('click', '.author-del', function(event) {
+        event.preventDefault();
+        $(this).closest('.writer-list').remove();
+    });
+
+    $(document).on('click', '.popup-close', function(event) {
+        event.preventDefault();
+        $(this).closest('.writer-list').find('.author-popup').hide();
+    });
+
+    $(document).on('keydown', '.popup-author-search', function(event){
+        if(event.key === 'Enter'){
+            event.preventDefault();
+            $(this).closest('.writer-list').find('.search-btn').click();
+        }
+    });
+
+    $(document).on('click', '.search-btn', function(event) {
+        event.preventDefault();
+        let keyword = $(this).closest('.writer-list').find('.popup-author-search').val().replace(/[^0-9a-zA-Z가-힣\u4E00-\u9FFF]/g,'');
+        let resultHTML = '';
+        let self = this;
+
+        axios.get(`/admin/authorSearch?keyword=${keyword}`).then(function(response){
+            if(typeof response.data === 'string' && response.data.startsWith('ERROR')){
+                alert(response.data.replace('ERROR:',''));
+                return false;
+            }
+
+            let authors = response.data;
+            authors.forEach(function(author) {
+                resultHTML += `<tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">${author.name}</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">${author.nickname || '-'}</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">
+                    <button class="select-author-btn"
+                    data-name="${author.name}"
+                    data-nickname="${author.nickname || ''}"
+                    data-gender="${author.gender}"
+                    data-nationality="${author.nationality}"
+                    data-description="${author.description || ''}"
+                    >선택</button></td>
+                </tr>`;
+            })
+            $(self).closest('.writer-list').find('.popup-author-result').html(resultHTML);
+        })
+    });
+
+
+    $(document).on('click', '.select-author-btn', function(event) {
+        event.preventDefault();
+        let name = $(this).data('name');
+        let nickname = $(this).data('nickname');
+        let gender = $(this).data('gender');
+        let nationality = $(this).data('nationality');
+        let description = $(this).data('description');
+
+        $(this).closest('.writer-list').find('.writer-medium-name').val(name);
+        $(this).closest('.writer-list').find('.writer-medium-gender').val(gender);
+        $(this).closest('.writer-list').find('.writer-medium').val(nationality);
+        $(this).closest('.writer-list').find('.writer-long').val(description);
+        $(this).closest('.writer-list').find('.writer-medium-nickname').val(nickname);
+
+        $(this).closest('.writer-list').find('.author-popup').hide();
+    });
+
+
+
+    // 출판사 팝업
+    $(document).on('click', '#publisher-id', function(event) {
+        event.preventDefault();
+        $('#publisher-popup').show();
+    });
+
+    $(document).on('click', '#publisher-popup-close', function(event) {
+        event.preventDefault();
+        $('#publisher-popup').hide();
+    });
+
+    $(document).on('keydown', '#popup-publisher-search', function(event){
+        if(event.key === 'Enter'){
+            event.preventDefault();
+            $('#publisher-search-btn').click();
+        }
+    });
+
+    $(document).on('click', '#publisher-search-btn', function(event) {
+        event.preventDefault();
+
+        let keyword = $('#popup-publisher-search').val().replace(/[^0-9a-zA-Z가-힣\u4E00-\u9FFF]/g,'');
+        let resultHTML = '';
+
+        axios.get(`/admin/publisherSearch?keyword=${keyword}`).then(function(response){
+            if(typeof response.data === 'string' && response.data.startsWith('ERROR')){
+                alert(response.data.replace('ERROR:',''));
+                return false;
+            }
+
+            let publisher = response.data;
+            publisher.forEach(function(publisher) {
+                resultHTML += `<tr>
+                    <td style="padding:8px; border-bottom:1px solid #eee;">${publisher.name}</td>
+                    <td style="padding:8px; border-bottom:1px solid #eee; text-align:right;">
+                    <button class="select-publisher-btn"
+                    data-name="${publisher.name}"
+                    data-president="${publisher.president}"
+                    data-bizRegNo="${publisher.bizRegNo}"
+                    data-mainAddress="${publisher.mainAddress}"
+                    data-detailAddress="${publisher.detailAddress}"
+                    data-zipCode="${publisher.zipCode}"
+                    data-phoneNum="${publisher.phoneNum}"
+                    data-bizArea="${publisher.bizArea}"
+                    >선택</button></td>
+                </tr>`;
+            })
+            $('#popup-publisher-result').html(resultHTML);
+        })
+    });
+
+
+    $(document).on('click', '.select-publisher-btn', function(event) {
+        event.preventDefault();
+        let name = $(this).data('name');
+        let president = $(this).data('president');
+        let bizRegNo = $(this).attr('data-bizRegNo').replace(/[^0-9]/g,'');
+        let mainAddress = $(this).attr('data-mainAddress');
+        let detailAddress = $(this).attr('data-detailAddress');
+        let zipCode = $(this).attr('data-zipCode');
+        let phoneNum = $(this).attr('data-phoneNum').replace(/[^0-9]/g,'');
+        let bizArea = $(this).attr('data-bizArea');
+
+        $('#publisher-name').val(name);
+        $('#publisher-ceo').val(president);
+        $('#business-number1').val(bizRegNo.substring(0,3));
+        $('#business-number2').val(bizRegNo.substring(3,5));
+        $('#business-number3').val(bizRegNo.substring(5));
+        $('#address1').val(mainAddress);
+        $('#address2').val(detailAddress);
+        $('#zipcode').val(zipCode);
+        $('#phone1').val(phoneNum.substring(0,3));
+        $('#phone2').val(phoneNum.substring(3,7));
+        $('#phone3').val(phoneNum.substring(7));
+        $('#publisher-nationality').val(bizArea);
+
+        $('#publisher-popup').hide();
     });
 </script>
 

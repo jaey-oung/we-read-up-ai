@@ -178,13 +178,6 @@
         FROM book
     </delete>
 
-    <!-- 관리자용: 책 한권 삭제 -->
-    <delete id="deleteByAdmin" parameterType="BookListResponse">
-        DELETE
-        FROM book
-        WHERE book_id=#{bookId}
-    </delete>
-
     <!-- 관리자용: 재고 관리 -->
     <update id="updateByAdmin" parameterType="BookListResponse">
         UPDATE book

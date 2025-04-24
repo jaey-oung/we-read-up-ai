@@ -107,11 +107,6 @@ public class BookRepositoryImpl implements BookRepository {
         return session.selectList(namespace + "selectBook", map);
     }
 
-    @Override
-    public void deleteByAdmin(BookListResponse bookListResponse) throws Exception{
-        session.delete(namespace + "deleteByAdmin", bookListResponse);
-    }
-
     // 카테고리 조회용
     @Override
     public List<CategoryResponse> selectCategoryLarge() throws Exception{

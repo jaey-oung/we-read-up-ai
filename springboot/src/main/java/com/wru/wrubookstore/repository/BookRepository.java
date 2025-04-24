@@ -44,7 +44,6 @@ public interface BookRepository {
     void deleteAllByAdmin() throws Exception;
     void updateByAdmin(BookListResponse bookListResponse) throws Exception;
     int countQuantityZeroByAdmin() throws Exception;
-    void deleteByAdmin(BookListResponse bookListResponse) throws Exception;
     List<BookDto> selectBook(Map map) throws Exception;
 
     // 카테고리 조회용

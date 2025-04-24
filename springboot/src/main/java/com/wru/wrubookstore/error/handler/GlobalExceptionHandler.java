@@ -1,18 +1,103 @@
 package com.wru.wrubookstore.error.handler;
 
 import com.wru.wrubookstore.error.exception.*;
-import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 검색에 실패했을 경우
+    @ExceptionHandler(SearchFailException.class)
+    @ResponseBody
+    public String handlerSearchFail(SearchFailException e) {
+        return e.getMessage();
+    }
+    // 책의 작가 등록에 실패했을 경우
+    @ExceptionHandler(WriterBookCreateFailException.class)
+    @ResponseBody
+    public String handlerWriterBookCreateFail(WriterBookCreateFailException e) {
+        return e.getMessage();
+    }
+
+    // 책 등록에 실패했을 경우
+    @ExceptionHandler(BookCreateFailException.class)
+    @ResponseBody
+    public String handlerBookCreateFail(BookCreateFailException e) {
+        return e.getMessage();
+    }
+    // 이미 있는 책을 등록하려 했을 경우
+    @ExceptionHandler(BookAlreadyExistsException.class)
+    @ResponseBody
+    public String handlerBookAlreadyExists(BookAlreadyExistsException e){
+        return e.getMessage();
+    }
+    // 출판사 등록에 실패했을 경우
+    @ExceptionHandler(PublisherCreateFailException.class)
+    @ResponseBody
+    public String handlerPublisherCreateFail(PublisherCreateFailException e) {
+        return e.getMessage();
+    }
+
+    // 카테고리 요청 정보가 없을 경우
+    @ExceptionHandler(CategoryInfoMissingException.class)
+    @ResponseBody
+    public String handlerCategoryInfoMissing(CategoryInfoMissingException e){
+        return e.getMessage();
+    }
+    // 출판사 요청 정보가 없을 경우
+    @ExceptionHandler(PublisherInfoMissingException.class)
+    @ResponseBody
+    public String handlerPublisherInfoMissing(PublisherInfoMissingException e){
+        return e.getMessage();
+    }
+    // 책 요청 정보가 없을 경우
+    @ExceptionHandler(BookInfoMissingException.class)
+    @ResponseBody
+    public String handlerBookInfoMissing(BookInfoMissingException e){
+        return e.getMessage();
+    }
+    // 지은이 요청 정보가 없을 경우
+    @ExceptionHandler(WriterInfoMissingException.class)
+    @ResponseBody
+    public String handlerWriterInfoMissing(WriterInfoMissingException e) {
+        return e.getMessage();
+    }
+    // 지은이 등록에 실패했을 경우
+    @ExceptionHandler(WriterCreateFailException.class)
+    @ResponseBody
+    public String handlerWriterCreateFail(WriterCreateFailException e) {
+        return e.getMessage();
+    }
+    // 책 재고 추가에 실패했을 경우
+    @ExceptionHandler(BookUpdateFailException.class)
+    @ResponseBody
+    public String handlerBookUpdateFail(BookUpdateFailException e) {
+        return e.getMessage();
+    }
+    // 책 삭제에 실패했을 경우
+    @ExceptionHandler(BookDeleteFailException.class)
+    @ResponseBody
+    public String handlerBookDeleteFail(BookDeleteFailException e) {
+        return e.getMessage();
+    }
+    // 카테고리가 없을 경우
+    @ExceptionHandler(CategoryNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handlerCategoryNotFound(CategoryNotFoundException e, Model model) {
+        model.addAttribute("errorMessage", e.getMessage());
+        return "error/error";
+    }
+    // 이미지 파일이 없을 경우
+    @ExceptionHandler(InvalidImageException.class)
+    @ResponseBody
+    public String handlerInvalidImage(InvalidImageException e) {
+        return e.getMessage();
+    }
     // 리뷰 추가에 실패했을 경우 발생
     @ExceptionHandler(ReviewInsertFailException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
