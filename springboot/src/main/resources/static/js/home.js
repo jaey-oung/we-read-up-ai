@@ -6,6 +6,13 @@ const LAST_QUESTION = 4;
 /* ===== 전역 상태 정의 ===== */
 // 각 성향 축(S/I, F/D, N/M, Q/A)에 대한 사용자 응답 점수를 저장하는 객체
 const answers = { S: 0, I: 0, F: 0, D: 0, N: 0, M: 0, Q: 0, A: 0 };
+// 척도별 점수 비율
+const SCALE_MAP = [
+    { left: 100, right: 0 },    // 1번 선택 (왼쪽 극단)
+    { left: 66.7, right: 33.3 },// 2번 선택 (왼쪽 약간)
+    { left: 33.3, right: 66.7 },// 3번 선택 (오른쪽 약간)
+    { left: 0, right: 100 }     // 4번 선택 (오른쪽 극단)
+];
 
 // 팝업 진행 여부 상태
 let popupInProgress = false;
@@ -159,59 +166,29 @@ function displayResult(code, info) {
     `;
     resultTypeDescription.textContent = info.description;
 
-    // 성향 유형에 맞는 추천 책 데이터 로드
-    loadRecommendedBooks(code);
+    // 성향 유형에 맞는 추천 책 데이터 가져오기
+    loadRecommendedBooks();
 }
 
-// 성향 유형에 맞는 추천 책 데이터 로드
-function loadRecommendedBooks(typeCode) {
-    // 여기서는 예시 데이터를 사용
-    // 추후에 서버에서 데이터 가져옴
-    recommendedBooks = [
-        {
-            id: 1,
-            title: "책 제목 1",
-            author: "저자 1",
-            cover: "/img/book-cover-1.jpg",
-            description:
-                "책 설명 1",
-        },
-        {
-            id: 2,
-            title: "책 제목 2",
-            author: "저자 2",
-            cover: "/img/book-cover-2.jpg",
-            description:
-                "책 설명 2",
-        },
-        {
-            id: 3,
-            title: "책 제목 3",
-            author: "저자 3",
-            cover: "/img/book-cover-3.jpg",
-            description:
-                "책 설명 3",
-        },
-        {
-            id: 4,
-            title: "책 제목 4",
-            author: "저자 4",
-            cover: "/img/book-cover-4.jpg",
-            description:
-                "책 설명 4",
-        },
-        {
-            id: 5,
-            title: "책 제목 5",
-            author: "저자 5",
-            cover: "/img/book-cover-5.jpg",
-            description:
-                "책 설명 5",
-        },
-    ];
+// 성향 유형에 맞는 추천 책 데이터 가져오기
+function loadRecommendedBooks() {
+    axios.post("http://localhost:8000/book/recommend", {
+        scores: answers
+    })
+        .then((res) => {
+            // 추천 결과 저장 및 UI 갱신
+            recommendedBooks = res.data;
+            // 추천 도서 그리드 렌더링
+            initBooksGrid();
+        })
+        .catch((err) => {
+            console.error("추천 도서 요청 실패", err);
+        });
+}
 
-    // 추천 책 그리드 초기화
-    initBooksGrid();
+// 글자수 자르고 말줄임표 붙이기
+function truncate(text, maxLength) {
+    return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
 }
 
 // 추천 책 그리드 초기화
@@ -226,10 +203,12 @@ function initBooksGrid() {
         const bookItem = document.createElement("div");
         bookItem.className = "recommended-book-item";
         bookItem.innerHTML = `
-          <img src="${book.cover}" alt="${book.title}" class="recommended-book-cover">
-          <h4 class="recommended-book-title">${book.title}</h4>
-          <p class="recommended-book-author">${book.author}</p>
-          <p class="recommended-book-description">${book.description}</p>
+            <a href="/book/bookDetail?bookId=${book.book_id}">
+                <img src="${book.image}" alt="${book.title}" class="recommended-book-image">
+            </a>
+            <h4 class="recommended-book-title">${truncate(book.title, 10)}</h4>
+            <p class="recommended-book-author">${book.author}</p>
+            <p class="recommended-book-description">${truncate(book.description, 50)}</p>
         `;
         gridContainer.appendChild(bookItem);
     });
@@ -344,16 +323,16 @@ function init() {
 
             // 점수 계산 (4척도 기준)
             // 1: 왼쪽 완전 선호 (100 / 0)
-            // 2: 왼쪽 약간 선호 (67 / 33)
-            // 3: 오른쪽 약간 선호 (33 / 67)
+            // 2: 왼쪽 약간 선호 (66.7 / 33.3)
+            // 3: 오른쪽 약간 선호 (33.3 / 66.7)
             // 4: 오른쪽 완전 선호 (0 / 100)
             const value = parseInt(selected.dataset.score);
             const leftCode = container.dataset.leftCode;
             const rightCode = container.dataset.rightCode;
-            const rightRatio = Math.round((value - 1) * 33.3);
+            const ratio = SCALE_MAP[value - 1];
 
-            answers[leftCode] = 100 - rightRatio;
-            answers[rightCode] = rightRatio;
+            answers[leftCode] = ratio.left;
+            answers[rightCode] = ratio.right;
         }
 
         const type = calculateType();
@@ -361,8 +340,6 @@ function init() {
         alert("당신의 독서 성향 점수:\n" + JSON.stringify(answers, null, 2));
         questions.classList.remove("active")
         popupInProgress = false;
-
-        // TODO: 백엔드로 결과 전송
     }
 
     // 스케일(1~4) 선택 시 선택 상태 갱신 및 제출 버튼 상태 업데이트
