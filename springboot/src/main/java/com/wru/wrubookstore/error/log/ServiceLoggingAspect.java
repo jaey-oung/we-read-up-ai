@@ -18,8 +18,8 @@ public class ServiceLoggingAspect {
 
     private static final Logger log = LoggerFactory.getLogger(ServiceLoggingAspect.class);
 
-    // 서비스 진입 로그
-    @Before("execution(* com.wru.wrubookstore.service.*.*(..))")
+    // 서비스, 레포지토리 진입 로그
+    @Before("execution(* com.wru.wrubookstore.service.*.*(..)) || execution(* com.wru.wrubookstore.repository.*.*(..))")
     public void logServiceAccess(JoinPoint joinPoint){
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String[] parameterNames = signature.getParameterNames();
@@ -32,8 +32,8 @@ public class ServiceLoggingAspect {
             if(i < parameterNames.length - 1) sb.append(", ");
         }
 
-        log.info("➡ [서비스 진입] {}.{}() - 인자: {}",
-                joinPoint.getSignature().getDeclaringTypeName(),
+        log.info("➡ [호출 진입] {}.{}() - 인자: {}",
+                joinPoint.getSignature().getDeclaringType().getSimpleName(),
                 joinPoint.getSignature().getName(),
                 sb.toString());
     }

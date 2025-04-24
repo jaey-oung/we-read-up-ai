@@ -57,7 +57,7 @@
 
                     <div class="addtional-info">
                         <p><strong>정가</strong>
-                            <span th:text="${#numbers.formatInteger(bookDetailResponse.bookDto.originalPrice,3,'COMMA')}+'원'" style="margin-left:63px"></span></p>
+                            <span th:text="${#numbers.formatInteger(bookDetailResponse.bookDto.originalPrice,3,'COMMA')}+'원'" style="margin-left:59px"></span></p>
                         <p><strong>판매가</strong>
                             <span th:text="${#numbers.formatInteger(bookDetailResponse.bookDto.salePrice,3,'COMMA')}+'원'" style="font-size:23px; vertical-align: -3px; margin-left:43px"></span>
                             <span th:text="'('+${#numbers.formatInteger(bookDetailResponse.bookDto.discountPercent*100, 0)}+'%, '+${#numbers.formatInteger(bookDetailResponse.bookDto.discountPrice,3,'COMMA')}+'원 할인)'"></span>
