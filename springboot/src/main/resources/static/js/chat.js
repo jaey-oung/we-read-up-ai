@@ -18,7 +18,7 @@ boardBtn.addEventListener('click', function() {
 
 // 챗봇에서 상품 확인하기 버튼 클릭 시 상품 리스트로 이동
 bookListBtn.addEventListener('click', function() {
-    window.location.href = '/bookList?category=cl_1';
+    window.location.href = '/book/bookList?cl_id=cl_0001&cm_id=&cs_id=&path=국내도서';
 });
 
 // 챗봇에서 마이페이지로 이동하기 버튼 클릭 시 마이페이지로 이동
