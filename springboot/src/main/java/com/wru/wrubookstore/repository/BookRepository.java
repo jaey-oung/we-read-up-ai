@@ -1,42 +1,51 @@
 package com.wru.wrubookstore.repository;
 
-import com.wru.wrubookstore.domain.MainSearchCondition;
+import com.wru.wrubookstore.domain.HomeSearchCondition;
 import com.wru.wrubookstore.dto.BookDto;
-import com.wru.wrubookstore.dto.CategoryDto;
-import com.wru.wrubookstore.dto.request.order.OrderBookRequest;
+import com.wru.wrubookstore.dto.CompleteBookDto;
+import com.wru.wrubookstore.dto.RankedBookDto;
+import com.wru.wrubookstore.dto.BookFilterDto;
+import com.wru.wrubookstore.dto.request.category.CategoryRequest;
 import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
-import com.wru.wrubookstore.dto.response.publisher.PublisherListResponse;
-import com.wru.wrubookstore.dto.response.writer.WriterListResponse;
 
 import java.util.List;
 import java.util.Map;
 
 public interface BookRepository {
 
+    // 순위에 오른 도서의 카테고리와 도서 정보 조회
+    RankedBookDto selectRankedBookInfo(Integer bookId) throws Exception;
+
+    // 대분류 카테고리 리스트 조회
+    List<CategoryResponse> selectAllLargeCategories() throws Exception;
+
+    // 중분류 카테고리 리스트 조회
+    List<CategoryResponse> selectAllMediumCategories(String categoryLargeId) throws Exception;
+
+    // 소분류 카테고리 리스트 조회
+    List<CategoryResponse> selectAllSmallCategories(String categoryMediumId) throws Exception;
+
+    // 특정 카테고리에 속한 도서 개수 조회
+    int selectCntByCategoryIds(CategoryRequest category) throws Exception;
+
+    // 특정 카테고리에 속한 도서 리스트 조회
+    List<CompleteBookDto> selectByCategory(BookFilterDto request) throws Exception;
+
+    // 검색 결과 개수 조회
+    int selectCntBySearchCondition(HomeSearchCondition sc) throws Exception;
+
+    // 도서 제목과 저자 이름으로 통합 검색 시 도서 정보 조회
+    List<CompleteBookDto> searchByAll(HomeSearchCondition sc) throws Exception;
+
+    // 도서 제목으로 검색 시 도서 정보 조회
+    List<CompleteBookDto> searchByTitle(HomeSearchCondition sc) throws Exception;
+
+    // 저자 이름으로 검색 시 도서 정보 조회
+    List<CompleteBookDto> searchByWriter(HomeSearchCondition sc) throws Exception;
+
     // 해당 책의 카테고리 정보 모두 조회
     CategoryResponse selectCategoryAll(Integer bookId) throws Exception;
-
-    // 출판사 이름 조회
-    PublisherListResponse selectPublisherName(String publisherId) throws Exception;
-    // 지은이 이름 조회
-    List<WriterListResponse> selectWriterName(Integer bookId) throws Exception;
-    // 카테고리 정보 조회
-    CategoryDto selectCategoryInfo(String category) throws Exception;
-
-    // 카테고리에 속한 책들의 수 조회
-    int selectByCategoryCnt(String category) throws Exception;
-
-    // 카테고리에 속한 책들의 정보 조회
-    List<CategoryDto> selectByCategory(MainSearchCondition sc) throws Exception;
-
-    // 낮은 가격 순
-    // 카테고리에 속한 책들의 정보 조회
-    List<CategoryDto> selectByCategory2(MainSearchCondition sc) throws Exception;
-
-    // 높은 가격 순
-    // 카테고리에 속한 책들의 정보 조회
-    List<CategoryDto> selectByCategory3(MainSearchCondition sc) throws Exception;
 
     // 관리자용
     int countAllByAdmin() throws Exception;
@@ -62,43 +71,4 @@ public interface BookRepository {
 
     // 각 책의 출판사를 조회
     String selectPublisher(Integer bookId) throws Exception;
-
-    //  도서 제목과 저자 이름으로 통합 검색
-    List<BookDto> searchByAll(MainSearchCondition sc) throws Exception;
-
-    // 도서 제목으로 검색
-    List<BookDto> searchByTitle(MainSearchCondition sc) throws Exception;
-
-    // 저자 이름으로 검색
-    List<BookDto> searchByWriter(MainSearchCondition sc) throws Exception;
-
-    // 검색 결과 개수 조회
-    int selectSearchCnt(MainSearchCondition sc) throws Exception;
-
-    CategoryResponse selectCategorySM(Integer bookId) throws Exception;
-
-    CategoryResponse selectCategoryL(CategoryResponse categoryResponse) throws Exception;
-
-    // 낮은 가격 순
-    //  도서 제목과 저자 이름으로 통합 검색
-    List<BookDto> searchByAll2(MainSearchCondition sc) throws Exception;
-
-    // 도서 제목으로 검색
-    List<BookDto> searchByTitle2(MainSearchCondition sc) throws Exception;
-
-    // 저자 이름으로 검색
-    List<BookDto> searchByWriter2(MainSearchCondition sc) throws Exception;
-
-    // 높은 가격 순
-    //  도서 제목과 저자 이름으로 통합 검색
-    List<BookDto> searchByAll3(MainSearchCondition sc) throws Exception;
-
-    // 도서 제목으로 검색
-    List<BookDto> searchByTitle3(MainSearchCondition sc) throws Exception;
-
-    // 저자 이름으로 검색
-    List<BookDto> searchByWriter3(MainSearchCondition sc) throws Exception;
-
-    // 순위에 오른 도서의 카테고리와 도서 정보 조회
-    CategoryDto selectRankedBookInfo(Integer bookId) throws Exception;
 }

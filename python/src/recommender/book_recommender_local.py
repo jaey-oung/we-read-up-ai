@@ -83,10 +83,7 @@ def predict_mbti_batch(texts, model, tokenizer, device, batch_size=16):
     return results
 
 # ===== DB 조회 함수 (도서 제목 → book_id) ===== #
-def normalize_title(title: str) -> str:
-    return re.sub(r'\s+', ' ', title.strip().lower())
-
-def get_book_id_by_title(title):
+def get_book_id_by_isbn(isbn):
     load_dotenv()
     connection = pymysql.connect(
         host=os.getenv("DB_HOST"),
@@ -102,11 +99,10 @@ def get_book_id_by_title(title):
             cursor.execute(sql)
             results = cursor.fetchall()
             for row in results:
-                if normalize_title(row['name']) == normalize_title(title):
-                    return row['book_id']
+                return row['book_id']
     finally:
         connection.close()
-    return None
+        return None
 
 # ===== 경로 및 파일 설정 ===== #
 dest = os.path.join('../../data/cache')
@@ -127,10 +123,10 @@ model.eval()
 print(f"[{current_time()}] 모델 로딩 완료")
 
 # ===== KoBART 요약 모델 ===== #
-print(f"[{current_time()}] 요약 모델 로딩 중...")
-kobart_tokenizer = PreTrainedTokenizerFast.from_pretrained("digit82/kobart-summarization")
-kobart_model = BartForConditionalGeneration.from_pretrained("digit82/kobart-summarization").to(device)
-print(f"[{current_time()}] 요약 모델 로딩 완료")
+# print(f"[{current_time()}] 요약 모델 로딩 중...")
+# kobart_tokenizer = PreTrainedTokenizerFast.from_pretrained("digit82/kobart-summarization")
+# kobart_model = BartForConditionalGeneration.from_pretrained("digit82/kobart-summarization").to(device)
+# print(f"[{current_time()}] 요약 모델 로딩 완료")
 
 # ===== 데이터 로딩 및 정제 ===== #
 if os.path.exists(CACHE_DATA_PATH):
@@ -144,7 +140,10 @@ else:
 
     df['title'] = df['title'].astype(str)
     df['description'] = df['description'].astype(str)
+    df['author'] = df['author'].astype(str)
+
     df = df[~df['description'].str.contains('책 소개 정보')]
+    df = df[df['author'].str.strip() != '']
 
     # 누락된 값이 있는 행 삭제
     df.dropna(axis=0)
@@ -157,8 +156,9 @@ else:
     for _, row in df.iterrows():
         intro = row['description'].strip()
         title = row['title'].strip()
+        isbn = row['isbn']
         if intro:
-            data.append({'title': title, 'paragraph': intro})
+            data.append({'title': title, 'paragraph': intro, 'isbn': isbn})
     df_para = pd.DataFrame(data)
 
     # 중복 제거
@@ -202,23 +202,21 @@ else:
     mbti_results = predict_mbti_batch(df_para['paragraph'].tolist(), model, tokenizer, device)
 
     for i, row in df_para.iterrows():
-        title = row["title"]
+        isbn = row["isbn"]
 
-        # book_id 가져오기 (title 기준으로)
-        book_id = get_book_id_by_title(title)
-
-        if book_id is None:
-            print(f"[WARN] book_id를 찾을 수 없습니다: '{title}'")
+        if isbn is None:
+            print(f"[WARN] book_id를 찾을 수 없습니다: '{isbn}'")
             continue
 
         mbti_tensor = mbti_results[i]
         mbti_score = {k: float(v * 100) for k, v in zip(CACHE_KEYS, mbti_tensor)}
 
         raw_dataset.append({
-            "book_id": book_id,
+            "book_id": row["isbn"],
             "title": row["title"],
             "paragraph": row["paragraph"],
-            "mbti_score": mbti_score
+            "mbti_score": mbti_score,
+            "isbns": isbn
         })
 
     with open(CACHE_EMB_PATH, 'w', encoding='utf-8') as f:

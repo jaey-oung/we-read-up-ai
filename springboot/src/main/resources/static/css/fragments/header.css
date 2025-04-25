@@ -51,11 +51,10 @@ header {
 }
 
  #nav-icon {
-     padding: 10px;
+     padding: 15px;
  }
 
-
-.search-container {
+#search-container {
     display: flex;
     align-items: center;
     background-color: #fff;
@@ -64,9 +63,10 @@ header {
     padding: 0 20px;
     width: 600px;
     overflow: hidden;
+    transform: translateX(-50px);
 }
 
-.search-container select {
+#search-container select {
     border: none;
     background: none;
     font-weight: bold;
@@ -77,7 +77,7 @@ header {
     font-size: 15px;
 }
 
-.search-container input {
+#search-container input {
     flex: 1;
     border: none;
     font-size: 14px;
@@ -85,14 +85,14 @@ header {
     outline: none;
 }
 
-.search-container button {
+#search-container button {
     background: none;
     border: none;
     cursor: pointer;
     padding: 5px;
 }
 
-.search-container button img {
+#search-container button img {
     width: 16px;
     height: 16px;
 }

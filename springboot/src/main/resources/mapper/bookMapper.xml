@@ -3,36 +3,226 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.wru.wrubookstore.mapper.BookMapper">
-    <sql id="sql-selectCategory">
-        (SELECT lm.*, c.category_small_id, c.name category_small_name
-        FROM (
-                 SELECT cl.category_large_id, cl.name category_large_name, cm.category_medium_id, cm.name category_medium_name
-                 FROM category_large cl, category_medium cm
-                 WHERE cl.category_large_id = cm.category_large_id) lm, category_small c
-        WHERE lm.category_medium_id = c.category_medium_id)
-    </sql>
-    <sql id="sql-option-category">
+
+    <!-- 순위에 오른 도서의 카테고리와 도서 정보 조회 -->
+    <select id="selectRankedBookInfo" parameterType="Integer" resultType="RankedBookDto">
+        SELECT b.book_id, b.name, b.image, wwb.writer_names,
+               (SELECT name
+                FROM category_large
+                WHERE category_large_id = b.category_large_id) AS category_large_name,
+               (SELECT name
+                FROM category_medium
+                WHERE category_medium_id = b.category_medium_id) AS category_medium_name
+        FROM
+            (SELECT book_id, name, image, category_large_id, category_medium_id, category_small_id FROM book WHERE book_id = #{book_id}) b
+                CROSS JOIN
+            (SELECT GROUP_CONCAT(name SEPARATOR ', ') as writer_names
+             FROM writer
+             WHERE writer_id IN (SELECT writer_id
+                                 FROM writer_book wb
+                                 WHERE wb.book_id = #{book_id})) wwb
+    </select>
+
+    <!-- 대분류 카테고리 리스트 조회 -->
+    <select id="selectAllLargeCategories" resultType="CategoryResponse">
+        SELECT category_large_id, name AS category_large_name
+        FROM category_large
+        ORDER BY category_large_id ASC
+    </select>
+
+    <!-- 중분류 카테고리 리스트 조회 -->
+    <select id="selectAllMediumCategories" parameterType="String" resultType="CategoryResponse">
+        SELECT category_medium_id, category_large_id, name AS category_medium_name
+        FROM category_medium
+        WHERE category_large_id = #{categoryLargeId}
+        ORDER BY category_medium_id ASC
+    </select>
+
+    <!-- 소분류 카테고리 리스트 조회 -->
+    <select id="selectAllSmallCategories" parameterType="String" resultType="CategoryResponse">
+        SELECT category_small_id, category_medium_id, name AS category_small_name
+        FROM category_small
+        WHERE category_medium_id = #{categoryMediumId}
+        ORDER BY category_small_id ASC
+    </select>
+
+    <!--  특정 카테고리에 속한 도서 개수 조회 -->
+    <select id="selectCntByCategory" parameterType="CategoryRequest" resultType="int">
+        SELECT COUNT(*)
+        FROM book
+        WHERE TRUE AND
         <choose>
-            <when test='category.startsWith("cl")'>
-                AND c.category_large_id = #{category}
+            <when test="categorySmallId != null and categorySmallId != ''">
+                category_small_id = #{categorySmallId}
             </when>
-            <when test='category.startsWith("cm")'>
-                AND c.category_medium_id = #{category}
+            <when test="categoryMediumId != null and categoryMediumId != ''">
+                category_medium_id = #{categoryMediumId}
             </when>
             <otherwise>
-                AND c.category_small_id = #{category}
+                category_large_id = #{categoryLargeId}
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 단일 변수 기준 정렬 조건 -->
+    <sql id="sql-option-sort-flat">
+        <choose>
+            <when test='sort==1'>
+                ORDER BY sale_price ASC
+            </when>
+            <when test='sort==2'>
+                ORDER BY sale_price DESC
+            </when>
+            <otherwise>
+                ORDER BY release_date DESC
             </otherwise>
         </choose>
     </sql>
-    <sql id="sql-part-selectByCategory">
-        FROM book b, <include refid="sql-selectCategory" /> c
-        WHERE b.category_small_id = c.category_small_id
+
+    <!-- 중첩 변수 기준 정렬 조건 -->
+    <sql id="sql-option-sort-nested">
+        <choose>
+            <when test='sc.sort==1'>
+                ORDER BY sale_price ASC
+            </when>
+            <when test='sc.sort==2'>
+                ORDER BY sale_price DESC
+            </when>
+            <otherwise>
+                ORDER BY release_date DESC
+            </otherwise>
+        </choose>
     </sql>
-    <!-- 카테고리 정보 조회 -->
-    <select id="selectCategoryInfo" parameterType="String" resultType="CategoryDto">
-        SELECT *
-        FROM <include refid="sql-selectCategory" /> c
-        WHERE TRUE <include refid="sql-option-category" />
+
+    <!-- 중첩 변수 기준 카테고리 조건 -->
+    <sql id="sql-option-category-nested">
+        <choose>
+            <when test="ctg.categorySmallId != null and ctg.categorySmallId != ''">
+                category_small_id = #{ctg.categorySmallId}
+            </when>
+            <when test="ctg.categoryMediumId != null and ctg.categoryMediumId != ''">
+                category_medium_id = #{ctg.categoryMediumId}
+            </when>
+            <otherwise>
+                category_large_id = #{ctg.categoryLargeId}
+            </otherwise>
+        </choose>
+    </sql>
+
+    <!-- CompleteBookDto에서 중첩 객체 BookDto 필드 매핑 -->
+    <resultMap id="completeBookMap" type="CompleteBookDto">
+        <id column="book_id" property="book.bookId"/>
+        <result column="publisher_id" property="book.publisherId"/>
+        <result column="category_large_id" property="book.categoryLargeId"/>
+        <result column="category_medium_id" property="book.categoryMediumId"/>
+        <result column="category_small_id" property="book.categorySmallId"/>
+        <result column="name" property="book.name"/>
+        <result column="translator" property="book.translator"/>
+        <result column="original_price" property="book.originalPrice"/>
+        <result column="discount_percent" property="book.discountPercent"/>
+        <result column="discount_price" property="book.discountPrice"/>
+        <result column="sale_price" property="book.salePrice"/>
+        <result column="release_date" property="book.releaseDate"/>
+        <result column="reg_date" property="book.regDate"/>
+        <result column="table_of_content" property="book.tableOfContent"/>
+        <result column="description" property="book.description"/>
+        <result column="isbn" property="book.isbn"/>
+        <result column="stock_quantity" property="book.stockQuantity"/>
+        <result column="size" property="book.size"/>
+        <result column="weight" property="book.weight"/>
+        <result column="page" property="book.page"/>
+        <result column="image" property="book.image"/>
+
+        <result column="publisher_name" property="publisherName"/>
+        <result column="writer_names" property="writerNames"/>
+    </resultMap>
+
+    <!-- 특정 카테고리에 속한 도서 리스트 조회 -->
+    <select id="selectByCategory" parameterType="BookFilterDto" resultMap="completeBookMap">
+        SELECT b.*, p.name AS publisher_name, GROUP_CONCAT(w.name SEPARATOR ', ') AS writer_names
+        FROM (SELECT * FROM book WHERE <include refid="sql-option-category-nested" />) b, publisher p, writer w, writer_book wb
+        WHERE b.publisher_id = p.publisher_id AND b.book_id = wb.book_id AND w.writer_id = wb.writer_id
+        GROUP BY b.book_id
+        <include refid="sql-option-sort-nested" />
+        LIMIT #{sc.offset}, #{sc.limit}
+    </select>
+
+    <!-- 도서 이름 기준으로 book_id 조회 -->
+    <sql id="sql-part-search-by-book-name">
+        (SELECT book_id
+         FROM book
+         WHERE name LIKE CONCAT('%', #{keyword}, '%'))
+    </sql>
+
+    <!-- 저자 이름 기준으로 book_id 조회 -->
+    <sql id="sql-part-search-by-writer-name">
+        (SELECT book_id
+         FROM writer_book wb
+         WHERE EXISTS (
+             SELECT 1
+             FROM writer w
+             WHERE w.writer_id = wb.writer_id AND w.name LIKE CONCAT('%', #{keyword}, '%')))
+    </sql>
+
+    <!-- 검색 결과 개수 조회 -->
+    <select id="selectSearchCnt" parameterType="HomeSearchCondition" resultType="int">
+        SELECT COUNT(book_id)
+        <choose>
+            <when test='option=="title"'>
+                FROM <include refid="sql-part-search-by-book-name" /> book_by_name
+            </when>
+            <when test='option=="writer"'>
+                FROM <include refid="sql-part-search-by-writer-name" /> book_wrt
+            </when>
+            <otherwise>
+                FROM (
+                SELECT book_id
+                FROM (<include refid="sql-part-search-by-book-name"/>
+                UNION ALL
+                <include refid="sql-part-search-by-writer-name"/>) united
+                GROUP BY book_id) filtered;
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 도서 제목과 저자 이름으로 통합 검색 시 도서 정보 조회 -->
+    <select id="searchByAll" parameterType="HomeSearchCondition" resultMap="completeBookMap">
+        SELECT b.*, p.name AS publisher_name, GROUP_CONCAT(outer_w.name SEPARATOR ', ') AS writer_names
+        FROM book b, publisher p, writer outer_w, writer_book outer_wb
+        WHERE b.book_id IN (
+        SELECT book_id
+        FROM
+        (<include refid="sql-part-search-by-book-name"/>
+        UNION ALL
+        <include refid="sql-part-search-by-writer-name" />) united
+        ) AND b.publisher_id = p.publisher_id AND b.book_id = outer_wb.book_id AND outer_w.writer_id = outer_wb.writer_id
+        GROUP BY b.book_id
+        <include refid="sql-option-sort-flat" />
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 도서 제목으로 검색 시 도서 정보 조회 -->
+    <select id="searchByTitle" parameterType="HomeSearchCondition" resultMap="completeBookMap">
+        SELECT b.*, p.name AS publisher_name, GROUP_CONCAT(w.name SEPARATOR ', ') AS writer_names
+        FROM (SELECT * FROM book WHERE name LIKE CONCAT('%', #{keyword} '%')) b, publisher p, writer w, writer_book wb
+        WHERE b.publisher_id = p.publisher_id AND b.book_id = wb.book_id AND w.writer_id = wb.writer_id
+        GROUP BY b.book_id
+        <include refid="sql-option-sort-flat" />
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 저자 이름으로 검색 시 도서 정보 조회 -->
+    <select id="searchByWriter" parameterType="HomeSearchCondition" resultMap="completeBookMap">
+        SELECT b.*, p.name AS publisher_name, GROUP_CONCAT(w.name SEPARATOR ', ') AS writer_names
+        FROM book b, publisher p, writer w, writer_book wb
+        WHERE b.book_id IN (
+        SELECT inner_wb.book_id
+        FROM writer inner_w, writer_book inner_wb
+        WHERE inner_w.writer_id = inner_wb.writer_id AND inner_w.name LIKE CONCAT('%', #{keyword}, '%')
+        ) AND b.publisher_id = p.publisher_id AND b.book_id = wb.book_id AND w.writer_id = wb.writer_id
+        GROUP BY b.book_id
+        <include refid="sql-option-sort-flat" />
+        LIMIT #{offset}, #{limit}
     </select>
 
     <!-- 컬럼 매핑 -->
@@ -44,32 +234,7 @@
         <result property="categorySmallId" column="category_small_id"/>
         <result property="categorySmallName" column="category_small_name"/>
     </resultMap>
-    <!-- 책에 들어있는 출판사 이름 조회 -->
-    <select id="selectPublisherName" parameterType="String" resultType="PublisherListResponse">
-        SELECT *
-        FROM publisher
-        WHERE publisher_id=#{publisherId}
-    </select>
-    <!-- 책에 들어있는 지은이 조회 -->
-    <select id="selectWriterName" parameterType="int" resultType="WriterListResponse">
-        SELECT book_id, name
-        FROM writer w, (SELECT * FROM writer_book WHERE book_id = #{bookId}) AS wb
-        WHERE w.writer_id=wb.writer_id;
-    </select>
-    <!-- 카테고리 대 조회 -->
-    <select id="selectCategoryL" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT name AS category_large_name
-        FROM category_large
-        WHERE category_large_id=#{categoryLargeId}
-    </select>
-    <!-- 카테고리 소,중 조회 -->
-    <select id="selectCategorySM" parameterType="int" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT m.name AS category_medium_name, cs.name AS category_small_name, category_large_id FROM category_medium m,
-               (SELECT name, category_medium_id FROM category_small,
-                       (SELECT category_small_id FROM book WHERE book_id = #{bookId}) AS bs
-                WHERE bs.category_small_id = category_small.category_small_id) AS cs
-        WHERE cs.category_medium_id=m.category_medium_id
-    </select>
+
     <!-- 카테고리 전부 조회 -->
     <select id="selectCategoryAll" parameterType="int" resultType="CategoryResponse" resultMap="categoryResultMap">
         SELECT
@@ -92,72 +257,6 @@
         WHERE b.book_id=#{bookId}
     </select>
 
-    <!-- 카테고리 대 조회 -->
-    <select id="selectCategoryLarge" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT category_large_id, name AS category_large_name
-        FROM category_large
-        ORDER BY category_large_id
-    </select>
-    <!-- 카테고리 중 조회 -->
-    <select id="selectCategoryMedium" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT cl.category_large_id, cm.category_medium_id, cl.name AS category_large_name, cm.name AS category_medium_name
-        FROM category_large cl, category_medium cm
-        WHERE cl.category_large_id = #{categoryLargeId} AND cm.category_large_id = #{categoryLargeId}
-        ORDER BY cm.category_medium_id
-    </select>
-    <!-- 카테고리 소 조회 -->
-    <select id="selectCategorySmall" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
-        SELECT cm.category_medium_id, cm.name AS category_medium_name, cs.category_small_id, cs.name AS category_small_name
-        FROM category_small cs, category_medium cm
-        WHERE cm.category_medium_id = #{categoryMediumId} AND cs.category_medium_id = #{categoryMediumId}
-        ORDER BY category_small_id
-    </select>
-    <!--  카테고리에 속한 책들의 수 조회 -->
-    <select id="selectByCategoryCnt" parameterType="String" resultType="int">
-        SELECT COUNT(*)
-        <include refid="sql-part-selectByCategory" />
-        <include refid="sql-option-category" />
-    </select>
-    <!--  카테고리에 속한 책들의 정보 조회 -->
-    <select id="selectByCategory" parameterType="MainSearchCondition" resultType="CategoryDto">
-        SELECT *
-        <include refid="sql-part-selectByCategory" />
-        <include refid="sql-option-category" />
-        ORDER BY book_id desc
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 가격 낮은 순 -->
-    <!--  카테고리에 속한 책들의 정보 조회 -->
-    <select id="selectByCategory2" parameterType="MainSearchCondition" resultType="CategoryDto">
-        SELECT *
-        <include refid="sql-part-selectByCategory" />
-        <include refid="sql-option-category" />
-        ORDER BY sale_price
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 가격 높은 순 -->
-    <!--  카테고리에 속한 책들의 정보 조회 -->
-    <select id="selectByCategory3" parameterType="MainSearchCondition" resultType="CategoryDto">
-        SELECT *
-        <include refid="sql-part-selectByCategory" />
-        <include refid="sql-option-category" />
-        ORDER BY sale_price desc
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 관리자용: 전체 책 잘라서 가져오기 -->
-    <select id="selectBook" parameterType="map" resultType="BookDto">
-        SELECT *
-        FROM book
-        ORDER BY book_id desc
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 관리자용: 판매중인 책 개수(0인거) 조회 -->
-    <select id="countQuantityZeroByAdmin" resultType="int">
-        SELECT count(*)
-        FROM book
-        WHERE stock_quantity = 0
-    </select>
-
     <!-- 관리자용: 전체 책 개수 조회 -->
     <select id="countAllByAdmin" resultType="int">
         SELECT COUNT(*)
@@ -168,7 +267,7 @@
     <select id="selectAllByAdmin" resultType="BookDto">
         SELECT book_id, publisher_id, category_small_id, name, translator, original_price, discount_percent,
                discount_price, sale_price, release_date, reg_date, table_of_content, description, isbn, stock_quantity,
-            size, weight, page, image
+               size, weight, page, image
         FROM book
     </select>
 
@@ -185,25 +284,51 @@
         WHERE book_id=#{bookId}
     </update>
 
+    <!-- 관리자용: 판매중인 책 개수(0인거) 조회 -->
+    <select id="countQuantityZeroByAdmin" resultType="int">
+        SELECT count(*)
+        FROM book
+        WHERE stock_quantity = 0
+    </select>
+
+    <!-- 관리자용: 전체 책 잘라서 가져오기 -->
+    <select id="selectBook" parameterType="map" resultType="BookDto">
+        SELECT *
+        FROM book
+        ORDER BY book_id desc
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 카테고리 대 조회 -->
+    <select id="selectCategoryLarge" resultType="CategoryResponse" resultMap="categoryResultMap">
+        SELECT category_large_id, name AS category_large_name
+        FROM category_large
+        ORDER BY category_large_id
+    </select>
+
+    <!-- 카테고리 중 조회 -->
+    <select id="selectCategoryMedium" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
+        SELECT cl.category_large_id, cm.category_medium_id, cl.name AS category_large_name, cm.name AS category_medium_name
+        FROM category_large cl, category_medium cm
+        WHERE cl.category_large_id = #{categoryLargeId} AND cm.category_large_id = #{categoryLargeId}
+        ORDER BY cm.category_medium_id
+    </select>
+
+    <!-- 카테고리 소 조회 -->
+    <select id="selectCategorySmall" parameterType="CategoryResponse" resultType="CategoryResponse" resultMap="categoryResultMap">
+        SELECT cm.category_medium_id, cm.name AS category_medium_name, cs.category_small_id, cs.name AS category_small_name
+        FROM category_small cs, category_medium cm
+        WHERE cm.category_medium_id = #{categoryMediumId} AND cs.category_medium_id = #{categoryMediumId}
+        ORDER BY category_small_id
+    </select>
+
      <!--  책 한 권의 정보 조회  -->
     <select id="select" parameterType="int" resultType="BookDto">
         SELECT *
         FROM book
         WHERE book_id=#{bookId}
     </select>
-    <!--  책 하나의 지은이들 조회 (bookId별 지은이) -->
-    <select id="selectWriter" parameterType="int" resultType="String">
-        SELECT w.name
-        FROM writer AS w, (SELECT writer_id FROM writer_book WHERE book_id=#{bookId} ORDER BY book_id desc) AS wb
-        WHERE wb.writer_id = w.writer_id
-        ORDER BY name;
-    </select>
-    <!--  책 하나의 출판사 이름 -->
-    <select id="selectPublisher" parameterType="int" resultType="String">
-        SELECT p.name
-        FROM publisher AS p, (SELECT publisher_id FROM book WHERE book_id=#{bookId}) AS bp
-        WHERE p.publisher_id = bp.publisher_id;
-    </select>
+
     <!-- 테스트용 -->
     <insert id="insert" parameterType="BookDto">
         INSERT INTO book (publisher_id, category_small_id, name, translator, original_price, discount_percent,
@@ -213,117 +338,19 @@
                 #{discountPrice},#{salePrice},#{releaseDate},#{regDate},#{tableOfContent},#{description},#{isbn},
                 #{stockQuantity},#{size},#{weight},#{page},#{image});
     </insert>
-    <sql id="sql-part-searchByTitle">
-        FROM book b
-        WHERE name LIKE concat('%', #{keyword}, '%')
-    </sql>
-    <sql id="sql-part-searchByWriter">
-        FROM
-            (SELECT w.*, wb.book_id
-            FROM
-                (SELECT *
-                FROM writer
-                WHERE name LIKE concat('%', #{keyword}, '%')) w, writer_book wb
-        WHERE w.writer_id = wb.writer_id) wwb, book b
-        WHERE wwb.book_id = b.book_id
-    </sql>
-    <sql id="sql-searchByTitle">
-        (SELECT *
-        <include refid="sql-part-searchByTitle" />)
-    </sql>
-    <sql id="sql-searchByWriter">
-        (SELECT DISTINCT b.*
-        <include refid="sql-part-searchByWriter" />)
-    </sql>
-    <sql id="sql-option-cnt">
-        <choose>
-            <when test='option=="title"'>
-                <include refid="sql-part-searchByTitle" />
-            </when>
-            <when test='option=="writer"'>
-                <include refid="sql-part-searchByWriter" />
-            </when>
-            <otherwise>
-                FROM (
-                <include refid="sql-searchByTitle"/>
-                UNION
-                <include refid="sql-searchByWriter"/>
-                ) b
-            </otherwise>
-        </choose>
-    </sql>
-    <!-- 도서 제목과 저자 이름으로 통합 검색 -->
-    <select id="searchByAll" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByTitle" />
-        UNION
-        <include refid="sql-searchByWriter" />
-        ORDER BY book_id desc
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 도서 제목으로 검색 -->
-    <select id="searchByTitle" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByTitle" />
-        ORDER BY book_id desc
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 저자 이름으로 검색 -->
-    <select id="searchByWriter" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByWriter" />
-        ORDER BY book_id desc
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 가격 낮은 순 조회 -->
-    <!-- 도서 제목과 저자 이름으로 통합 검색 -->
-    <select id="searchByAll2" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByTitle" />
-        UNION
-        <include refid="sql-searchByWriter" />
-        ORDER BY sale_price
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 도서 제목으로 검색 -->
-    <select id="searchByTitle2" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByTitle" />
-        ORDER BY sale_price
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 저자 이름으로 검색 -->
-    <select id="searchByWriter2" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByWriter" />
-        ORDER BY sale_price
-        LIMIT #{offset}, #{limit}
+
+    <!--  책 하나의 지은이들 조회 (bookId별 지은이) -->
+    <select id="selectWriter" parameterType="int" resultType="String">
+        SELECT w.name
+        FROM writer AS w, (SELECT writer_id FROM writer_book WHERE book_id=#{bookId} ORDER BY book_id desc) AS wb
+        WHERE wb.writer_id = w.writer_id
+        ORDER BY name;
     </select>
 
-    <!-- 가격 높은 순 조회 -->
-    <!-- 도서 제목과 저자 이름으로 통합 검색 -->
-    <select id="searchByAll3" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByTitle" />
-        UNION
-        <include refid="sql-searchByWriter" />
-        ORDER BY sale_price DESC
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 도서 제목으로 검색 -->
-    <select id="searchByTitle3" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByTitle" />
-        ORDER BY sale_price DESC
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 저자 이름으로 검색 -->
-    <select id="searchByWriter3" parameterType="MainSearchCondition" resultType="BookDto">
-        <include refid="sql-searchByWriter" />
-        ORDER BY sale_price DESC
-        LIMIT #{offset}, #{limit}
-    </select>
-    <!-- 검색 결과 개수 조회 -->
-    <select id="selectSearchCnt" parameterType="MainSearchCondition" resultType="int">
-        SELECT COUNT(DISTINCT b.book_id)
-        <include refid="sql-option-cnt" />
-    </select>
-    <!-- 순위에 오른 도서의 카테고리와 도서 정보 조회 -->
-    <select id="selectRankedBookInfo" parameterType="Integer" resultType="CategoryDto">
-        SELECT  b.book_id, b.name, b.category_small_id, b.image, c.*
-        <include refid="sql-part-selectByCategory" />
-        AND book_id = #{bookId}
+    <!--  책 하나의 출판사 이름 -->
+    <select id="selectPublisher" parameterType="int" resultType="String">
+        SELECT p.name
+        FROM publisher AS p, (SELECT publisher_id FROM book WHERE book_id=#{bookId}) AS bp
+        WHERE p.publisher_id = bp.publisher_id;
     </select>
 </mapper>

@@ -23,7 +23,7 @@ public interface OrderRepository {
     int selectCntByOsc(Map<String, Object> map) throws Exception;
     // 주문상세조회 -> 주문상품 정보
     List<OrderBookRequest> selectOrderBook(Integer orderId) throws Exception;
-    // 판매 순위별 상위 5권 bookId 조회 (판매량이 같을 경우 bookId가 큰 순서대로)
+    // 판매량 기준 상위 5권 bookId 조회 (판매량이 같을 경우 bookId가 큰 순서대로)
     List<Integer> selectBookIdInSalesRank() throws Exception;
 
     /* insert */

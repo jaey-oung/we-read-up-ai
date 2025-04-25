@@ -10,12 +10,18 @@ import java.util.List;
 @Setter
 @ToString
 public class RankedBookDto {
+    // 책 관련 정보
+    private String bookId;
+    private String name;
+    private String image;
 
-    private CategoryDto bookAndCategory;
-    private List<String> writers;
+    // 카테고리 정보
+    private String categoryLargeName;
+    private String categoryMediumName;
 
-    public RankedBookDto(CategoryDto bookAndCategory, List<String> writers) {
-        this.bookAndCategory = bookAndCategory;
-        this.writers = writers;
-    }
+    // 저자 정보
+    private String writerNames;
+
+    public RankedBookDto() {}
+
 }

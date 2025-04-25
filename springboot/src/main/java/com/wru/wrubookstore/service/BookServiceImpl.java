@@ -1,16 +1,15 @@
 package com.wru.wrubookstore.service;
 
-import com.wru.wrubookstore.domain.MainSearchCondition;
+import com.wru.wrubookstore.domain.HomeSearchCondition;
 import com.wru.wrubookstore.dto.BookDto;
-import com.wru.wrubookstore.dto.CategoryDto;
+import com.wru.wrubookstore.dto.CompleteBookDto;
 import com.wru.wrubookstore.dto.RankedBookDto;
+import com.wru.wrubookstore.dto.BookFilterDto;
+import com.wru.wrubookstore.dto.request.category.CategoryRequest;
 import com.wru.wrubookstore.dto.response.book.BookDetailResponse;
 import com.wru.wrubookstore.dto.response.book.BookListResponse;
 import com.wru.wrubookstore.dto.response.category.CategoryResponse;
-import com.wru.wrubookstore.dto.response.publisher.PublisherListResponse;
-import com.wru.wrubookstore.dto.response.writer.WriterListResponse;
 import com.wru.wrubookstore.error.exception.BookNotFoundException;
-import com.wru.wrubookstore.error.exception.MemberNotFoundException;
 import com.wru.wrubookstore.error.exception.PublisherNotFoundException;
 import com.wru.wrubookstore.error.exception.WriterNotFoundException;
 import com.wru.wrubookstore.repository.BookRepository;
@@ -37,45 +36,77 @@ public class BookServiceImpl implements BookService {
         this.memberService = memberService;
     }
 
+    // 판매량 기준 상위 5권 도서 리스트 반환
+    @Override
+    public List<RankedBookDto> getWeeklyRanking() throws Exception {
+        List<RankedBookDto> rankedBooks = new ArrayList<>();
+        // 판매량 기준 상위 5권 bookId 조회
+        List<Integer> bookIds = orderRepository.selectBookIdInSalesRank();
+        for (int i = 0; i < bookIds.size(); i++) {
+            int bookId = bookIds.get(i);
+            // 도서 정보, 카테고리 경로, 저자 정보 반환
+            rankedBooks.add(bookRepository.selectRankedBookInfo(bookId));
+        }
+        return rankedBooks;
+    }
+
+    // 대분류 카테고리 리스트 조회
+    @Override
+    public List<CategoryResponse> getAllLargeCategories() throws Exception {
+        return bookRepository.selectAllLargeCategories();
+    }
+
+    // 중분류 카테고리 리스트 조회
+    @Override
+    public List<CategoryResponse> getAllMediumCategories(String categoryLargeId) throws Exception {
+        return bookRepository.selectAllMediumCategories(categoryLargeId);
+    }
+
+    // 소분류 카테고리 리스트 조회
+    @Override
+    public List<CategoryResponse> getAllSmallCategories(String categoryMediumId) throws Exception {
+        return bookRepository.selectAllSmallCategories(categoryMediumId);
+    }
+
+    // 특정 카테고리에 속한 도서 개수 조회
+    @Override
+    public int getCntByCategoryIds(CategoryRequest category) throws Exception {
+        return bookRepository.selectCntByCategoryIds(category);
+    }
+
+    // 특정 카테고리에 속한 도서 리스트 조회
+    @Override
+    public List<CompleteBookDto> getAllCompleteBooks(BookFilterDto request) throws Exception {
+        return bookRepository.selectByCategory(request);
+    }
+
+    // 검색 결과 개수 조회
+    @Override
+    public int getCntBySearchCondition(HomeSearchCondition sc) throws Exception {
+        return bookRepository.selectCntBySearchCondition(sc);
+    }
+
+    // 검색 창에서 특정 키워드를 포함하는 도서 리스트 조회
+    @Override
+    public List<CompleteBookDto> getAllCompleteBooks(HomeSearchCondition sc) throws Exception {
+        /* 어떤 검색 옵션을 통한 검색인지 가져오기 */
+        String option = sc.getOption();
+
+        /* 검색 옵션에 따라 도서 리스트 반환 */
+        return switch (option) {
+            case "all" -> bookRepository.searchByAll(sc);
+            case "title" ->  bookRepository.searchByTitle(sc);
+            case "writer" -> bookRepository.searchByWriter(sc);
+            default -> throw new Exception("잘못된 옵션입니다.");
+        };
+    }
+
     // 해당 책의 카테고리 정보 모두 조회
     @Override
     public CategoryResponse selectCategoryAll(Integer bookId) throws Exception{
         return bookRepository.selectCategoryAll(bookId);
     }
 
-    // 카테고리 정보 조회
-    @Override
-    public CategoryDto selectCategoryInfo(String category) throws Exception {
-        return bookRepository.selectCategoryInfo(category);
-    }
-
-    // 카테고리에 속한 책들의 수 조회
-    @Override
-    public int selectByCategoryCnt(String category) throws Exception {
-        return bookRepository.selectByCategoryCnt(category);
-    }
-
-    // 카테고리에 속한 책들의 정보 조회
-    @Override
-    public List<CategoryDto> selectByCategory(MainSearchCondition sc) throws Exception {
-        return bookRepository.selectByCategory(sc);
-    }
-
-    // 낮은 가격 순
-    // 카테고리에 속한 책들의 정보 조회
-    @Override
-    public List<CategoryDto> selectByCategory2(MainSearchCondition sc) throws Exception {
-        return bookRepository.selectByCategory2(sc);
-    }
-
-    // 높은 가격 순
-    // 카테고리에 속한 책들의 정보 조회
-    @Override
-    public List<CategoryDto> selectByCategory3(MainSearchCondition sc) throws Exception {
-        return bookRepository.selectByCategory3(sc);
-    }
-
-    // 책 번호로 한 개 조회
     @Override
     public int countAllByAdmin() throws Exception {
         return bookRepository.countAllByAdmin();
@@ -167,117 +198,4 @@ public class BookServiceImpl implements BookService {
     public int insert(BookDto book) throws Exception{
         return bookRepository.insert(book);
     }
-    // 각 책의 지은이들을 조회
-    @Override
-    public List<String> selectWriter(Integer bookId) throws Exception{
-        return bookRepository.selectWriter(bookId);
-    }
-    // 각 책의 출판사를 조회
-    @Override
-    public String selectPublisher(Integer bookId) throws Exception{
-        return bookRepository.selectPublisher(bookId);
-    }
-
-    //  도서 제목과 저자 이름으로 통합 검색
-    @Override
-    public List<BookDto> searchByAll(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByAll(sc);
-    }
-
-    // 도서 제목으로 검색
-    @Override
-    public List<BookDto> searchByTitle(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByTitle(sc);
-    }
-
-    // 저자 이름으로 검색
-    @Override
-    public List<BookDto> searchByWriter(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByWriter(sc);
-    }
-
-    // 검색 결과 개수 조회
-    @Override
-    public int selectSearchCnt(MainSearchCondition sc) throws Exception {
-        return bookRepository.selectSearchCnt(sc);
-    }
-
-    // 카테고리 소, 중 검색 이름
-    @Override
-    public CategoryResponse selectCategorySM(Integer bookId) throws Exception{
-        return bookRepository.selectCategorySM(bookId);
-    }
-
-    // 카테고리 대 검색 이름
-    @Override
-    public CategoryResponse selectCategoryL(CategoryResponse categoryResponse) throws Exception{
-        return bookRepository.selectCategoryL(categoryResponse);
-    }
-
-    // 지은이 이름 조회
-    @Override
-    public List<WriterListResponse> selectWriterName(Integer bookId) throws Exception{
-        return bookRepository.selectWriterName(bookId);
-    }
-
-    // 출판사 이름 조회
-    @Override
-    public PublisherListResponse selectPublisherName(String publisherId) throws Exception{
-        return bookRepository.selectPublisherName(publisherId);
-    }
-
-
-    // 낮은 가격 순
-
-    //  도서 제목과 저자 이름으로 통합 검색
-    public List<BookDto> searchByAll2(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByAll2(sc);
-    }
-
-    // 도서 제목으로 검색
-    public List<BookDto> searchByTitle2(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByTitle2(sc);
-    }
-
-    // 저자 이름으로 검색
-    public List<BookDto> searchByWriter2(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByWriter2(sc);
-    }
-
-    // 높은 가격 순
-
-    //  도서 제목과 저자 이름으로 통합 검색
-    public List<BookDto> searchByAll3(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByAll3(sc);
-    }
-
-    // 도서 제목으로 검색
-    public List<BookDto> searchByTitle3(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByTitle3(sc);
-    }
-
-    // 저자 이름으로 검색
-    public List<BookDto> searchByWriter3(MainSearchCondition sc) throws Exception {
-        return bookRepository.searchByWriter3(sc);
-    }
-
-    // 판매 순위별 상위 5권 조회
-    @Override
-    public List<RankedBookDto> getWeeklyRanking() throws Exception {
-        List<RankedBookDto> rankedBooks = new ArrayList<>();
-        // 판매 순위별 상위 5권 bookId 조회
-        List<Integer> bookIds = orderRepository.selectBookIdInSalesRank();
-        for (int i = 0; i < bookIds.size(); i++) {
-            // bookId 하나씩 가져오기
-            int bookId = bookIds.get(i);
-            // 책 정보와 카테고리 정보 가져오기
-            CategoryDto bookAndCategoryInfo = bookRepository.selectRankedBookInfo(bookId);
-            // 책 하나당 저자 정보 가져오기
-            List<String> authors = bookRepository.selectWriter(bookId);
-            rankedBooks.add(new RankedBookDto(bookAndCategoryInfo, authors));
-        }
-        // 책의 개별 정보 각각 담아 리스트로 반환
-        return rankedBooks;
-    }
-
 }
