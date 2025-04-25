@@ -18,4 +18,6 @@ class MBTIModel(nn.Module):
     def forward(self, input_ids, attention_mask):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
         cls_embedding = outputs.last_hidden_state[:, 0, :]  # [CLS] 토큰
-        return self.classifier(cls_embedding)
+        raw_output = self.classifier(cls_embedding)
+        normalized_output = (raw_output + 1) / 2 * 100
+        return normalized_output
