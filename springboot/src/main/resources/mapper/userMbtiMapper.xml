@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wru.wrubookstore.mapper.UserMbtiMapper">
+    <!-- 사용자 성향 점수 등록 -->
+    <insert id="insert" parameterType="UserMbtiDto">
+        INSERT INTO user_mbti (user_id, mbti_s, mbti_i, mbti_f, mbti_d, mbti_n, mbti_m, mbti_q, mbti_a)
+        VALUES (#{userId}, #{mbtiS}, #{mbtiI}, #{mbtiF}, #{mbtiD}, #{mbtiN}, #{mbtiM}, #{mbtiQ}, #{mbtiA})
+    </insert>
+
+    <!-- 특정 사용자 성향 점수 조회 -->
+    <select id="selectByUserId" parameterType="int" resultType="UserMbtiDto">
+        SELECT user_mbti_id, user_id, mbti_s, mbti_i, mbti_f, mbti_d, mbti_n, mbti_m, mbti_q, mbti_a, reg_date, mod_date
+        FROM user_mbti
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- 사용자 성향 점수 갱신 -->
+    <update id="update" parameterType="UserMbtiDto">
+        UPDATE user_mbti
+        SET mbti_s = #{mbtiS},
+            mbti_i = #{mbtiI},
+            mbti_f = #{mbtiF},
+            mbti_d = #{mbtiD},
+            mbti_n = #{mbtiN},
+            mbti_m = #{mbtiM},
+            mbti_q = #{mbtiQ},
+            mbti_a = #{mbtiA},
+            mod_date = NOW()
+        WHERE user_id = #{userId}
+    </update>
+</mapper>

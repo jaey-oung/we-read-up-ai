@@ -208,6 +208,10 @@
 </section>
 <div th:replace="~{fragments/chat :: chatbot}"></div>
 <div th:replace="~{fragments/footer :: footer}"></div>
+<script th:inline="javascript">
+    // 로그인 여부
+    const loggedInUserId = [[${session.userId}]];
+</script>
 <!-- Lucide 아이콘 라이브러리 -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <!-- Axios HTTP 클라이언트 라이브러리 -->

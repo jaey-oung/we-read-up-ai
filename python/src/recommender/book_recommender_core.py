@@ -30,3 +30,27 @@ def get_top_book_ids(user_mbti: Dict[str, float], top_k: int = 5) -> List[int]:
 
     scored.sort(key=lambda x: x[0])
     return [book_id for _, book_id in scored[:top_k]]
+
+# 임베딩 캐시 파일(.pt) 로드
+# 전달받은 book_id 목록에 해당하는 도서의 MBTI 점수의 평균 계산
+def get_average_embedding(book_ids: List[int]) -> Dict[str, float]:
+    if not CACHE_EMB_PATH.exists():
+        raise FileNotFoundError(f"캐시 파일이 없습니다: {CACHE_EMB_PATH}")
+
+    with open(CACHE_EMB_PATH, "r", encoding="utf-8") as f:
+        raw_dataset = json.load(f)
+
+    # 필터링된 책 임베딩만 추출
+    embeddings = [item["mbti_score"] for item in raw_dataset if item["book_id"] in book_ids]
+
+    if not embeddings:
+        raise ValueError("해당 book_id에 대한 임베딩 데이터가 없습니다.")
+
+    # 평균 계산
+    keys = embeddings[0].keys()
+    avg_embedding = {
+        key: round(np.mean([embed[key] for embed in embeddings]), 2)
+        for key in keys
+    }
+
+    return avg_embedding
