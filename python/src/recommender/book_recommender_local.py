@@ -95,14 +95,15 @@ def get_book_id_by_isbn(isbn):
     )
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT book_id, name FROM book"
-            cursor.execute(sql)
-            results = cursor.fetchall()
-            for row in results:
-                return row['book_id']
+            sql = "SELECT book_id FROM book WHERE isbn = %s"
+            cursor.execute(sql, (isbn,))
+            result = cursor.fetchone()
+            if result:
+                return result['book_id']
+            else:
+                return None
     finally:
         connection.close()
-        return None
 
 # ===== 경로 및 파일 설정 ===== #
 dest = os.path.join('../../data/cache')
@@ -203,6 +204,7 @@ else:
 
     for i, row in df_para.iterrows():
         isbn = row["isbn"]
+        book_id = get_book_id_by_isbn(isbn)
 
         if isbn is None:
             print(f"[WARN] book_id를 찾을 수 없습니다: '{isbn}'")
@@ -212,11 +214,11 @@ else:
         mbti_score = {k: float(v * 100) for k, v in zip(CACHE_KEYS, mbti_tensor)}
 
         raw_dataset.append({
-            "book_id": row["isbn"],
+            "book_id": book_id,
             "title": row["title"],
             "paragraph": row["paragraph"],
             "mbti_score": mbti_score,
-            "isbns": isbn
+            "isbn": isbn
         })
 
     with open(CACHE_EMB_PATH, 'w', encoding='utf-8') as f:
