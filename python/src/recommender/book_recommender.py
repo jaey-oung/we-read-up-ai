@@ -1,3 +1,7 @@
+# ========================= #
+# JS → Python 통신용 추천 API
+# ========================= #
+
 import pymysql
 import os
 from dotenv import load_dotenv
