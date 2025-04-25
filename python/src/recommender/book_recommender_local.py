@@ -206,6 +206,8 @@ else:
         isbn = row["isbn"]
         book_id = get_book_id_by_isbn(isbn)
 
+        print(f"[{current_time()}] ({i+1}/{len(df_para)}) ISBN '{isbn}'에 대한 book_id 조회 중...")
+
         if isbn is None:
             print(f"[WARN] book_id를 찾을 수 없습니다: '{isbn}'")
             continue
