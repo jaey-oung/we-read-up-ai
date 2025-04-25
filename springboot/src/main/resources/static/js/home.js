@@ -172,16 +172,22 @@ function displayResult(code, info) {
 
 // 성향 유형에 맞는 추천 책 데이터 가져오기
 function loadRecommendedBooks() {
-    axios.post("http://localhost:8000/book/recommend", {
+    const payload = {
         scores: answers
-    })
-        .then((res) => {
+    };
+
+    const apiUrl = loggedInUserId && loggedInUserId !== "null"
+        ? "http://localhost:8080/book/recommend" // Spring 컨트롤러 경로
+        : "http://localhost:8000/book/recommend"; // FastAPI 직접 호출
+
+    axios.post(apiUrl, payload)
+        .then(res => {
             // 추천 결과 저장 및 UI 갱신
             recommendedBooks = res.data;
             // 추천 도서 그리드 렌더링
             initBooksGrid();
         })
-        .catch((err) => {
+        .catch(err => {
             console.error("추천 도서 요청 실패", err);
         });
 }
@@ -337,7 +343,6 @@ function init() {
 
         const type = calculateType();
         showResult(type);
-        alert("당신의 독서 성향 점수:\n" + JSON.stringify(answers, null, 2));
         questions.classList.remove("active")
         popupInProgress = false;
     }
