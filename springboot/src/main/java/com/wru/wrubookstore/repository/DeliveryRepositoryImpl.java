@@ -23,4 +23,9 @@ public class DeliveryRepositoryImpl implements DeliveryRepository {
     public int insert(DeliveryDto deliveryDto) throws Exception {
         return session.insert(namespace + "insert", deliveryDto);
     }
+
+    @Override
+    public int deleteAll() throws Exception {
+        return session.delete(namespace + "deleteAll");
+    }
 }

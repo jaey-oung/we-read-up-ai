@@ -1,33 +1,39 @@
-//package com.wru.wrubookstore.repository;
-//
-//import com.wru.wrubookstore.dto.CouponDto;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//
-//@SpringBootTest
-//class CouponRepositoryImplTest {
-//
-//    @Autowired
-//    CouponRepository couponRepository;
-//
-//    Integer userId = 3;
-//
-//    @Test
-//    public void selectListTest() throws Exception {
-//        List<CouponDto> couponDtoList = couponRepository.selectList(userId);
-//
-//        assertEquals(couponDtoList.size(), 3);
-//    }
-//
-//    @Test
-//    public void selectCountTest() throws Exception {
-//        int couponCount = couponRepository.selectCount(userId);
-//
-//        assertEquals(couponCount, 3);
-//    }
-//}
+package com.wru.wrubookstore.repository;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest
+@Transactional
+class CouponRepositoryImplTest {
+
+    @Autowired
+    private CouponRepository couponRepository;
+
+    Integer memberId = 1;
+    Integer userId = 3;
+
+    @BeforeEach
+    @DisplayName("해당 멤버 쿠폰 삭제")
+    public void beforeEach() throws Exception {
+        int deleteCnt = couponRepository.deleteAll(memberId);
+    }
+
+    @Test
+    @DisplayName("해당 회원의 쿠폰 개수 테스트")
+    public void selectCountTest() throws Exception {
+        /* given */
+
+        /* when */
+        int couponCnt = couponRepository.selectCount(userId);
+
+        /* then */
+        assertEquals(0, couponCnt);
+    }
+}

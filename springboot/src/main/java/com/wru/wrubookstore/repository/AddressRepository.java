@@ -21,4 +21,8 @@ public interface AddressRepository {
     int update(AddressDto addressDto) throws Exception;
     // 해당 회원의 기본 배송지 해제
     int unsetDefaultAddress(Integer memberId) throws Exception;
+
+    /* delete */
+    // 회원 전체 삭제
+    int deleteAll() throws Exception;
 }
