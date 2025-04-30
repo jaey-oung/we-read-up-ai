@@ -11,4 +11,8 @@ public interface DeliveryRepository {
     /* insert */
     // 배송 생성
     int insert(DeliveryDto deliveryDto) throws Exception;
+
+    /* delete */
+    // 배송 전체 삭제
+    int deleteAll() throws Exception;
 }

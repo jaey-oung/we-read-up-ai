@@ -45,4 +45,9 @@ public class AddressRepositoryImpl implements AddressRepository {
     public int unsetDefaultAddress(Integer memberId) throws Exception {
         return session.update(namespace + "unsetDefaultAddress", memberId);
     }
+
+    @Override
+    public int deleteAll() throws Exception {
+        return session.delete(namespace + "deleteAll");
+    }
 }

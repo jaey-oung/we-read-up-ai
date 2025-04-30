@@ -9,4 +9,7 @@ public interface CouponRepository {
     /* select */
     List<CouponDto> selectList(Integer userId) throws Exception;
     int selectCount(Integer userId) throws Exception;
+
+    /* delete*/
+    int deleteAll(Integer memberId) throws Exception;
 }

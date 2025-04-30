@@ -3,6 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.wru.wrubookstore.mapper.AddressMapper">
+    <!-- select -->
     <select id="selectList" parameterType="Integer" resultType="AddressDto">
         SELECT *
         FROM address
@@ -22,11 +23,13 @@
         WHERE a.member_id = m.member_id AND m.user_id = #{userId} AND default_address = true
     </select>
 
-    <insert id="insert" parameterType="AddressDto">
+    <!-- insert -->
+    <insert id="insert" parameterType="AddressDto" useGeneratedKeys="true" keyProperty="addressId">
         INSERT INTO address(member_id, name, recipient, phone_num, zip_code, main_address, detail_address, default_address)
         VALUES(#{memberId}, #{name}, #{recipient}, #{phoneNum}, #{zipCode},#{mainAddress}, #{detailAddress}, #{defaultAddress})
     </insert>
 
+    <!-- update -->
     <update id="update" parameterType="AddressDto">
         UPDATE address
         SET name = #{name}, recipient = #{recipient}, zip_code = #{zipCode}, main_address = #{mainAddress}, detail_address = #{detailAddress}, phone_num = #{phoneNum}, default_address = #{defaultAddress}
@@ -38,4 +41,9 @@
         SET default_address = 0
         WHERE member_id = #{memberId}
     </update>
+
+    <!-- delete-->
+    <delete id="deleteAll">
+        DELETE FROM address
+    </delete>
 </mapper>

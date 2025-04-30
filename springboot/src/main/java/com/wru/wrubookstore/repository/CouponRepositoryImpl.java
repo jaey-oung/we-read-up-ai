@@ -25,4 +25,9 @@ public class CouponRepositoryImpl implements CouponRepository {
     public int selectCount(Integer userId) throws Exception {
         return session.selectOne(namespace + "selectCount", userId);
     }
+
+    @Override
+    public int deleteAll(Integer memberId) throws Exception {
+        return session.delete(namespace + "deleteAll", memberId);
+    }
 }
